@@ -1,5 +1,4 @@
 .body {
-  padding: 0px 30px;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -8,7 +7,7 @@
 }
 
 .firstScreen {
-  height: 100vh;
+  min-height: 100vh;
 }
 .mainPlot {
   width: 50%;
@@ -16,6 +15,7 @@
 .mainPlotHeader {
   display: flex;
   flex-direction: column;
+  padding: 0 30px;
 }
 .mainPlotTitle {
   font-size: 30px;
