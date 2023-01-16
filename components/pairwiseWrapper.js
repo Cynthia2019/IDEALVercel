@@ -1,7 +1,7 @@
 import React, {useRef, useState, useEffect} from "react";
-import Pairwise_d3 from "./Pairwise_d3";
+import Pairwise_d3 from "./pairwise_d3";
 
-const Pairwise_wrapper = ({data, element, setDataPoint, query1, query2, setSelectedData}) => {
+const PairwiseWrapper = ({data, element, setDataPoint, query1, query2, setSelectedData}) => {
     const pairwiseContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
@@ -38,4 +38,4 @@ const Pairwise_wrapper = ({data, element, setDataPoint, query1, query2, setSelec
 
     );
 };
-export default Pairwise_wrapper;
+export default PairwiseWrapper;

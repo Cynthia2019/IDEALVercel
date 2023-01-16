@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import Scatter from "../charts/Scatter";
+import Scatter from "../charts/scatter";
 // import Switch from '@mui/material/Switch';
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";

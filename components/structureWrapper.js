@@ -1,6 +1,6 @@
 import zIndex from "@mui/material/styles/zIndex";
 import React, { useRef, useState, useEffect } from "react";
-import Structure from "../charts/Structure";
+import Structure from "../charts/structure";
 
 const StructureWrapper = ({ data }) => {
   const chartArea = useRef(null);
