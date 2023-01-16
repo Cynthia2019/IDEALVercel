@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import styles from "../styles/Home.module.css";
-// import SaveDataTable from "./saveDataTable";
+import SaveDataTable from "./saveDataTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -30,7 +30,7 @@ const SavePanel = ({ selectedData, setReset }) => {
         </div>
       </div>
       <div className={styles["save-table-wrapper"]}>
-        {/* <SaveDataTable data={selectedData}/> */}
+        <SaveDataTable data={selectedData}/>
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
 import {Row, Col} from "antd";
-import Pairwise_wrapper from "../components/pairwise_wrapper";
+import PairwiseWrapper from "../components/pairwiseWrapper";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -139,7 +139,7 @@ export default function Scatter() {
                                 double-click to reset.
                             </p>
                         </div>
-                        <Pairwise_wrapper
+                        <PairwiseWrapper
                             data={filteredDatasets}
                             setDataPoint={setDataPoint}
                             query1={query1}

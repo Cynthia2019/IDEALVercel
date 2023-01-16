@@ -129,7 +129,7 @@ export default function Scatter() {
     <div>
       <Header />
       <div className={styles.body}>
-        <Row>
+        <Row className={styles.firstScreen}>
           <div className={styles.mainPlot}>
             <div className={styles.mainPlotHeader}>
               <p className={styles.mainPlotTitle}>Material Data Explorer</p>

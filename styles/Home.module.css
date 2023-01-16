@@ -6,6 +6,10 @@
   min-height: 100vh;
   max-width: 100vw;
 }
+
+.firstScreen {
+  height: 100vh;
+}
 .mainPlot {
   width: 50%;
 }
