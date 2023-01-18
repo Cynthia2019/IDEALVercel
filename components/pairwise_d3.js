@@ -107,29 +107,28 @@ class Pairwise_d3 {
             .attr("height", cellHeight);
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 12)
+            .attr("font-size", 14)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
             .data(x)
             .join("text")
-            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding},${i * (cellHeight + padding) + marginTop * 9}) rotate(270)`)
+            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding * 1.5},${i * (cellHeight + padding) + marginTop * 9}) rotate(270)`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .attr("dy", ".71em")
             .text(d => d);
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 12)
+            .attr("font-size", 14)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
             .data(y)
             .join("text")
-            .attr("transform", (d, i) => `translate(${i * (cellHeight)},${cellHeight * 6 + padding * 2 + marginBottom * 2})`)
+            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding) + marginBottom - padding / 2},${cellHeight * 6 + marginBottom + padding * 4})`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
-            .attr("dy", ".71em")
             .text(d => d);
 
     }
