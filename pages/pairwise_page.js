@@ -131,13 +131,13 @@ export default function Scatter() {
                 <Row>
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
-                            <p className={styles.mainPlotTitle}>Material Data Explorer</p>
-                            <p className={styles.mainPlotSub}>
-                                Select properties from the dropdown menus below to graph on the
-                                x and y axes. Hovering over data points provides additional
-                                information. Scroll to zoom, click and drag to pan, and
-                                double-click to reset.
-                            </p>
+                            <p className={styles.mainPlotTitle}>Material Data Explorer (Pairwise)</p>
+                            {/*<p className={styles.mainPlotSub}>*/}
+                            {/*    Select properties from the dropdown menus below to graph on the*/}
+                            {/*    x and y axes. Hovering over data points provides additional*/}
+                            {/*    information. Scroll to zoom, click and drag to pan, and*/}
+                            {/*    double-click to reset.*/}
+                            {/*</p>*/}
                         </div>
                         <PairwiseWrapper
                             data={filteredDatasets}
