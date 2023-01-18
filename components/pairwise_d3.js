@@ -145,8 +145,6 @@ class Pairwise_d3 {
         fillOpacity = 0.7, // opacity of the dots
         colors = d3.schemeCategory10, // array of colors for z
     } = {}, container) {
-        console.log('axis data')
-        console.log(data)
         const X = d3.map(x, x => d3.map(data, typeof x === "function" ? x : d => +d[x]));
         const Y = d3.map(y, y => d3.map(data, typeof y === "function" ? y : d => +d[y]));
         const Z = d3.map(data, z);
@@ -179,10 +177,6 @@ class Pairwise_d3 {
             .each(function (yScale) {
                 d3.select(this).call(yAxis.scale(yScale));
             })
-        // .call(g => g.select(".domain").remove())
-        // .call(g => g.selectAll(".tick line").clone()
-        //     .attr("x2", width - marginLeft - marginRight)
-        //     .attr("stroke-opacity", 0.1));
 
         this.svg
             .append("g")
@@ -192,21 +186,8 @@ class Pairwise_d3 {
             .attr("transform", (d, i) => `translate(${i * (cellWidth + padding)}, ${height - marginBottom - marginTop})`)
             .attr("class", "xAxisGroup")
             .each(function (xScale, columns) {
-                console.log("coliumns" + columns)
                 d3.select(this).call(xAxis.scale(xScale))
-                    // .append("text")
-                    // .text(d => console.log("redered text" + d))
-                    // .attr("x", (d, i) => i * (cellWidth) + cellHeight / 2 - padding / 2 + marginTop / 2)
-                    // .attr("y", (d, i) => 0 + marginBottom)
-                    // .attr("font-size", 12)
-                    // .attr("font-family", "sans-serif")
-                    // .attr("font-weight", "bold")
             })
-        // .call(g => g.select(".domain").remove())
-        // .call(g => g.selectAll(".tick line").clone()
-        //     .attr("y2", -height + marginTop + marginBottom)
-        //     .attr("stroke-opacity", 0.1))
-
     }
 
     update(data, {
@@ -242,8 +223,11 @@ class Pairwise_d3 {
         });
         let finalData = [].concat(...datasets);
 
-        d3.selectAll(".xAxisGroup").remove()
-        d3.selectAll(".yAxisGroup").remove()
+        //clean up before updating visuals
+        d3.selectAll(".xAxisGroup").remove();
+        d3.selectAll(".yAxisGroup").remove();
+        d3.selectAll(".legend").remove();
+        d3.selectAll("circle").remove();
         for (let i = 0; i < 2; i++) {
             d3.selectAll(".group" + i).remove()
         }
@@ -342,18 +326,6 @@ class Pairwise_d3 {
                     .on("mouseleave", mouseleave)
 
             } else {
-                // d3.select(this)
-                //     .append("g")
-                //     .selectAll("g")
-                //     .data((d, i) => yScales[i])
-                //     .join("g")
-                //     .attr("transform", (d, i) => `translate(0, ${i * (cellHeight + padding)})`)
-                //     .call((d, i) => yAxis.scale(i));
-
-                // .call(g => g.select(".domain").remove())
-                // .call(g => g.selectAll(".tick line").clone()
-                //     .attr("x2", width - marginLeft - marginRight)
-                //     .attr("stroke-opacity", 0.1));
 
                 for (let i = 0; i < 2; i++) {
                     let a = columns;
@@ -392,9 +364,6 @@ class Pairwise_d3 {
                     if (datasets[i].length == 0) {
                         d3.selectAll(".group" + i)
                             .remove()
-                        // } else if (dafinalData.length < 260) {
-                        //     console.log("range slider change")
-                        //     console.log(finalData.length) }
                     } else {
                         let histogram = d3.select(this)
                             .append("g")

@@ -38,6 +38,8 @@ export default function Scatter() {
         } = e;
         setSelectedDatasetNames(value);
         let newDatasets = datasets.filter((d) => value.includes(d.name));
+        console.log('filtered');
+        console.log(newDatasets);
         setFilteredDatasets(newDatasets);
     };
 
@@ -50,13 +52,14 @@ export default function Scatter() {
     };
 
     const handleRangeChange = (name, value) => {
-        let filteredDatasets = datasets.map((set, i) => {
+        let filtered_datasets = datasets.map((set, i) => {
             let filtered = set.data.filter(
                 (d) => d[name] >= value[0] && d[name] <= value[1]
             );
             return {name: set.name, data: filtered, color: set.color};
         });
-        setFilteredDatasets(filteredDatasets);
+        filtered_datasets = filtered_datasets.filter(s => selectedDatasetNames.includes(s.name))
+        setFilteredDatasets(filtered_datasets);
     };
 
     const datasetLinks = [
@@ -142,8 +145,6 @@ export default function Scatter() {
                         <PairwiseWrapper
                             data={filteredDatasets}
                             setDataPoint={setDataPoint}
-                            query1={query1}
-                            query2={query2}
                             setSelectedData={setSelectedData}
                         />
                     </div>
