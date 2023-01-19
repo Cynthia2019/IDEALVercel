@@ -60,13 +60,13 @@ const ScatterWrapper = ({
       <div id="main-plot" ref={chartArea}></div>
       <div
         id="main-plot-side-bar"
-        style={{ display: "flex", flexDirection: "column", zIndex: 10 }}
+        style={{ display: "flex", flexDirection: "column", zIndex: 10, marginLeft: 10 }}
       >
-        <div
+        {/* <div
           id="main-plot-legend"
           style={{ display: "flex", flexDirection: "column" }}
           ref={legendArea}
-        ></div>
+        ></div> */}
         <ToggleButtonGroup
           orientation="vertical"
           value={view}

@@ -5,16 +5,18 @@ const circleFocusSize = 7;
 
 const legendSpacing = 4;
 
-const SIZE = 600;
 
 const MARGIN = {
-  TOP: 50,
-  RIGHT: 20,
-  BOTTOM: 50,
-  LEFT: 100,
+  TOP: 0,
+  RIGHT: 50,
+  BOTTOM: 20,
+  LEFT: 50,
 };
-const WIDTH = SIZE - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = SIZE - MARGIN.TOP - MARGIN.BOTTOM;
+
+const SIDE_BAR_SIZE = 100;
+
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 
 function expo(x, f) {
   if (x < 1000 && x > -1000) return x;
@@ -44,6 +46,8 @@ class Scatter {
       .append("svg")
       .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
       .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+      .attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM])
+      .attr("style", "max-width: 100%")
       .append("g")
       .attr("class", "scatter-plot-plot")
       .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
@@ -164,8 +168,6 @@ class Scatter {
     else {
       this.yScale = this.zoomedYScale
     }
-    // this.xScale = this.zoomedXScale ? this.zoomedXScale : xScale;
-    // this.yScale = this.zoomedYScale ? this.zoomedYScale : yScale;
 
     // Add a clipPath: everything out of this area won't be drawn.
     this.svg

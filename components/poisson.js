@@ -32,7 +32,8 @@ export default function poisson({dataPoint}) {
         height: 330
     };
     var config = {
-        modeBarButtonsToRemove: ['zoom2d']
+        modeBarButtonsToRemove: ['zoom2d'],
+        responsive: true
     }    
     var style = {
         marginTop: '-50px'

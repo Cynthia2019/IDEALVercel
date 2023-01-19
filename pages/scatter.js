@@ -37,7 +37,7 @@ export default function Scatter() {
       target: { value },
     } = e;
     setSelectedDatasetNames(value);
-    let newDatasets = datasets.filter((s) => value.includes(s.name));
+    let newDatasets = datasets.filter((s) => value.map(v => JSON.parse(v)).map(v => v.name).includes(s.name));
     setFilteredDatasets(newDatasets);
   };
 
@@ -56,7 +56,7 @@ export default function Scatter() {
       );
       return { name: set.name, data: filtered, color: set.color };
     });
-    filtered_datasets = filtered_datasets.filter(s => selectedDatasetNames.includes(s.name))
+    filtered_datasets = filtered_datasets.filter(s => selectedDatasetNames.map(s => s.name).includes(s.name))
     setFilteredDatasets(filtered_datasets);
   };
 
@@ -119,7 +119,7 @@ export default function Scatter() {
             color: d.color,
           },
         ]);
-        setSelectedDatasetNames((datasets) => [...datasets, d.name]);
+        setSelectedDatasetNames((datasets) => [...datasets, JSON.stringify({name: d.name, color: d.color})]);
         setDataPoint(processedData[0]);
       });
     });
