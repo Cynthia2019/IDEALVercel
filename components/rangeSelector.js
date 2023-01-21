@@ -18,6 +18,7 @@ const RangeSelector = ({ datasets, filteredDatasets, handleChange }) => {
   const handleSliderChange = (name, value) => {
     handleChange(name, value);
   };
+  console.log(data, filtered)
   return (
     <div className={styles["property-range"]}>
       <p className={styles["range-title"]}>Property Range</p>

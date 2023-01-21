@@ -14,7 +14,8 @@ import PairwiseWrapper from "../components/pairwiseWrapper";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Scatter() {
+export default function Scatter({data}) {
+    console.log("pairwise data", data)
     const [datasets, setDatasets] = useState([]);
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});

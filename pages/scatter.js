@@ -3,23 +3,25 @@ import Header from "../components/header";
 import styles from "../styles/Home.module.css";
 import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
-import { csv } from "d3";
+import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
 import DataSelector from "../components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
 import { Row, Col } from "antd";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from './api/aws'
+import { s3BucketList } from '@/util/constants'
+import processData from "../util/processData";
 
-const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
-
-export default function Scatter() {
+export default function Scatter({data}) {
   const [datasets, setDatasets] = useState([]);
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
-  const [selectedData, setSelectedData] = useState([])
-  const [reset, setReset] = useState(false)
+  const [selectedData, setSelectedData] = useState([]);
+  const [reset, setReset] = useState(false);
 
   const [query1, setQuery1] = useState("C11");
   const [query2, setQuery2] = useState("C12");
@@ -37,7 +39,12 @@ export default function Scatter() {
       target: { value },
     } = e;
     setSelectedDatasetNames(value);
-    let newDatasets = datasets.filter((s) => value.map(v => JSON.parse(v)).map(v => v.name).includes(s.name));
+    let newDatasets = datasets.filter((s) =>
+      value
+        .map((v) => JSON.parse(v))
+        .map((v) => v.name)
+        .includes(s.name)
+    );
     setFilteredDatasets(newDatasets);
   };
 
@@ -56,7 +63,11 @@ export default function Scatter() {
       );
       return { name: set.name, data: filtered, color: set.color };
     });
-    filtered_datasets = filtered_datasets.filter(s => selectedDatasetNames.map(s => s.name).includes(s.name))
+    filtered_datasets = filtered_datasets.filter((s) => {
+     let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name) 
+     return names.includes(s.name)
+    }
+    );
     setFilteredDatasets(filtered_datasets);
   };
 
@@ -73,56 +84,72 @@ export default function Scatter() {
     },
   ];
   useEffect(() => {
-    datasetLinks.map((d, i) => {
-      csv(d.src).then((data) => {
-        const processedData = data.map((d) => {
-          let youngs = d.youngs.match(regex).map(parseFloat);
-          let poisson = d.poisson.match(regex).map(parseFloat);
-          let processed = {
-            C11: parseFloat(d.C11),
-            C12: parseFloat(d.C12),
-            C22: parseFloat(d.C22),
-            C16: parseFloat(d.C16),
-            C26: parseFloat(d.C26),
-            C66: parseFloat(d.C66),
-            condition: d.condition,
-            symmetry: d.symmetry,
-            CM0: d.CM0,
-            CM1: d.CM1,
-            CM0_E: d.CM0_E, 
-            CM0_nu: d.CM0_nu, 
-            CM1_E: d.CM1_E, 
-            CM1_nu: d.CM1_nu,            
-            geometry: d.geometry_full,
-            youngs: youngs,
-            poisson: poisson,
-            "Minimal directional Young's modulus [N/m]": Math.min(...youngs),
-            "Maximal directional Young's modulus [N/m]": Math.max(...youngs),
-            "Minimal Poisson's ratio [-]": Math.min(...poisson),
-            "Maximal Poisson's ratio [-]": Math.max(...poisson),
-          };
-          return processed;
+    async function fetchData(info) {
+      const command = new GetObjectCommand({
+        Bucket: info.bucket_name,
+        Key: info.file_name,
+      })
+      
+      await s3Client.send(command).then((res) => {
+        let body = res.Body.transformToByteArray();
+        body.then((stream) => {
+          new Response(stream, { headers: { "Content-Type": "text/csv" } })
+            .text()
+            .then((data) => {
+              const processedData = processData(csvParse(data))
+              setDatasets((datasets) => [
+                ...datasets,
+                {
+                  name: info.name,
+                  data: processedData,
+                  color: info.color,
+                },
+              ]);
+              setFilteredDatasets((datasets) => [
+                ...datasets,
+                {
+                  name: info.name,
+                  data: processedData,
+                  color: info.color,
+                },
+              ]);
+              setSelectedDatasetNames((datasets) => [
+                ...datasets,
+                JSON.stringify({ name: info.name, color: info.color }),
+              ]);
+              setDataPoint(processedData[0]);
+            });
         });
-        setDatasets((datasets) => [
-          ...datasets,
-          {
-            name: d.name,
-            data: processedData,
-            color: d.color,
-          },
-        ]);
-        setFilteredDatasets((datasets) => [
-          ...datasets,
-          {
-            name: d.name,
-            data: processedData,
-            color: d.color,
-          },
-        ]);
-        setSelectedDatasetNames((datasets) => [...datasets, JSON.stringify({name: d.name, color: d.color})]);
-        setDataPoint(processedData[0]);
       });
-    });
+    }
+
+    s3BucketList.map((info, i) => fetchData(info))
+    // datasetLinks.map((d, i) => {
+    //   csv(d.src).then((data) => {
+    //     const processedData = processData(data);
+    //     setDatasets((datasets) => [
+    //       ...datasets,
+    //       {
+    //         name: d.name,
+    //         data: processedData,
+    //         color: d.color,
+    //       },
+    //     ]);
+    //     setFilteredDatasets((datasets) => [
+    //       ...datasets,
+    //       {
+    //         name: d.name,
+    //         data: processedData,
+    //         color: d.color,
+    //       },
+    //     ]);
+    //     setSelectedDatasetNames((datasets) => [
+    //       ...datasets,
+    //       JSON.stringify({ name: d.name, color: d.color }),
+    //     ]);
+    //     setDataPoint(processedData[0]);
+    //   });
+    // });
   }, []);
 
   return (
@@ -134,9 +161,9 @@ export default function Scatter() {
             <div className={styles.mainPlotHeader}>
               <p className={styles.mainPlotTitle}>Material Data Explorer</p>
               <p className={styles.mainPlotSub}>
-                Select properties from the dropdown menus to graph on the
-                x and y axes. Hovering over data points provides additional
-                information. Scroll to zoom, click and drag to pan. 
+                Select properties from the dropdown menus to graph on the x and
+                y axes. Hovering over data points provides additional
+                information. Scroll to zoom, click and drag to pan.
               </p>
             </div>
             <ScatterWrapper
@@ -173,10 +200,10 @@ export default function Scatter() {
         </Row>
         <Row>
           <Col span={16}>
-          <SavePanel selectedData={selectedData} setReset={setReset}/>
+            <SavePanel selectedData={selectedData} setReset={setReset} />
           </Col>
           <Col span={8}>
-            <MaterialInformation dataPoint={dataPoint}/>
+            <MaterialInformation dataPoint={dataPoint} />
           </Col>
         </Row>
       </div>
