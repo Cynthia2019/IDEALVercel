@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  transpilePackages: ['@mui/material'],
-}
+  transpilePackages: ["@mui/material"],
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

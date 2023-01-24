@@ -4,6 +4,7 @@ import SaveDataTable from "./saveDataTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import Box from '@mui/material/Box';
 import { CSVLink } from "react-csv";
 
 
@@ -31,6 +32,9 @@ const SavePanel = ({ selectedData, setReset }) => {
       </div>
       <div className={styles["save-table-wrapper"]}>
         <SaveDataTable data={selectedData}/>
+        <Box component="span" sx={{ p: 2 }}>
+          <h3>Total:&nbsp;{selectedData.length}</h3>
+        </Box>
       </div>
     </div>
   );

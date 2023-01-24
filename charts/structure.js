@@ -16,6 +16,7 @@ class Structure {
       .append("svg")
       .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
       .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+      .attr("viewBox", [0, 0,  WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM])
       .style("z-index", 10)
       .style("margin-top", "30px")
       .append("g")
