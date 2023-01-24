@@ -124,32 +124,6 @@ export default function Scatter({data}) {
     }
 
     s3BucketList.map((info, i) => fetchData(info))
-    // datasetLinks.map((d, i) => {
-    //   csv(d.src).then((data) => {
-    //     const processedData = processData(data);
-    //     setDatasets((datasets) => [
-    //       ...datasets,
-    //       {
-    //         name: d.name,
-    //         data: processedData,
-    //         color: d.color,
-    //       },
-    //     ]);
-    //     setFilteredDatasets((datasets) => [
-    //       ...datasets,
-    //       {
-    //         name: d.name,
-    //         data: processedData,
-    //         color: d.color,
-    //       },
-    //     ]);
-    //     setSelectedDatasetNames((datasets) => [
-    //       ...datasets,
-    //       JSON.stringify({ name: d.name, color: d.color }),
-    //     ]);
-    //     setDataPoint(processedData[0]);
-    //   });
-    // });
   }, []);
 
   return (

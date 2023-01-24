@@ -3,19 +3,22 @@ import Header from "../components/header";
 import styles from "../styles/Home.module.css";
 import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
-import {csv} from "d3";
+import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-import Pairwise_DataSelector from "../components/pairwise_dataSelector";
+// import Pairwise_DataSelector from "../components/pairwise_dataSelector";
+import DataSelector from "@/components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
-import SavePanel from "../components/savePanel";
 import {Row, Col} from "antd";
 import PairwiseWrapper from "../components/pairwiseWrapper";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from './api/aws'
+import { s3BucketList } from '@/util/constants'
+import processData from "../util/processData";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 export default function Scatter({data}) {
-    console.log("pairwise data", data)
     const [datasets, setDatasets] = useState([]);
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
@@ -35,14 +38,17 @@ export default function Scatter({data}) {
 
     const handleSelectedDatasetNameChange = (e) => {
         const {
-            target: {value},
+          target: { value },
         } = e;
         setSelectedDatasetNames(value);
-        let newDatasets = datasets.filter((d) => value.includes(d.name));
-        console.log('filtered');
-        console.log(newDatasets);
+        let newDatasets = datasets.filter((s) =>
+          value
+            .map((v) => JSON.parse(v))
+            .map((v) => v.name)
+            .includes(s.name)
+        );
         setFilteredDatasets(newDatasets);
-    };
+      };
 
     const handleQuery1Change = (e) => {
         setQuery1(e.target.value);
@@ -54,14 +60,18 @@ export default function Scatter({data}) {
 
     const handleRangeChange = (name, value) => {
         let filtered_datasets = datasets.map((set, i) => {
-            let filtered = set.data.filter(
-                (d) => d[name] >= value[0] && d[name] <= value[1]
-            );
-            return {name: set.name, data: filtered, color: set.color};
+          let filtered = set.data.filter(
+            (d) => d[name] >= value[0] && d[name] <= value[1]
+          );
+          return { name: set.name, data: filtered, color: set.color };
         });
-        filtered_datasets = filtered_datasets.filter(s => selectedDatasetNames.includes(s.name))
+        filtered_datasets = filtered_datasets.filter((s) => {
+         let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name) 
+         return names.includes(s.name)
+        }
+        );
         setFilteredDatasets(filtered_datasets);
-    };
+      };
 
     const datasetLinks = [
         {
@@ -122,7 +132,10 @@ export default function Scatter({data}) {
                         color: d.color,
                     },
                 ]);
-                setSelectedDatasetNames((datasets) => [...datasets, d.name]);
+                setSelectedDatasetNames((datasets) => [
+                    ...datasets,
+                    JSON.stringify({ name: d.name, color: d.color }),
+                  ]);
                 setDataPoint(processedData[0]);
             });
         });
@@ -155,7 +168,7 @@ export default function Scatter({data}) {
                         <Poisson dataPoint={dataPoint}/>
                     </div>
                     <div className={styles.selectors}>
-                        <Pairwise_DataSelector
+                        <DataSelector
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                             query1={query1}
