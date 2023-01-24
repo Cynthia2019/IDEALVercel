@@ -5,8 +5,8 @@ import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-// import Pairwise_DataSelector from "../components/pairwise_dataSelector";
-import DataSelector from "@/components/dataSelector";
+import Pairwise_DataSelector from "../components/pairwise_dataSelector";
+// import DataSelector from "@/components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
@@ -168,7 +168,7 @@ export default function Scatter({data}) {
                         <Poisson dataPoint={dataPoint}/>
                     </div>
                     <div className={styles.selectors}>
-                        <DataSelector
+                        <Pairwise_DataSelector
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                             query1={query1}

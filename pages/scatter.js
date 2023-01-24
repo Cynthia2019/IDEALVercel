@@ -96,7 +96,8 @@ export default function Scatter({data}) {
           new Response(stream, { headers: { "Content-Type": "text/csv" } })
             .text()
             .then((data) => {
-              const processedData = processData(csvParse(data))
+              let parsed = csvParse(data)
+              const processedData = processData(parsed.slice(0, 1000))
               setDatasets((datasets) => [
                 ...datasets,
                 {

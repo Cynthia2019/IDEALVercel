@@ -8,7 +8,13 @@ import Select from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 
-const datasetNames = ["free form 2D", "lattice 2D"];
+const datasetNames = [{
+  name: "free form 2D", 
+  color: "#8A8BD0"
+}, {
+  name: "lattice 2D", 
+  color: "#FFB347"
+}];
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -34,29 +40,33 @@ const Pairwise_DataSelector = ({
     <div className={styles["data-selector"]}>
       <div className={styles["content-line"]}>
         <p className={styles["data-title"]}>Data</p>
-        <FormControl sx={{ m: 1}}>
-          <InputLabel htmlFor="dataset-select">
-            Data
-          </InputLabel>
+        <FormControl sx={{ m: 1, maxWidth: '100%' }}>
+          <InputLabel htmlFor="dataset-select">Data</InputLabel>
           <Select
             id="dataset-select"
             labelId="dataset-select-label"
             multiple
             onChange={handleSelectedDatasetNameChange}
             input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-            value={selectedDatasetNames}
+            value={selectedDatasetNames || ""}
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
+                {selected.map((obj) => {
+                  const parsed = JSON.parse(obj)
+                  return (
+                    <Chip key={parsed.name} label={parsed.name} sx={{backgroundColor:parsed.color, color:'white'}} />
+                  )
+                })}
               </Box>
             )}
             MenuProps={MenuProps}
           >
-            {datasetNames.map((name, i) => (
-              <MenuItem value={name} key={`${name}-${i}`}>
-                {name}
+            {datasetNames.map((obj, i) => (
+              <MenuItem value={JSON.stringify({
+                name: obj.name, 
+                color: obj.color
+              })} key={`${obj.name}-${i}`} sx={{backgroundColor: obj.color}}>
+                {obj.name}
               </MenuItem>
             ))}
           </Select>
