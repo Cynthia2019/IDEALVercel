@@ -97,7 +97,7 @@ export default function Scatter({data}) {
             .text()
             .then((data) => {
               let parsed = csvParse(data)
-              const processedData = processData(parsed.slice(0, 1000))
+              const processedData = processData(parsed.slice(0, 5000))
               setDatasets((datasets) => [
                 ...datasets,
                 {
@@ -118,6 +118,7 @@ export default function Scatter({data}) {
                 ...datasets,
                 JSON.stringify({ name: info.name, color: info.color }),
               ]);
+              console.log('data point: ', processedData[0])
               setDataPoint(processedData[0]);
             });
         });

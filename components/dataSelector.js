@@ -9,14 +9,22 @@ import { styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
+import { UploadOutlined } from '@ant-design/icons';
+import { Button, message, Upload } from 'antd';
+import s3Client from '../pages/api/aws'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+// import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
-const datasetNames = [{
-  name: "free form 2D", 
-  color: "#8A8BD0"
-}, {
-  name: "lattice 2D", 
-  color: "#FFB347"
-}];
+const datasetNames = [
+  {
+    name: "free form 2D",
+    color: "#8A8BD0",
+  },
+  {
+    name: "lattice 2D",
+    color: "#FFB347",
+  },
+];
 
 const AxisSelections = [
   "C11",
@@ -75,6 +83,42 @@ const MenuProps = {
   },
 };
 
+const handleUpload = () => {};
+
+const props = {
+  multiple: false, 
+  async customRequest({
+    action,
+    data,
+    file,
+    filename,
+    headers,
+    onError,
+    onProgress,
+    onSuccess,
+    withCredentials
+  }) {
+    const command = new PutObjectCommand({
+      Bucket: 'ideal-dataset-1', 
+      Key: file.name,
+      Body: file,
+      Fields: {
+        acl: 'public-read',
+        'Content-Type': 'text/csv'
+      },
+    })
+    await s3Client.send(command).then((res) => {
+      if(res.$metadata.httpStatusCode == 200) {
+        onSuccess(res, file)
+      }
+      else {
+        onError()
+        console.log('failed')
+      }
+    })
+  }
+}
+
 const DataSelector = ({
   selectedDatasetNames,
   handleSelectedDatasetNameChange,
@@ -85,9 +129,14 @@ const DataSelector = ({
 }) => {
   return (
     <div className={styles["data-selector"]}>
-      <div className={styles["content-line"]}>
+      <div className={styles["data-row"]}>
         <p className={styles["data-title"]}>Data</p>
-        <FormControl sx={{ m: 1, maxWidth: '100%' }}>
+        <Upload {...props} accept='text/csv'>
+          <Button icon={<UploadOutlined />}>Click to Upload</Button>
+        </Upload>
+      </div>
+      <div className={styles["data-content-line"]}>
+        <FormControl sx={{ m: 1, maxWidth: "100%" }}>
           <InputLabel htmlFor="dataset-select">Data</InputLabel>
           <Select
             id="dataset-select"
@@ -99,20 +148,28 @@ const DataSelector = ({
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((obj) => {
-                  const parsed = JSON.parse(obj)
+                  const parsed = JSON.parse(obj);
                   return (
-                    <Chip key={parsed.name} label={parsed.name} sx={{backgroundColor:parsed.color, color:'white'}} />
-                  )
+                    <Chip
+                      key={parsed.name}
+                      label={parsed.name}
+                      sx={{ backgroundColor: parsed.color, color: "white" }}
+                    />
+                  );
                 })}
               </Box>
             )}
             MenuProps={MenuProps}
           >
             {datasetNames.map((obj, i) => (
-              <MenuItem value={JSON.stringify({
-                name: obj.name, 
-                color: obj.color
-              })} key={`${obj.name}-${i}`} sx={{backgroundColor: obj.color}}>
+              <MenuItem
+                value={JSON.stringify({
+                  name: obj.name,
+                  color: obj.color,
+                })}
+                key={`${obj.name}-${i}`}
+                sx={{ backgroundColor: obj.color }}
+              >
                 {obj.name}
               </MenuItem>
             ))}

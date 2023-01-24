@@ -34,7 +34,7 @@ class Structure {
   update(data) {
     this.data = data?.geometry
     let res = []
-    res = this.pixelate(data.geometry);
+    res = this.pixelate(this.data);
     const yScale = d3.scaleLinear().domain([0, 50]).range([HEIGHT, 0]);
 
     const xScale = d3.scaleLinear().domain([0, 50]).range([0, WIDTH]);
