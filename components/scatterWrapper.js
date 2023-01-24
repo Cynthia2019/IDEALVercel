@@ -6,6 +6,8 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import Link from 'next/link';
+
 
 const ScatterWrapper = ({
   data,

@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import Header from "./header";
 
 const padding = 20// separation between adjacent cells, in pixels
 const marginTop = 10 // top margin, in pixels
@@ -100,11 +101,14 @@ class Pairwise_d3 {
             .attr("fill-opacity", fillOpacity)
             .attr("transform", ([i, j]) => `translate(${i * (cellWidth + padding)},${j * (cellHeight + padding)})`);
 
+        //add rect box frames
         this.cell.append("rect")
             .attr("fill", "none")
             .attr("stroke", "currentColor")
             .attr("width", cellWidth)
-            .attr("height", cellHeight);
+            .attr("height", cellHeight)
+            .attr("class", "cell")
+
 
         if (x === y) this.svg.append("g")
             .attr("font-size", 14)
@@ -254,6 +258,7 @@ class Pairwise_d3 {
             setDataPoint(finalData[d]);
         };
 
+
         let mouseleave = function (e, d) {
             d3.select(this)
                 .attr("r", circleSize)
@@ -311,8 +316,48 @@ class Pairwise_d3 {
         const yScales = Y.map(Y => yType(d3.extent(Y), [cellHeight, 0]));
         const zScale = d3.scaleOrdinal(zDomain, colors);
 
+        let mouseover_hist = function (e, d) {
+            console.log("hist");
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 4)
+                .style("fill-opacity", 1);
+        };
+
+        let mouseover_non_hist = function (e, d) {
+            console.log("non-hist")
+            d3.select(this)
+                .style("stroke", "green")
+                .style("stroke-width", 4)
+                .style("fill-opacity", 1);
+        };
+
+        let mousedown_non_hist = function (e, d) {
+            d3.select(container.current).remove()
+            console.log("clicked")
+            console.log(e)
+            console.log(d)
+            window.open(
+                '/scatter'
+                //'_blank' // <- This is what makes it open in a new window.
+            );
+
+        }
+        //
+        // d3.selectAll(".hist")
+        //     .on("mouseover", mouseover_hist)
+        //
+        // d3.selectAll(".non-hist")
+        //     .on("mouseover", mouseover_non_hist)
+
+
         this.cell.each(function ([x, y]) {
             if (x != y) {
+                d3.select(this)
+                    .selectAll(".cell")
+                    .attr("class", "non_hist")
+                    .on("mouseover", mouseover_non_hist)
+                    .on("mousedown", mousedown_non_hist)
 
                 d3.select(this).selectAll("circle")
                     //.data(finalData)
@@ -326,7 +371,10 @@ class Pairwise_d3 {
                     .on("mouseleave", mouseleave)
 
             } else {
-
+                d3.select(this)
+                    .selectAll(".cell")
+                    .attr("class", "hist")
+                    .on("mouseover", mouseover_hist)
                 for (let i = 0; i < 2; i++) {
                     let a = columns;
                     let b = columns;
@@ -377,6 +425,7 @@ class Pairwise_d3 {
                             .attr("width", d => (bins.length == 1) ? 5 : Math.max(0, xScale(d.x1) - xScale(d.x0) - insetLeft - insetRight))
                             .attr("y", (d, i) => yScale(Y1[i]))
                             .attr("height", (d, i) => yScale(0) - yScale(Y1[i]))
+
                         histogram.exit().remove();
                     }
 
