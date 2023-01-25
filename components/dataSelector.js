@@ -13,7 +13,6 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, message, Upload } from 'antd';
 import s3Client from '../pages/api/aws'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
-// import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
 const datasetNames = [
   {
