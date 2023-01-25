@@ -34,13 +34,7 @@ export default function Home() {
     // }, [])
     return (
         <div>
-            <div>
                 <Pairwise />
-                <Link href="/scatter">
-                <button>Scatter</button>
-                </Link>
-
-            </div>
         </div>
     );
 }

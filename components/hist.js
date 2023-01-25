@@ -12,8 +12,8 @@ function expo(x, f) {
     return Number(x).toExponential(f);
 }
 
-class Pairwise_d3 {
-// Copyright 2021 Observable, Inc.
+class Hist {
+// Hist 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
     constructor(data, container, legendContainer) {
@@ -102,36 +102,36 @@ class Pairwise_d3 {
             .attr("transform", ([i, j]) => `translate(${i * (cellWidth + padding)},${j * (cellHeight + padding)})`);
 
         //add rect box frames
-        this.cell.append("rect")
-            .attr("fill", "none")
-            .attr("stroke", "grey")
-            .attr("stroke-width", 2)
-            .attr("width", cellWidth)
-            .attr("height", cellHeight)
-            .attr("class", "cell")
+        // this.cell.append("rect")
+        //     .attr("fill", "none")
+        //     .attr("stroke", "grey")
+        //     .attr("stroke-width", 2)
+        //     .attr("width", cellWidth)
+        //     .attr("height", cellHeight)
+        //     .attr("class", "cell")
 
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 14)
+            .attr("font-size", 20)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
-            .data(x)
+            .data([x[0]])
             .join("text")
-            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding * 1.5},${i * (cellHeight + padding) + marginTop * 9}) rotate(270)`)
+            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding * 1.5},${cellHeight * 2 + padding + marginTop * 9}) rotate(270)`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .attr("dy", ".71em")
             .text(d => d);
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 14)
+            .attr("font-size", 20)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
-            .data(y)
+            .data([x[0]])
             .join("text")
-            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding) + marginBottom - padding / 2},${cellHeight * 6 + marginBottom + padding * 4})`)
+            .attr("transform", (d, i) => `translate(${cellHeight + marginLeft + padding * 4},${cellHeight * 6 + marginBottom + padding * 2})`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .text(d => d);
@@ -162,8 +162,8 @@ class Pairwise_d3 {
         const I = d3.range(Z.length).filter(i => zDomain.has(Z[i]));
 
         // Compute the inner dimensions of the cells.
-        const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding) / X.length;
-        const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding) / Y.length;
+        const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding)
+        const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding)
 
         // Construct scales and axes.
         const xScales = X.map(X => xType(d3.extent(X), [0, cellWidth]));
@@ -172,27 +172,27 @@ class Pairwise_d3 {
         const xAxis = d3.axisBottom().tickFormat((x) => `${expo(x, 0)}`).ticks(3);
         const yAxis = d3.axisLeft().tickFormat((x) => `${expo(x, 0)}`).ticks(3);
 
+        console.log('scales')
+        console.log(yScales)
         this.svg
             .append("g")
             .selectAll("g")
             .data(yScales)
             .join("g")
-            .attr("transform", (d, i) => `translate(0,${i * (cellHeight + padding)})`)
+            .attr("transform", (d, i) => `translate(0,${i * (cellHeight)})`)
             .attr("class", "yAxisGroup")
-            .each(function (yScale) {
-                d3.select(this).call(yAxis.scale(yScale));
-            })
+            .call(yAxis.scale(yScales[0]));
+
 
         this.svg
             .append("g")
             .selectAll(".xAxisGroup")
             .data(xScales)
             .join("g")
-            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding)}, ${height - marginBottom - marginTop})`)
+            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding)}, ${height - marginBottom + marginTop})`)
             .attr("class", "xAxisGroup")
-            .each(function (xScale, columns) {
-                d3.select(this).call(xAxis.scale(xScale))
-            })
+            .call(xAxis.scale(xScales[0]))
+
     }
 
     update(data, {
@@ -241,19 +241,19 @@ class Pairwise_d3 {
         for (let i = 0; i < 2; i++) {
             d3.selectAll(".group" + i).remove()
         }
-        this.renderAxis(finalData,
-            {
-                columns: [
-                    "C11",
-                    "C12",
-                    "C22",
-                    "C16",
-                    "C26",
-                    "C66"
-                ],
-                // z: d => d.species
-                colors: data.color
-            }, container);
+        // this.renderAxis(finalData,
+        //     {
+        //         columns: [
+        //             "C11",
+        //             "C12",
+        //             "C22",
+        //             "C16",
+        //             "C26",
+        //             "C66"
+        //         ],
+        //         // z: d => d.species
+        //         colors: data.color
+        //     }, container);
 
         let tooltip_hist = d3
             .select(container.current)
@@ -446,8 +446,8 @@ class Pairwise_d3 {
         const I = d3.range(Z.length).filter(i => zDomain.has(Z[i]));
 
         // Compute the inner dimensions of the cells.
-        const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding) / X.length;
-        const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding) / Y.length;
+        const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding);
+        const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding);
 
         // Construct scales and axes.
         const xScales = X.map(X => xType(d3.extent(X), [0, cellWidth]));
@@ -464,30 +464,7 @@ class Pairwise_d3 {
 
 
         this.cell.each(function ([x, y]) {
-            if (x != y) {
-                d3.select(this)
-                    .selectAll(".cell")
-                    .attr("class", "non_hist")
-                    .on("mouseover", mouseover_non_hist)
-                    .on("mousedown", mousedown_non_hist)
-                    .on("mouseleave", mouseleave_rec)
-
-                tooltip_circ.html(
-                    "sup"
-                )
-                d3.select(this).selectAll("circle")
-                    //.data(finalData)
-                    .data(I.filter(i => !isNaN(X[x][i]) && !isNaN(Y[y][i])))
-                    .join("circle")
-                    .attr("r", circleSize)
-                    .attr("cx", i => xScales[x](X[x][i]))
-                    .attr("cy", i => yScales[y](Y[y][i]))
-                    .attr("fill", (i) => finalData[i].color)
-                    .on("mouseover", mouseover_circ)
-                    .on("mouseleave", mouseleave_circ)
-                    .on("mousemove", mousemove_circ)
-
-            } else {
+            if (x == 0 && y == 0) {
                 d3.select(this)
                     .selectAll(".cell")
                     .attr("class", "hist")
@@ -562,4 +539,4 @@ class Pairwise_d3 {
 }
 
 
-export default Pairwise_d3;
+export default Hist;
