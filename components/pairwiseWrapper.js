@@ -31,13 +31,13 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
             <div id="main-plot" ref={pairwiseContainer}
                  style={{display: "flex", flexDirection: "column"}}
             ></div>
-            <div
-                id="main-plot-legend"
-                style={{display: "flex", flexDirection: "column"}}
-                ref={legendContainer}
-            >
+            {/*<div*/}
+            {/*    id="main-plot-legend"*/}
+            {/*    style={{display: "flex", flexDirection: "column"}}*/}
+            {/*    ref={legendContainer}*/}
+            {/*>*/}
 
-            </div>
+            {/*</div>*/}
 
         </div>
 

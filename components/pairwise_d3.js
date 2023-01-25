@@ -104,7 +104,8 @@ class Pairwise_d3 {
         //add rect box frames
         this.cell.append("rect")
             .attr("fill", "none")
-            .attr("stroke", "currentColor")
+            .attr("stroke", "grey")
+            .attr("stroke-width", 2)
             .attr("width", cellWidth)
             .attr("height", cellHeight)
             .attr("class", "cell")
@@ -232,6 +233,8 @@ class Pairwise_d3 {
         d3.selectAll(".yAxisGroup").remove();
         d3.selectAll(".legend").remove();
         d3.selectAll("circle").remove();
+        d3.selectAll(".tooltip_circ").remove();
+
         for (let i = 0; i < 2; i++) {
             d3.selectAll(".group" + i).remove()
         }
@@ -249,22 +252,145 @@ class Pairwise_d3 {
                 colors: data.color
             }, container);
 
-        let mouseover = function (e, d) {
+        let tooltip_hist = d3
+            .select(container.current)
+            .append("div")
+            .attr("class", "tooltip_hist")
+            .style("position", "fixed")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("visibility", "hidden")
+
+        let tooltip_circ = d3
+            .select(container.current)
+            .append("div")
+            .attr("class", "tooltip_circ")
+            .style("position", "fixed")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("visibility", "hidden")
+
+        let mouseover_circ = function (e, d) {
             d3.select(this)
                 .attr("r", circleFocusSize)
                 .style("stroke", "black")
                 .style("stroke-width", 2)
                 .style("fill-opacity", 1);
             setDataPoint(finalData[d]);
+            tooltip_circ.style("visibility", "visible").transition().duration(200);
         };
 
 
-        let mouseleave = function (e, d) {
+        let mouseleave_circ = function (e, d) {
+            tooltip_circ.style("visibility", "hidden").transition().duration(200);
             d3.select(this)
                 .attr("r", circleSize)
                 .style("stroke", "none")
                 .style("stroke-width", 2)
                 .style("fill-opacity", 0.8);
+        };
+
+        let mouseleave_rec = function (e, d) {
+            tooltip_hist.style("visibility", "hidden").transition().duration(200);
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 2)
+                .style("fill-opacity", 0.8);
+        };
+
+        let mouseover_hist = function (e, d) {
+            console.log("hist");
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 5)
+                .style("fill-opacity", 1);
+            tooltip_hist.style("visibility", "visible").transition().duration(200);
+
+        };
+
+        let mouseover_non_hist = function (e, d) {
+            console.log("non-hist")
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 5)
+                .style("fill-opacity", 1);
+        };
+
+        let mousedown_non_hist = function (e, d) {
+            d3.select(container.current).remove()
+            console.log("clicked")
+            console.log(e)
+            console.log(d)
+            window.open(
+                '/scatter',
+                '_self' // <- This is what makes it open in a new window.
+            );
+
+        }
+
+        let mousemove_circ = function (e, d) {
+            console.log("move circle: ")
+            console.log(datasets)
+            // console.log("mousemove " + e.pageX / (cellWidth / 2));
+            //console.log("mousemove" + (Math.floor(d / datasets[0].length)))
+            //console.log("mousemove " + e.pageX);
+            //console.log("mousemove " + e.pageY)
+            // console.log("mousemove " + cellWidth)
+            // console.log("mousemove " + cellHeight);
+            tooltip_circ
+                .html(
+                    "Dataset: " +
+                    dataset_dic[(Math.floor(d / datasets[0].length))] +
+                    "<br>symmetry: " +
+                    finalData[d]["symmetry"]
+                    // "<br>Material_0: " +
+                    // finalData[d].CM0 +
+                    // "<br>Material_1: "
+                    // d.CM1 +
+                    // `<br>${query1}: ` +
+                    // d[query1] +
+                    // `<br>${query2}: ` +
+                    // d[query2]
+                )
+                .style("top", e.pageY - 85 + "px")
+                .style("left", e.pageX - 165 + "px");
+        };
+
+        let mousemove_hist = function (e, d) {
+            let column = columns[parseInt(d)]
+            let temp_arr = [...finalData.map(data => data[column])]
+            tooltip_hist
+                .html(
+                    "Column: " +
+                    column  +
+                    "<br>Range: " +
+                    (d3.min(temp_arr) > 0 ? d3.min(temp_arr) : 0) +
+                    " to " +
+                    (d3.max(temp_arr) > 0 ? d3.max(temp_arr) : 0) +
+                    "<br>Mean: " +
+                    d3.mean(temp_arr) +
+                    "<br>Median: " +
+                    d3.median(temp_arr)
+
+                    // "<br>symmetry: " +
+                    // finalData[d]["symmetry"]
+                    // "<br>Material_0: " +
+                    // finalData[d].CM0 +
+                    // "<br>Material_1: "
+                    // d.CM1 +
+                    // `<br>${query1}: ` +
+                    // d[query1] +
+                    // `<br>${query2}: ` +
+                    // d[query2]
+                )
+                .style("top", e.pageY - 110 + "px")
+                .style("left", e.pageX + 10 + "px");
         };
 
         d3.select(legendContainer).selectAll(".legend").remove();
@@ -316,33 +442,7 @@ class Pairwise_d3 {
         const yScales = Y.map(Y => yType(d3.extent(Y), [cellHeight, 0]));
         const zScale = d3.scaleOrdinal(zDomain, colors);
 
-        let mouseover_hist = function (e, d) {
-            console.log("hist");
-            d3.select(this)
-                .style("stroke", "black")
-                .style("stroke-width", 4)
-                .style("fill-opacity", 1);
-        };
 
-        let mouseover_non_hist = function (e, d) {
-            console.log("non-hist")
-            d3.select(this)
-                .style("stroke", "green")
-                .style("stroke-width", 4)
-                .style("fill-opacity", 1);
-        };
-
-        let mousedown_non_hist = function (e, d) {
-            d3.select(container.current).remove()
-            console.log("clicked")
-            console.log(e)
-            console.log(d)
-            window.open(
-                '/scatter'
-                //'_blank' // <- This is what makes it open in a new window.
-            );
-
-        }
         //
         // d3.selectAll(".hist")
         //     .on("mouseover", mouseover_hist)
@@ -358,7 +458,11 @@ class Pairwise_d3 {
                     .attr("class", "non_hist")
                     .on("mouseover", mouseover_non_hist)
                     .on("mousedown", mousedown_non_hist)
+                    .on("mouseleave", mouseleave_rec)
 
+                tooltip_circ.html(
+                    "sup"
+                )
                 d3.select(this).selectAll("circle")
                     //.data(finalData)
                     .data(I.filter(i => !isNaN(X[x][i]) && !isNaN(Y[y][i])))
@@ -367,14 +471,17 @@ class Pairwise_d3 {
                     .attr("cx", i => xScales[x](X[x][i]))
                     .attr("cy", i => yScales[y](Y[y][i]))
                     .attr("fill", (i) => finalData[i].color)
-                    .on("mouseover", mouseover)
-                    .on("mouseleave", mouseleave)
+                    .on("mouseover", mouseover_circ)
+                    .on("mouseleave", mouseleave_circ)
+                    .on("mousemove", mousemove_circ)
 
             } else {
                 d3.select(this)
                     .selectAll(".cell")
                     .attr("class", "hist")
                     .on("mouseover", mouseover_hist)
+                    .on("mouseleave", mouseleave_rec)
+                    .on("mousemove", mousemove_hist)
                 for (let i = 0; i < 2; i++) {
                     let a = columns;
                     let b = columns;
