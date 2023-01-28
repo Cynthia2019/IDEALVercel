@@ -101,14 +101,16 @@ class Pairwise_d3 {
             .attr("fill-opacity", fillOpacity)
             .attr("transform", ([i, j]) => `translate(${i * (cellWidth + padding)},${j * (cellHeight + padding)})`);
 
+
         //add rect box frames
         this.cell.append("rect")
-            .attr("fill", "none")
+            .attr("fill", "white")
             .attr("stroke", "grey")
             .attr("stroke-width", 2)
             .attr("width", cellWidth)
             .attr("height", cellHeight)
-            .attr("class", "cell")
+            .attr("class", "cell");
+
 
 
         if (x === y) this.svg.append("g")
@@ -227,10 +229,7 @@ class Pairwise_d3 {
             dataset_dic[i] = d.name;
         });
         let finalData = [].concat(...datasets);
-        console.log("datasets")
-        console.log(datasets)
-        console.log("final")
-        console.log(finalData)
+
         //clean up before updating visuals
         d3.selectAll(".xAxisGroup").remove();
         d3.selectAll(".yAxisGroup").remove();
@@ -302,6 +301,7 @@ class Pairwise_d3 {
         let mouseleave_rec = function (e, d) {
             tooltip_hist.style("visibility", "hidden").transition().duration(200);
             d3.select(this)
+                .style("fill", "white")
                 .style("stroke", "grey")
                 .style("stroke-width", 2)
                 .style("fill-opacity", 0.8);
@@ -319,9 +319,11 @@ class Pairwise_d3 {
 
         let mouseover_non_hist = function (e, d) {
             console.log("non-hist")
+            console.log(this)
             d3.select(this)
+                // .style("fill", "#EAEAEA")
                 .style("stroke", "black")
-                .style("stroke-width", 5)
+                .style("stroke-width", 4)
                 .style("fill-opacity", 1);
         };
 
@@ -347,14 +349,6 @@ class Pairwise_d3 {
         }
 
         let mousemove_circ = function (e, d) {
-            console.log("move circle: ")
-            console.log(datasets)
-            // console.log("mousemove " + e.pageX / (cellWidth / 2));
-            //console.log("mousemove" + (Math.floor(d / datasets[0].length)))
-            //console.log("mousemove " + e.pageX);
-            //console.log("mousemove " + e.pageY)
-            // console.log("mousemove " + cellWidth)
-            // console.log("mousemove " + cellHeight);
             tooltip_circ
                 .html(
                     "Dataset: " +
@@ -465,16 +459,15 @@ class Pairwise_d3 {
 
         this.cell.each(function ([x, y]) {
             if (x != y) {
+                console.log("cell")
+                console.log(this)
                 d3.select(this)
-                    .selectAll(".cell")
+                    .select(".cell")
                     .attr("class", "non_hist")
                     .on("mouseover", mouseover_non_hist)
                     .on("mousedown", mousedown_non_hist)
-                    .on("mouseleave", mouseleave_rec)
+                    .on("mouseout", mouseleave_rec)
 
-                tooltip_circ.html(
-                    "sup"
-                )
                 d3.select(this).selectAll("circle")
                     //.data(finalData)
                     .data(I.filter(i => !isNaN(X[x][i]) && !isNaN(Y[y][i])))
@@ -495,6 +488,7 @@ class Pairwise_d3 {
                     .on("mouseleave", mouseleave_rec)
                     .on("mousemove", mousemove_hist)
                     .on("mousedown", mousedown_hist)
+
                 for (let i = 0; i < 2; i++) {
                     let a = columns;
                     let b = columns;
