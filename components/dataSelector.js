@@ -13,6 +13,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, message, Upload } from 'antd';
 import s3Client from '../pages/api/aws'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
+import processData from "@/util/processData";
+import Papa, { parse } from 'papaparse'
+import { colorAssignment, requiredColumns } from "@/util/constants";
 
 const datasetNames = [
   {
@@ -82,43 +85,12 @@ const MenuProps = {
   },
 };
 
-const handleUpload = () => {};
 
-const props = {
-  multiple: false, 
-  async customRequest({
-    action,
-    data,
-    file,
-    filename,
-    headers,
-    onError,
-    onProgress,
-    onSuccess,
-    withCredentials
-  }) {
-    const command = new PutObjectCommand({
-      Bucket: 'ideal-dataset-1', 
-      Key: file.name,
-      Body: file,
-      Fields: {
-        acl: 'public-read',
-        'Content-Type': 'text/csv'
-      },
-    })
-    await s3Client.send(command).then((res) => {
-      if(res.$metadata.httpStatusCode == 200) {
-        onSuccess(res, file)
-      }
-      else {
-        onError()
-        console.log('failed')
-      }
-    })
-  }
-}
 
 const DataSelector = ({
+  setDatasets, 
+  availableDatasetNames,
+  setAvailableDatasetNames,
   selectedDatasetNames,
   handleSelectedDatasetNameChange,
   query1,
@@ -126,6 +98,80 @@ const DataSelector = ({
   query2,
   handleQuery2Change,
 }) => {
+
+  const props = {
+    multiple: false, 
+    async customRequest({
+      action,
+      data,
+      file,
+      filename,
+      headers,
+      onError,
+      onProgress,
+      onSuccess,
+      withCredentials
+    }) {
+      //TODO: examine the columns of data first; if format unmatch, then trigger onError
+      // also need to check the file size. 
+      // cannot be more than 100 MB
+      // file size check 
+      // Papa.parse(file, {
+      //   header: true,
+      //   skipEmptyLines: true,
+      //   chunkSize: 1048576,
+      //   error: (res, file) => {
+      //     alert("Could not upload file larger than 1MB")
+      //     onError()
+      //   },
+      //   complete: (res, file) => {
+      //     columns = res.data[0].keys()
+      //     for (const col in requiredColumns) {
+      //       if(!columns.includes(col)) {
+      //         alert("Incorrect Column Names")
+      //         onError()
+      //       }
+      //     }
+      //   }
+      // })
+
+      const command = new PutObjectCommand({
+        Bucket: 'ideal-dataset-1', 
+        Key: file.name,
+        Body: file,
+        Fields: {
+          acl: 'public-read',
+          'Content-Type': 'text/csv'
+        },
+      })
+      await s3Client.send(command).then((res) => {
+        if(res.$metadata.httpStatusCode == 200) {
+          onSuccess(res, file)
+          //if success, process the file data, then add the dataset to the dataset state. 
+          Papa.parse(file, {
+            header:true, 
+            skipEmptyLines: true, 
+            complete: (res) => {
+              setDatasets(prevState => [...prevState, {
+                name: file.name, 
+                data: processData(res.data), 
+                color: colorAssignment[prevState.length]
+              }])
+              setAvailableDatasetNames(prevState => [...prevState, {
+                name: file.name, 
+                color: colorAssignment[prevState.length]
+              }])
+            }
+          })
+        }
+        else {
+          onError()
+          console.log('failed')
+        }
+      })
+    }
+  }
+
   return (
     <div className={styles["data-selector"]}>
       <div className={styles["data-row"]}>
@@ -160,7 +206,7 @@ const DataSelector = ({
             )}
             MenuProps={MenuProps}
           >
-            {datasetNames.map((obj, i) => (
+            {availableDatasetNames.map((obj, i) => (
               <MenuItem
                 value={JSON.stringify({
                   name: obj.name,

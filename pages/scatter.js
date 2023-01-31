@@ -10,15 +10,16 @@ import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
 import { Row, Col } from "antd";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
-import { s3BucketList } from '@/util/constants'
+import { s3BucketList, colorAssignment } from '@/util/constants'
 import processData from "../util/processData";
 import { useRouter } from 'next/router';
 
 
-export default function Scatter({data}) {
+export default function Scatter({fetchedNames}) {
   const [datasets, setDatasets] = useState([]);
+  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -77,23 +78,11 @@ export default function Scatter({data}) {
     setFilteredDatasets(filtered_datasets);
   };
 
-  const datasetLinks = [
-    {
-      name: "free form 2D",
-      src: "https://gist.githubusercontent.com/Cynthia2019/837a01c52c4c17d7b31dbd8ad3045878/raw/703d9fcdefcf28a084709ad6a98f403303aba5bd/ideal_freeform_2d_sample.csv",
-      color: "#8A8BD0",
-    },
-    {
-      name: "lattice 2D",
-      src: "https://gist.githubusercontent.com/Cynthia2019/d840d03813d9b0fc13956430b8c42886/raw/6c82615e1bcce639938a008cc4af212f771627da/ideal_lattice_2d.csv",
-      color: "#FFB347",
-    },
-  ];
   useEffect(() => {
     async function fetchData(info) {
       const command = new GetObjectCommand({
         Bucket: info.bucket_name,
-        Key: info.file_name,
+        Key: info.name,
       })
       
       await s3Client.send(command).then((res) => {
@@ -124,14 +113,13 @@ export default function Scatter({data}) {
                 ...datasets,
                 JSON.stringify({ name: info.name, color: info.color }),
               ]);
-              console.log('data point: ', processedData[0])
               setDataPoint(processedData[0]);
             });
         });
       });
     }
 
-    s3BucketList.map((info, i) => fetchData(info))
+    availableDatasetNames.map((info, i) => fetchData(info))
   }, []);
 
   return (
@@ -166,6 +154,9 @@ export default function Scatter({data}) {
           </div>
           <div className={styles.selectors}>
             <DataSelector
+              setDatasets={setDatasets}
+              availableDatasetNames={availableDatasetNames}
+              setAvailableDatasetNames={setAvailableDatasetNames}
               selectedDatasetNames={selectedDatasetNames}
               handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
               query1={query1}
@@ -192,3 +183,26 @@ export default function Scatter({data}) {
     </div>
   );
 }
+
+export async function getStaticProps() {
+  let fetchedNames = []
+  const listObjectCommand = new ListObjectsCommand({
+    Bucket: 'ideal-dataset-1'
+  })
+  await s3Client.send(listObjectCommand).then((res) => {
+    const names = res.Contents.map(content => content.Key)
+    for (let i = 0; i < names.length; i++) {
+      fetchedNames.push({
+        bucket_name: 'ideal-dataset-1',
+        name: names[i], 
+        color: colorAssignment[i]
+      })
+    }
+  })
+  return {
+    props: {
+      fetchedNames: fetchedNames
+    }
+  }
+}
+
