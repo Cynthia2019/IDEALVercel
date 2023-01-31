@@ -1,14 +1,19 @@
 import React, {useRef, useState, useEffect} from "react";
 import Pairwise_d3 from "./pairwise_d3";
+import {useRouter} from "next/router";
 
 const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
     const pairwiseContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
+    const router = useRouter();
+
 
     useEffect(() => {
         if (!chart) {
-            setChart(new Pairwise_d3(data, pairwiseContainer, legendContainer.current));
+            setChart(new Pairwise_d3(data,
+                                    pairwiseContainer,
+                                    legendContainer.current));
         } else {
             chart.update(data, {
                     columns: [
@@ -21,7 +26,8 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
                     ]
                 }, pairwiseContainer,
                 legendContainer.current,
-                setDataPoint);
+                setDataPoint,
+                router);
 
         }
     }, [data]);

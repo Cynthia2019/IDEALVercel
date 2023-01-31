@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import Header from "./header";
 
 const padding = 20// separation between adjacent cells, in pixels
 const marginTop = 10 // top margin, in pixels
@@ -11,6 +10,7 @@ function expo(x, f) {
     if (x < 1000 && x > -1000) return x;
     return Number(x).toExponential(f);
 }
+
 
 class Pairwise_d3 {
 // Copyright 2021 Observable, Inc.
@@ -210,7 +210,8 @@ class Pairwise_d3 {
                colors = {}, // array of colors for z
            } = {}, container,
            legendContainer,
-           setDataPoint) {
+           setDataPoint,
+           router) {
         console.log("updating...");
 
         const circleFocusSize = 7;
@@ -328,18 +329,27 @@ class Pairwise_d3 {
         };
 
         let mousedown_non_hist = function (e, d) {
-            d3.select(container.current).remove()
             console.log("clicked")
-            console.log(e)
             console.log(d)
-            window.open(
-                '/scatter',
-                '_self' // <- This is what makes it open in a new window.
-            );
+            d3.select(container.current).remove()
+            router.push({
+                pathname: "/scatter",
+                query: {
+                    pairwise_query1 : x[d[0]],
+                    pairwise_query2 : x[d[1]]
+                }
+            });
+
+            // window.open(
+            //     '/scatter',
+            //     '_self' // <- This is what makes it open in a new window.
+            // );
 
         }
 
         let mousedown_hist = function (e, d) {
+            console.log("clicked_hist")
+            console.log(d)
             d3.select(container.current).remove()
             window.open(
                 '/hist',

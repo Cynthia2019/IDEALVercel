@@ -14,6 +14,8 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
 import { s3BucketList } from '@/util/constants'
 import processData from "../util/processData";
+import { useRouter } from 'next/router';
+
 
 export default function Scatter({data}) {
   const [datasets, setDatasets] = useState([]);
@@ -23,8 +25,12 @@ export default function Scatter({data}) {
   const [selectedData, setSelectedData] = useState([]);
   const [reset, setReset] = useState(false);
 
-  const [query1, setQuery1] = useState("C11");
-  const [query2, setQuery2] = useState("C12");
+  const router = useRouter();
+  const {pairwise_query1, pairwise_query2} = router.query;
+
+  const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
+  const [query2, setQuery2] = useState(pairwise_query2 ? pairwise_query2 : "C12");
+
 
   const Youngs = dynamic(() => import("../components/youngs"), {
     ssr: false,
