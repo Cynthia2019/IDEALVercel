@@ -20,7 +20,7 @@ const ScatterWrapper = ({
   const chartArea = useRef(null);
   const legendArea = useRef(null);
   const [chart, setChart] = useState(null);
-  const [view, setView] = useState("brush-on");
+  const [view, setView] = useState("zoom");
 
   const handleChange = (e, nextView) => {
     setView(nextView);

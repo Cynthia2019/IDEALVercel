@@ -36,6 +36,16 @@ a {
   stroke-width: 2px !important;
 }
 
+.highlighted {
+  opacity: 1 !important;
+  stroke: red !important;
+  stroke-width: 3px !important; 
+}
+
+.masked {
+  opacity: 0.3 !important;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
