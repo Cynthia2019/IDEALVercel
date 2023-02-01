@@ -1,7 +1,8 @@
 import React, {useRef, useState, useEffect} from "react";
 import Hist from "./hist";
+import {useRouter} from "next/router";
 
-const HistWrapper = ({data, element, setDataPoint, setSelectedData}) => {
+const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1}) => {
     const histContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
@@ -21,10 +22,12 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData}) => {
                     ]
                 }, histContainer,
                 legendContainer.current,
-                setDataPoint);
+                setDataPoint,
+                query1
+                );
 
         }
-    }, [data]);
+    }, [data, query1]);
 
     return (
         <div style={{display: "flex", flexDirection: "column"}}>

@@ -5,16 +5,14 @@ import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-import Pairwise_DataSelector from "../components/pairwise_dataSelector";
+import Hist_dataSelector from "../components/hist_dataSelector";
 // import DataSelector from "@/components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histWrapper";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import s3Client from './api/aws'
-import { s3BucketList } from '@/util/constants'
-import processData from "../util/processData";
+import { useRouter } from 'next/router';
+
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -25,7 +23,10 @@ export default function Hist({data}) {
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
     const [selectedData, setSelectedData] = useState([])
 
-    const [query1, setQuery1] = useState("C11");
+    const router = useRouter();
+    const {pairwise_query1} = router.query;
+
+    const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
     const [query2, setQuery2] = useState("C12");
 
     const Youngs = dynamic(() => import("../components/youngs"), {
@@ -160,12 +161,13 @@ export default function Hist({data}) {
                             data={filteredDatasets}
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
+                            query1={query1}
                         />
                     </div>
                     <div className={styles.subPlots}>
                     </div>
                     <div className={styles.selectors}>
-                        <Pairwise_DataSelector
+                        <Hist_dataSelector
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                             query1={query1}

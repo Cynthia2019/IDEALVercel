@@ -28,7 +28,6 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
                 legendContainer.current,
                 setDataPoint,
                 router);
-
         }
     }, [data]);
 
