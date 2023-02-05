@@ -6,18 +6,24 @@ import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
 import Hist_dataSelector from "../components/hist_dataSelector";
+import DataSelector from "../components/dataSelector";
 // import DataSelector from "@/components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histWrapper";
 import { useRouter } from 'next/router';
+import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
+import s3Client from "@/pages/api/aws";
+import {colorAssignment} from "@/util/constants";
+import processData from "@/util/processData";
 
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Hist({data}) {
+export default function Hist({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
+    const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -87,59 +93,47 @@ export default function Hist({data}) {
         },
     ];
     useEffect(() => {
-        datasetLinks.map((d, i) => {
-            csv(d.src).then((data) => {
-                const processedData = data.map((d) => {
-                    let youngs = d.youngs.match(regex).map(parseFloat);
-                    let poisson = d.poisson.match(regex).map(parseFloat);
-                    let processed = {
-                        C11: parseFloat(d.C11),
-                        C12: parseFloat(d.C12),
-                        C22: parseFloat(d.C22),
-                        C16: parseFloat(d.C16),
-                        C26: parseFloat(d.C26),
-                        C66: parseFloat(d.C66),
-                        condition: d.condition,
-                        symmetry: d.symmetry,
-                        CM0: d.CM0,
-                        CM1: d.CM1,
-                        CM0_E: d.CM0_E,
-                        CM0_nu: d.CM0_nu,
-                        CM1_E: d.CM1_E,
-                        CM1_nu: d.CM1_nu,
-                        geometry: d.geometry_full,
-                        youngs: youngs,
-                        poisson: poisson,
-                        "Minimal directional Young's modulus [N/m]": Math.min(...youngs),
-                        "Maximal directional Young's modulus [N/m]": Math.max(...youngs),
-                        "Minimal Poisson's ratio [-]": Math.min(...poisson),
-                        "Maximal Poisson's ratio [-]": Math.max(...poisson),
-                    };
-                    return processed;
+        async function fetchData(info) {
+            const command = new GetObjectCommand({
+                Bucket: info.bucket_name,
+                Key: info.name,
+            })
+
+            await s3Client.send(command).then((res) => {
+                let body = res.Body.transformToByteArray();
+                body.then((stream) => {
+                    new Response(stream, { headers: { "Content-Type": "text/csv" } })
+                        .text()
+                        .then((data) => {
+                            let parsed = csvParse(data)
+                            const processedData = processData(parsed.slice(0, 5000))
+                            setDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setFilteredDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setSelectedDatasetNames((datasets) => [
+                                ...datasets,
+                                JSON.stringify({ name: info.name, color: info.color }),
+                            ]);
+                            setDataPoint(processedData[0]);
+                        });
                 });
-                setDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setFilteredDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setSelectedDatasetNames((datasets) => [
-                    ...datasets,
-                    JSON.stringify({ name: d.name, color: d.color }),
-                ]);
-                setDataPoint(processedData[0]);
             });
-        });
+        }
+
+        availableDatasetNames.map((info, i) => fetchData(info))
     }, []);
 
     return (
@@ -167,7 +161,10 @@ export default function Hist({data}) {
                     <div className={styles.subPlots}>
                     </div>
                     <div className={styles.selectors}>
-                        <Hist_dataSelector
+                        <DataSelector
+                            setDatasets={setDatasets}
+                            availableDatasetNames={availableDatasetNames}
+                            setAvailableDatasetNames={setAvailableDatasetNames}
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                             query1={query1}
@@ -187,4 +184,26 @@ export default function Hist({data}) {
             </div>
         </div>
     );
+}
+
+export async function getStaticProps() {
+    let fetchedNames = []
+    const listObjectCommand = new ListObjectsCommand({
+        Bucket: 'ideal-dataset-1'
+    })
+    await s3Client.send(listObjectCommand).then((res) => {
+        const names = res.Contents.map(content => content.Key)
+        for (let i = 0; i < names.length; i++) {
+            fetchedNames.push({
+                bucket_name: 'ideal-dataset-1',
+                name: names[i],
+                color: colorAssignment[i]
+            })
+        }
+    })
+    return {
+        props: {
+            fetchedNames: fetchedNames
+        }
+    }
 }
