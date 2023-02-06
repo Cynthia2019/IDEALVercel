@@ -32,7 +32,7 @@ class Structure {
 
     this.svg.append("text")
       .attr("x", (WIDTH / 2))             
-      .attr("y", HEIGHT - MARGIN.BOTTOM)
+      .attr("y", SIDE - MARGIN.BOTTOM)
       .attr("class", "volumn-ratio")
       .attr("text-anchor", "middle")  
       .style("font-size", "16px") 
