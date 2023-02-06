@@ -5,10 +5,28 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
+import { styled } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
-import {styled} from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
+import { UploadOutlined } from '@ant-design/icons';
+import { Button, message, Upload } from 'antd';
+import s3Client from '../pages/api/aws'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import processData from "@/util/processData";
+import Papa, { parse } from 'papaparse'
+import { colorAssignment, requiredColumns } from "@/util/constants";
+
+const datasetNames = [
+    {
+        name: "free form 2D",
+        color: "#8A8BD0",
+    },
+    {
+        name: "lattice 2D",
+        color: "#FFB347",
+    },
+];
 
 const AxisSelections = [
     "C11",
@@ -51,72 +69,197 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const datasetNames = [{
-  name: "free form 2D",
-  color: "#8A8BD0"
-}, {
-  name: "lattice 2D",
-  color: "#FFB347"
-}];
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
     },
-  },
 };
 
+
+
 const Hist_DataSelector = ({
-                                 selectedDatasetNames,
-                                 handleSelectedDatasetNameChange,
-                                 query1,
-                                 handleQuery1Change,
-                                 query2,
-                                 handleQuery2Change,
-                               }) => {
-  return (
-      <div className={styles["data-selector"]}>
-        <div className={styles["content-line"]}>
-          <p className={styles["data-title"]}>Data</p>
-          <FormControl sx={{ m: 1, maxWidth: '100%' }}>
-            <InputLabel htmlFor="dataset-select">Data</InputLabel>
-            <Select
-                id="dataset-select"
-                labelId="dataset-select-label"
-                multiple
-                onChange={handleSelectedDatasetNameChange}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                value={selectedDatasetNames || ""}
-                renderValue={(selected) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {selected.map((obj) => {
-                        const parsed = JSON.parse(obj)
-                        return (
-                            <Chip key={parsed.name} label={parsed.name} sx={{backgroundColor:parsed.color, color:'white'}} />
-                        )
-                      })}
-                    </Box>
-                )}
-                MenuProps={MenuProps}
-            >
-              {datasetNames.map((obj, i) => (
-                  <MenuItem value={JSON.stringify({
-                    name: obj.name,
-                    color: obj.color
-                  })} key={`${obj.name}-${i}`} sx={{backgroundColor: obj.color}}>
-                    {obj.name}
-                  </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                          setDatasets,
+                          availableDatasetNames,
+                          setAvailableDatasetNames,
+                          selectedDatasetNames,
+                          handleSelectedDatasetNameChange,
+                          query1,
+                          handleQuery1Change,
+                          query2,
+                          handleQuery2Change,
+                      }) => {
+
+    const props = {
+        multiple: false,
+        async customRequest({
+                                action,
+                                data,
+                                file,
+                                filename,
+                                headers,
+                                onError,
+                                onProgress,
+                                onSuccess,
+                                withCredentials
+                            }) {
+            //TODO: examine the columns of data first; if format unmatch, then trigger onError
+            // also need to check the file size.
+            // cannot be more than 100 MB
+            // file size check
+            // Papa.parse(file, {
+            //   header: true,
+            //   skipEmptyLines: true,
+            //   chunkSize: 1048576,
+            //   error: (res, file) => {
+            //     alert("Could not upload file larger than 1MB")
+            //     onError()
+            //   },
+            //   complete: (res, file) => {
+            //     columns = res.data[0].keys()
+            //     for (const col in requiredColumns) {
+            //       if(!columns.includes(col)) {
+            //         alert("Incorrect Column Names")
+            //         onError()
+            //       }
+            //     }
+            //   }
+            // })
+
+            const command = new PutObjectCommand({
+                Bucket: 'ideal-dataset-1',
+                Key: file.name,
+                Body: file,
+                Fields: {
+                    acl: 'public-read',
+                    'Content-Type': 'text/csv'
+                },
+            })
+            await s3Client.send(command).then((res) => {
+                if(res.$metadata.httpStatusCode == 200) {
+                    onSuccess(res, file)
+                    //if success, process the file data, then add the dataset to the dataset state.
+                    Papa.parse(file, {
+                        header:true,
+                        skipEmptyLines: true,
+                        complete: (res) => {
+                            setDatasets(prevState => [...prevState, {
+                                name: file.name,
+                                data: processData(res.data),
+                                color: colorAssignment[prevState.length]
+                            }])
+                            setAvailableDatasetNames(prevState => [...prevState, {
+                                name: file.name,
+                                color: colorAssignment[prevState.length]
+                            }])
+                        }
+                    })
+                }
+                else {
+                    onError()
+                    console.log('failed')
+                }
+            })
+        }
+    }
+
+    return (
+        <div className={styles["data-selector"]}>
+            <div className={styles["data-row"]}>
+                <p className={styles["data-title"]}>Data</p>
+                <Upload {...props} accept='text/csv'>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
+            </div>
             <div className={styles["data-content-line"]}>
-                <p className={styles["data-title"]}>X-axis</p>
+                <FormControl sx={{ m: 1, maxWidth: "100%" }}>
+                    <InputLabel htmlFor="dataset-select">Active Data</InputLabel>
+                    <Select
+                        id="dataset-select"
+                        labelId="dataset-select-label"
+                        multiple
+                        onChange={handleSelectedDatasetNameChange}
+                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                        value={selectedDatasetNames || ""}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {selected.map((obj) => {
+                            const parsed = JSON.parse(obj);
+                            return (
+                            <Chip
+                            key={parsed.name}
+                            label={parsed.name}
+                            sx={{ backgroundColor: parsed.color, color: "white" }}
+                            />
+                            );
+                        })}
+                            </Box>
+                        )}
+                        MenuProps={MenuProps}
+                    >
+                        {availableDatasetNames.map((obj, i) => (
+                            <MenuItem
+                                value={JSON.stringify({
+                                    name: obj.name,
+                                    color: obj.color,
+                                })}
+                                key={`${obj.name}-${i}`}
+                                sx={{ backgroundColor: obj.color }}
+                            >
+                                {obj.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <InputLabel style={{marginTop: "145px"}}htmlFor="dataset-select">Data Library</InputLabel>
+
+                    <Select
+                        style={{marginTop: "15px"}}
+                        id="dataset-select"
+                        labelId="dataset-select-label"
+                        multiple
+                        onChange={handleSelectedDatasetNameChange}
+                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                        value={selectedDatasetNames || ""}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                {selected.map((obj) => {
+                                    const parsed = JSON.parse(obj);
+                                    return (
+                                        <Chip
+                                            key={parsed.name}
+                                            label={parsed.name}
+                                            sx={{ backgroundColor: parsed.color, color: "white" }}
+                                        />
+                                    );
+                                })}
+                            </Box>
+                        )}
+                        MenuProps={MenuProps}
+                    >
+                        {availableDatasetNames.map((obj, i) => (
+                            <MenuItem
+                                value={JSON.stringify({
+                                    name: obj.name,
+                                    color: obj.color,
+                                })}
+                                key={`${obj.name}-${i}`}
+                                sx={{ backgroundColor: obj.color }}
+                            >
+                                {obj.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+            <div className={styles["data-content-line"]}>
+                <p>X-axis</p>
                 <FormControl variant="standard" fullWidth>
+                    <InputLabel id="x-axis-select-label">{query1}</InputLabel>
                     <Select
                         labelId="x-axis-select-label"
                         id="x-axis-select"
@@ -135,8 +278,7 @@ const Hist_DataSelector = ({
                 </FormControl>
             </div>
         </div>
-      </div>
-  );
+    );
 };
 
 export default Hist_DataSelector;

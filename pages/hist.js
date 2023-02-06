@@ -156,12 +156,13 @@ export default function Hist({fetchedNames}) {
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
                             query1={query1}
+                            max_num_datasets={availableDatasetNames.length}
                         />
                     </div>
                     <div className={styles.subPlots}>
                     </div>
                     <div className={styles.selectors}>
-                        <DataSelector
+                        <Hist_dataSelector
                             setDatasets={setDatasets}
                             availableDatasetNames={availableDatasetNames}
                             setAvailableDatasetNames={setAvailableDatasetNames}

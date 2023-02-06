@@ -2,7 +2,7 @@ import React, {useRef, useState, useEffect} from "react";
 import Hist from "./hist";
 import {useRouter} from "next/router";
 
-const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1}) => {
+const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_num_datasets}) => {
     const histContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
@@ -23,7 +23,8 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1}) => 
                 }, histContainer,
                 legendContainer.current,
                 setDataPoint,
-                query1
+                query1,
+                max_num_datasets
                 );
 
         }

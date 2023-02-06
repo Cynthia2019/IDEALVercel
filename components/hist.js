@@ -94,11 +94,16 @@ class Hist {
            } = {}, container,
            legendContainer,
            setDataPoint,
-           query1) {
+           query1,
+           max_num_datasets) {
         console.log("updating")
+        //console.log(data)
         let index = columns.indexOf(query1)
-        let datasets = [[], []];
-        let dataset_dic = {}
+        let datasets = [];
+        let dataset_dic = {};
+        for (let i = 0; i < max_num_datasets; i++) {
+            datasets.push([])
+        }
         data.map((d, i) => {
             for (let data of d.data) {
                 data.name = d.name;
@@ -109,28 +114,15 @@ class Hist {
             dataset_dic[i] = d.name;
         });
         let finalData = [].concat(...datasets);
-
         //clean up before updating visuals
         d3.selectAll(".xAxisGroup").remove();
         d3.selectAll(".yAxisGroup").remove();
         d3.selectAll(".x-label").remove();
 
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < max_num_datasets; i++) {
             d3.selectAll(".group" + i).remove()
         }
-        // this.renderAxis(finalData,
-        //     {
-        //         columns: [
-        //             "C11",
-        //             "C12",
-        //             "C22",
-        //             "C16",
-        //             "C26",
-        //             "C66"
-        //         ]
-        //     },
-        //     index);
 
         // Compute values (and promote column names to accessors).
         const X = d3.map(x, x => d3.map(finalData, typeof x === "function" ? x : d => +d[x]));
@@ -186,7 +178,7 @@ class Hist {
                     .text(d => d);
 
 
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < max_num_datasets; i++) {
                     let a = columns;
                     let b = columns;
                     let X0 = d3.map(a, a => d3.map(datasets[i], typeof a === "function" ? a : d => +d[a]));
