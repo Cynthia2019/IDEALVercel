@@ -37,7 +37,7 @@ export default function youngs({dataPoint}) {
         responsive: true
     }
     var style = {
-        marginTop: '-50px'
+        marginTop: '0px'
     }
     return (
         <Plot

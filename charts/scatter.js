@@ -1,6 +1,4 @@
-import { GetApp } from "@mui/icons-material";
 import * as d3 from "d3";
-import useSWR from "swr";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 7;
