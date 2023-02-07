@@ -1,22 +1,25 @@
-import { useState } from "react";
+import {useState} from "react";
 import styles from "../styles/dataSelector.module.css";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
-import { styled } from "@mui/material/styles";
+import {styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
-import { UploadOutlined } from '@ant-design/icons';
-import { Button, message, Upload } from 'antd';
+import {UploadOutlined} from '@ant-design/icons';
+import {Button, message, Upload} from 'antd';
 import s3Client from '../pages/api/aws'
-import { PutObjectCommand } from '@aws-sdk/client-s3'
+import {PutObjectCommand} from '@aws-sdk/client-s3'
 import processData from "@/util/processData";
-import Papa, { parse } from 'papaparse'
-import { colorAssignment, requiredColumns } from "@/util/constants";
+import Papa, {parse} from 'papaparse'
+import {colorAssignment, requiredColumns} from "@/util/constants";
+import {DragDropContext, Droppable, Draggable, resetServerContext} from 'react-beautiful-dnd';
+import {useDrag, useDrop, DndProvider, DragSource, DropTarget} from "react-dnd";
 
+resetServerContext()
 const datasetNames = [
     {
         name: "free form 2D",
@@ -37,7 +40,7 @@ const AxisSelections = [
     "C66",
 ];
 
-const BootstrapInput = styled(InputBase)(({ theme }) => ({
+const BootstrapInput = styled(InputBase)(({theme}) => ({
     "label + &": {
         marginTop: theme.spacing(3),
     },
@@ -82,18 +85,15 @@ const MenuProps = {
 };
 
 
-
 const Hist_DataSelector = ({
-                          setDatasets,
-                          availableDatasetNames,
-                          setAvailableDatasetNames,
-                          selectedDatasetNames,
-                          handleSelectedDatasetNameChange,
-                          query1,
-                          handleQuery1Change,
-                          query2,
-                          handleQuery2Change,
-                      }) => {
+                               setDatasets,
+                               availableDatasetNames,
+                               setAvailableDatasetNames,
+                               selectedDatasetNames,
+                               handleSelectedDatasetNameChange,
+                               query1,
+                               handleQuery1Change
+                           }) => {
 
     const props = {
         multiple: false,
@@ -141,11 +141,11 @@ const Hist_DataSelector = ({
                 },
             })
             await s3Client.send(command).then((res) => {
-                if(res.$metadata.httpStatusCode == 200) {
+                if (res.$metadata.httpStatusCode == 200) {
                     onSuccess(res, file)
                     //if success, process the file data, then add the dataset to the dataset state.
                     Papa.parse(file, {
-                        header:true,
+                        header: true,
                         skipEmptyLines: true,
                         complete: (res) => {
                             setDatasets(prevState => [...prevState, {
@@ -159,8 +159,7 @@ const Hist_DataSelector = ({
                             }])
                         }
                     })
-                }
-                else {
+                } else {
                     onError()
                     console.log('failed')
                 }
@@ -168,92 +167,98 @@ const Hist_DataSelector = ({
         }
     }
 
+    const onDragEnd = result => {
+        // logic to handle the end of a drag event
+        console.log(result)
+    };
     return (
         <div className={styles["data-selector"]}>
             <div className={styles["data-row"]}>
                 <p className={styles["data-title"]}>Data</p>
                 <Upload {...props} accept='text/csv'>
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    <Button icon={<UploadOutlined/>}>Click to Upload</Button>
                 </Upload>
             </div>
             <div className={styles["data-content-line"]}>
-                <FormControl sx={{ m: 1, maxWidth: "100%" }}>
-                    <InputLabel htmlFor="dataset-select">Active Data</InputLabel>
-                    <Select
-                        id="dataset-select"
-                        labelId="dataset-select-label"
-                        multiple
-                        onChange={handleSelectedDatasetNameChange}
-                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                        value={selectedDatasetNames || ""}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((obj) => {
-                            const parsed = JSON.parse(obj);
-                            return (
-                            <Chip
-                            key={parsed.name}
-                            label={parsed.name}
-                            sx={{ backgroundColor: parsed.color, color: "white" }}
-                            />
-                            );
-                        })}
-                            </Box>
-                        )}
-                        MenuProps={MenuProps}
-                    >
-                        {availableDatasetNames.map((obj, i) => (
-                            <MenuItem
-                                value={JSON.stringify({
-                                    name: obj.name,
-                                    color: obj.color,
-                                })}
-                                key={`${obj.name}-${i}`}
-                                sx={{ backgroundColor: obj.color }}
-                            >
-                                {obj.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <InputLabel style={{marginTop: "145px"}}htmlFor="dataset-select">Data Library</InputLabel>
+                <FormControl sx={{m: 1, maxWidth: "100%"}}>
+                    <div>
+                        <p> Active Data </p>
+                        <DragDropContext>
+                            <Droppable droppableId="active-data">
+                                {(provided) => (
+                                    <div {...provided.droppableProps}
+                                         ref={provided.innerRef}>
+                                        <Box sx={{
+                                            border: 1,
+                                            display: "flex column",
+                                            padding: 1
+                                        }}>
+                                            {availableDatasetNames.map((dataset, index) => (
+                                                <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
+                                                    {(provided) => (
+                                                        <div {...provided.draggableProps}
+                                                             ref={provided.innerRef}
+                                                             {...provided.dragHandleProps}>
+                                                            <Button
 
-                    <Select
-                        style={{marginTop: "15px"}}
-                        id="dataset-select"
-                        labelId="dataset-select-label"
-                        multiple
-                        onChange={handleSelectedDatasetNameChange}
-                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                        value={selectedDatasetNames || ""}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                {selected.map((obj) => {
-                                    const parsed = JSON.parse(obj);
-                                    return (
-                                        <Chip
-                                            key={parsed.name}
-                                            label={parsed.name}
-                                            sx={{ backgroundColor: parsed.color, color: "white" }}
-                                        />
-                                    );
-                                })}
-                            </Box>
-                        )}
-                        MenuProps={MenuProps}
-                    >
-                        {availableDatasetNames.map((obj, i) => (
-                            <MenuItem
-                                value={JSON.stringify({
-                                    name: obj.name,
-                                    color: obj.color,
-                                })}
-                                key={`${obj.name}-${i}`}
-                                sx={{ backgroundColor: obj.color }}
-                            >
-                                {obj.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                                                                sx={{gap: 1}}
+                                                                className={styles.datasetButton}
+                                                                style={{backgroundColor: dataset.color}}
+                                                                onClick={() => handleSelectedDatasetNameChange(dataset.name)}
+                                                                disabled={selectedDatasetNames.includes(dataset.name)}
+                                                            >
+                                                                {dataset.name}
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                        </Box>
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+                    </div>
+                    <div>
+                        <p> Data Library </p>
+                        <DragDropContext>
+                            <Droppable droppableId="active-data">
+                                {(provided) => (
+                                    <div {...provided.droppableProps}
+                                         ref={provided.innerRef}>
+                                        <Box sx={{
+                                            border: 1,
+                                            display: "flex column",
+                                            padding: 1
+                                        }}>
+                                            {availableDatasetNames.map((dataset, index) => (
+                                                <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
+                                                    {(provided) => (
+                                                        <div {...provided.draggableProps}
+                                                             ref={provided.innerRef}
+                                                             {...provided.dragHandleProps}>
+                                                            <Button
+
+                                                                sx={{gap: 1}}
+                                                                className={styles.datasetButton}
+                                                                style={{backgroundColor: dataset.color}}
+                                                                onClick={() => handleSelectedDatasetNameChange(dataset.name)}
+                                                                disabled={selectedDatasetNames.includes(dataset.name)}
+                                                            >
+                                                                {dataset.name}
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                        </Box>
+                                        {provided.placeholder}
+                                    </div>
+                                    )}
+                            </Droppable>
+                        </DragDropContext>
+                    </div>
                 </FormControl>
             </div>
             <div className={styles["data-content-line"]}>
@@ -265,7 +270,7 @@ const Hist_DataSelector = ({
                         id="x-axis-select"
                         value={query1}
                         onChange={handleQuery1Change}
-                        input={<BootstrapInput />}
+                        input={<BootstrapInput/>}
                     >
                         {AxisSelections.map((item, index) => {
                             return (
@@ -278,7 +283,8 @@ const Hist_DataSelector = ({
                 </FormControl>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default Hist_DataSelector;
