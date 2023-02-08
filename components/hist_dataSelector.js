@@ -92,7 +92,11 @@ const Hist_DataSelector = ({
                                selectedDatasetNames,
                                handleSelectedDatasetNameChange,
                                query1,
-                               handleQuery1Change
+                               handleQuery1Change,
+                               activeData,
+                               dataLibrary,
+                               setActiveData,
+                               setDataLibrary,
                            }) => {
 
     const props = {
@@ -108,28 +112,6 @@ const Hist_DataSelector = ({
                                 onSuccess,
                                 withCredentials
                             }) {
-            //TODO: examine the columns of data first; if format unmatch, then trigger onError
-            // also need to check the file size.
-            // cannot be more than 100 MB
-            // file size check
-            // Papa.parse(file, {
-            //   header: true,
-            //   skipEmptyLines: true,
-            //   chunkSize: 1048576,
-            //   error: (res, file) => {
-            //     alert("Could not upload file larger than 1MB")
-            //     onError()
-            //   },
-            //   complete: (res, file) => {
-            //     columns = res.data[0].keys()
-            //     for (const col in requiredColumns) {
-            //       if(!columns.includes(col)) {
-            //         alert("Incorrect Column Names")
-            //         onError()
-            //       }
-            //     }
-            //   }
-            // })
 
             const command = new PutObjectCommand({
                 Bucket: 'ideal-dataset-1',
@@ -157,8 +139,15 @@ const Hist_DataSelector = ({
                                 name: file.name,
                                 color: colorAssignment[prevState.length]
                             }])
+                            setDataLibrary(prevState => [...prevState, {
+                                name: file.name,
+                                data: processData(res.data),
+                                color: colorAssignment[availableDatasetNames.length]
+                            }])
+
                         }
                     })
+
                 } else {
                     onError()
                     console.log('failed')
@@ -167,9 +156,29 @@ const Hist_DataSelector = ({
         }
     }
 
+
     const onDragEnd = result => {
         // logic to handle the end of a drag event
-        console.log(result)
+        if (!result.destination) return;
+        const {source, destination} = result;
+        if (source.droppableId !== destination.droppableId) {
+            const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
+            const destinationData = destination.droppableId === "data-library" ? dataLibrary : activeData
+            const sourceItems = Array.from(sourceData);
+            const destItems = Array.from(destinationData);
+            const [removed] = sourceItems.splice(source.index, 1);
+            destItems.splice(destination.index, 0, removed)
+            sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
+            destinationData == activeData ? setActiveData(destItems) : setDataLibrary(destItems);
+
+        } else {
+            const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
+            const sourceItems = Array.from(sourceData);
+            const [removed] = sourceItems.splice(result.source.index, 1);
+            sourceItems.splice(result.destination.index, 0, removed)
+            sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
+        }
+
     };
     return (
         <div className={styles["data-selector"]}>
@@ -182,25 +191,26 @@ const Hist_DataSelector = ({
             <div className={styles["data-content-line"]}>
                 <FormControl sx={{m: 1, maxWidth: "100%"}}>
                     <div>
-                        <p> Active Data </p>
-                        <DragDropContext>
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            <p> Active Data </p>
                             <Droppable droppableId="active-data">
-                                {(provided) => (
+                                {(provided, snapshot) => (
                                     <div {...provided.droppableProps}
                                          ref={provided.innerRef}>
                                         <Box sx={{
-                                            border: 1,
+                                            border: 2,
                                             display: "flex column",
-                                            padding: 1
+                                            padding: 1,
+                                            color: "lightgrey",
+                                            background: snapshot.isDraggingOver ? 'lightblue' : 'white',
                                         }}>
-                                            {availableDatasetNames.map((dataset, index) => (
+                                            {activeData.map((dataset, index) => (
                                                 <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
                                                     {(provided) => (
                                                         <div {...provided.draggableProps}
                                                              ref={provided.innerRef}
                                                              {...provided.dragHandleProps}>
                                                             <Button
-
                                                                 sx={{gap: 1}}
                                                                 className={styles.datasetButton}
                                                                 style={{backgroundColor: dataset.color}}
@@ -213,33 +223,30 @@ const Hist_DataSelector = ({
                                                     )}
                                                 </Draggable>
                                             ))}
+                                            {provided.placeholder}
                                         </Box>
-                                        {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
-                        </DragDropContext>
-                    </div>
-                    <div>
-                        <p> Data Library </p>
-                        <DragDropContext>
-                            <Droppable droppableId="active-data">
-                                {(provided) => (
+                            <p> Data Library </p>
+                            <Droppable droppableId="data-library">
+                                {(provided, snapshot) => (
                                     <div {...provided.droppableProps}
                                          ref={provided.innerRef}>
                                         <Box sx={{
-                                            border: 1,
+                                            border: 2,
                                             display: "flex column",
-                                            padding: 1
+                                            padding: 1,
+                                            color: "lightgrey",
+                                            background: snapshot.isDraggingOver ? 'lightblue' : 'white',
                                         }}>
-                                            {availableDatasetNames.map((dataset, index) => (
+                                            {dataLibrary.map((dataset, index) => (
                                                 <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
                                                     {(provided) => (
                                                         <div {...provided.draggableProps}
                                                              ref={provided.innerRef}
                                                              {...provided.dragHandleProps}>
                                                             <Button
-
                                                                 sx={{gap: 1}}
                                                                 className={styles.datasetButton}
                                                                 style={{backgroundColor: dataset.color}}
@@ -252,10 +259,10 @@ const Hist_DataSelector = ({
                                                     )}
                                                 </Draggable>
                                             ))}
+                                            {provided.placeholder}
                                         </Box>
-                                        {provided.placeholder}
                                     </div>
-                                    )}
+                                )}
                             </Droppable>
                         </DragDropContext>
                     </div>

@@ -24,6 +24,8 @@ const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 export default function Hist({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
     const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+    const [activeData, setActiveData] = useState(datasets);
+    const [dataLibrary, setDataLibrary] = useState([])
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -80,18 +82,6 @@ export default function Hist({fetchedNames}) {
         setFilteredDatasets(filtered_datasets);
     };
 
-    const datasetLinks = [
-        {
-            name: "free form 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/837a01c52c4c17d7b31dbd8ad3045878/raw/703d9fcdefcf28a084709ad6a98f403303aba5bd/ideal_freeform_2d_sample.csv",
-            color: "#8A8BD0",
-        },
-        {
-            name: "lattice 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/d840d03813d9b0fc13956430b8c42886/raw/6c82615e1bcce639938a008cc4af212f771627da/ideal_lattice_2d.csv",
-            color: "#FFB347",
-        },
-    ];
     useEffect(() => {
         async function fetchData(info) {
             const command = new GetObjectCommand({
@@ -116,6 +106,14 @@ export default function Hist({fetchedNames}) {
                                 },
                             ]);
                             setFilteredDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setActiveData((datasets) => [
                                 ...datasets,
                                 {
                                     name: info.name,
@@ -152,7 +150,7 @@ export default function Hist({fetchedNames}) {
                             {/*</p>*/}
                         </div>
                         <HistWrapper
-                            data={filteredDatasets}
+                            data={activeData}
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
                             query1={query1}
@@ -172,6 +170,10 @@ export default function Hist({fetchedNames}) {
                             handleQuery1Change={handleQuery1Change}
                             query2={query2}
                             handleQuery2Change={handleQuery2Change}
+                            activeData={activeData}
+                            dataLibrary={dataLibrary}
+                            setActiveData={setActiveData}
+                            setDataLibrary={setDataLibrary}
                         />
                         <RangeSelector
                             datasets={datasets}
