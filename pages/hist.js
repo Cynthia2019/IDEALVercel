@@ -79,7 +79,7 @@ export default function Hist({fetchedNames}) {
                 return names.includes(s.name)
             }
         );
-        setFilteredDatasets(filtered_datasets);
+        setActiveData(filtered_datasets);
     };
 
     useEffect(() => {

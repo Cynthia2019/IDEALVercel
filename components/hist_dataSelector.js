@@ -18,6 +18,7 @@ import Papa, {parse} from 'papaparse'
 import {colorAssignment, requiredColumns} from "@/util/constants";
 import {DragDropContext, Droppable, Draggable, resetServerContext} from 'react-beautiful-dnd';
 import {useDrag, useDrop, DndProvider, DragSource, DropTarget} from "react-dnd";
+import * as d3 from "d3";
 
 resetServerContext()
 const datasetNames = [
@@ -156,6 +157,49 @@ const Hist_DataSelector = ({
         }
     }
 
+    let tooltip_data = d3
+        .select(this)
+        .append("div")
+        .attr("class", "tooltip_hist")
+        .style("position", "fixed")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "1px")
+        .style("border-radius", "5px")
+        .style("padding", "10px")
+        .style("visibility", "hidden")
+
+    let mouseover_data = function (e, d) {
+        console.log("data");
+        tooltip_data.style("visibility", "visible").transition().duration(200);
+
+    };
+
+    let mouseleave_data = function (e, d) {
+        tooltip_data.style("visibility", "hidden").transition().duration(200);
+    };
+
+    let mousemove_data = function (e, d) {
+        console.log('data tool tip')
+        console.log(e)
+        console.log(d)
+        // let column = columns[parseInt(d)]
+        //let temp_arr = [...finalData.map(data => data[columns[index]])]
+        tooltip_data
+            .html(
+                "<br>Data: "
+                // (d.x0) +
+                // " to " +
+                // (d.x1) +
+                // "<br>Distribution Mean: " +
+                // d3.mean(temp_arr) +
+                // "<br>Distribution Median: " +
+                // d3.median(temp_arr)
+
+            )
+            .style("top", e.pageY - 110 + "px")
+            .style("left", e.pageX + 10 + "px");
+    };
 
     const onDragEnd = result => {
         // logic to handle the end of a drag event
@@ -214,8 +258,10 @@ const Hist_DataSelector = ({
                                                                 sx={{gap: 1}}
                                                                 className={styles.datasetButton}
                                                                 style={{backgroundColor: dataset.color}}
-                                                                onClick={() => handleSelectedDatasetNameChange(dataset.name)}
                                                                 disabled={selectedDatasetNames.includes(dataset.name)}
+                                                                onMouseOver={mouseover_data}
+                                                                onMouseLeave={mouseleave_data}
+                                                                onMouseMove={mousemove_data}
                                                             >
                                                                 {dataset.name}
                                                             </Button>
