@@ -1,7 +1,8 @@
 import * as d3 from "d3";
+import { nnColorAssignment } from "@/util/constants";
 
 const circleOriginalSize = 5;
-const circleFocusSize = 7;
+const circleFocusSize = 8;
 
 const legendSpacing = 4;
 
@@ -31,15 +32,7 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 class Scatter {
-  constructor(
-    element,
-    legendElement,
-    data,
-    setDataPoint,
-    selectedData,
-    setSelectedData,
-    view
-  ) {
+  constructor(element, legendElement, data, view) {
     this.svg = d3
       .select(element)
       .append("svg")
@@ -92,18 +85,15 @@ class Scatter {
     this.zoomedXScale;
     this.zoomedYScale;
 
-    this.update(
-      data,
-      element,
-      legendElement,
-      setDataPoint,
-      this.query1,
-      this.query2,
-      selectedData,
-      setSelectedData,
-      view,
-      false
-    );
+    this.update({
+      data: data,
+      element: element,
+      legendElement: legendElement,
+      query1: this.query1,
+      query2: this.query2,
+      view: view,
+      reset: false,
+    });
   }
   async getKnnData(data) {
     columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -111,14 +101,13 @@ class Scatter {
     for (const col in columns) {
       req.push(data[col]);
     }
-    console.log("request: ", req);
     return fetch(`http://localhost:8000/model?data=${req}`)
       .then((res) => res.json())
       .catch((err) => console.log(err.message));
   }
   //query1: x-axis
   //query2: y-axis
-  update(
+  update({
     data,
     element,
     legendElement,
@@ -127,10 +116,11 @@ class Scatter {
     query2,
     selectedData,
     setSelectedData,
+    setNeighbors, 
     view,
     reset,
-    setReset
-  ) {
+    setReset,
+  }) {
     this.data = data;
     this.query1 = query1;
     this.query2 = query2;
@@ -251,18 +241,22 @@ class Scatter {
         .style("fill-opacity", 0.8);
     };
 
-    async function getKnnData (data, name) {
-      let response = await fetch(`http://localhost:8000/model/?data=[${data}]&name=${name}`, {
-        method: 'GET',
-        mode: 'cors',
-      }).then((res) => res.json())
+    async function getKnnData(data, name) {
+      let response = await fetch(
+        `http://localhost:8000/model/?data=[${data}]&name=${name}`,
+        {
+          method: "GET",
+          mode: "cors",
+        }
+      )
+        .then((res) => res.json())
         .catch((err) => console.log("fetch error", err.message));
-      return response
+      return response;
     }
 
     let mousedown = function (e, d) {
       let columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
-      let inputData = columns.map(c => d[c])
+      let inputData = columns.map((c) => d[c]);
       let target = d3.select(this);
       if (view == "brush-on") {
         target.classed("selected", true);
@@ -274,23 +268,33 @@ class Scatter {
       d3.selectAll(".selected").each((d, i) => selected.push(d));
       setSelectedData(selected);
 
-      getKnnData(inputData, d.name).then(indices => {
+      getKnnData(inputData, d.name).then((indices) => {
         d3.selectAll(".dataCircle")
-        .data(finalData)
-        .classed("highlighted", function (datum) {
-          return (
-            indices.includes(datum.index) && d.name == datum.name
-          )
-        });
-        d3.selectAll(".dataCircle")
-        .data(finalData)
-        .classed("masked", function (datum) {
-          return (
-            !(indices.includes(datum.index) && d.name == datum.name)
-          )
-        });
+          .data(finalData)
+          .classed("highlighted", function (datum) {
+            return indices.includes(datum.index) && d.name == datum.name;
+          })
+          .classed("highlighted_black", function (datum) {
+            return d.index == datum.index && d.name == datum.name;
+          })
+          .classed("masked", function (datum) {
+            return !(indices.includes(datum.index) && d.name == datum.name);
+          })
+          ;
+      });
 
-      })
+      let neighborElements = d3.selectAll('.highlighted')
+      let masked = d3.selectAll('.masked')
+      masked.attr('fill', d => d.color).attr('r', circleOriginalSize)
+
+
+      let neighbors = [];
+      neighborElements.each((d, i) => {
+        d['outline_color'] = nnColorAssignment[i]
+        return neighbors.push(d)
+      });
+      neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
+      setNeighbors(neighbors);
     };
     let zoomedXScale = this.xScale;
     let zoomedYScale = this.yScale;

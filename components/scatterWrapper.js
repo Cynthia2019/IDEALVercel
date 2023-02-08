@@ -14,6 +14,7 @@ const ScatterWrapper = ({
   query2,
   selectedData,
   setSelectedData,
+  setNeighbors, 
   reset,
   setReset
 }) => {
@@ -40,17 +41,20 @@ const ScatterWrapper = ({
       );
     } else {
       chart.update(
-        data,
-        chartArea.current,
-        legendArea.current,
-        setDataPoint,
-        query1,
-        query2,
-        selectedData,
-        setSelectedData,
-        view,
-        reset,
-        setReset
+        {
+          data,
+          element: chartArea.current,
+          legendElement: legendArea.current,
+          setDataPoint,
+          query1,
+          query2,
+          selectedData,
+          setSelectedData,
+          setNeighbors,
+          view,
+          reset,
+          setReset
+        }
       );
     }
   }, [chart, query1, query2, data, view, reset]);

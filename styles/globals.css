@@ -38,8 +38,14 @@ a {
 
 .highlighted {
   opacity: 1 !important;
-  stroke: red !important;
+  fill-opacity: 1 !important;
+}
+
+.highlighted_black {
+  opacity: 1 !important;
+  stroke: black !important;
   stroke-width: 3px !important; 
+  fill-opacity: 1 !important;
 }
 
 .masked {

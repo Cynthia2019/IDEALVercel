@@ -53,7 +53,6 @@ class Structure {
 
     let ratio = this.calculateRatio(this.data)
     const volumn_ratio = this.svg.select(".volumn-ratio")
-    console.log(volumn_ratio)
   
     this.svg.select(".volumn-ratio").text(`Volumn Ratio: ${ratio}`);
 

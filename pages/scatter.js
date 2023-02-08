@@ -9,6 +9,7 @@ import DataSelector from "../components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
+import NeighborPanel from "@/components/neighborPanel";
 import { Row, Col } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
@@ -24,6 +25,7 @@ export default function Scatter({fetchedNames}) {
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
+  const [neighbors, setNeighbors] = useState([]); 
   const [reset, setReset] = useState(false);
 
   const router = useRouter();
@@ -143,6 +145,7 @@ export default function Scatter({fetchedNames}) {
               query2={query2}
               selectedData={selectedData}
               setSelectedData={setSelectedData}
+              setNeighbors={setNeighbors}
               reset={reset}
               setReset={setReset}
             />
@@ -172,12 +175,15 @@ export default function Scatter({fetchedNames}) {
           </div>
         </Row>
         <Row>
-          <Col span={16}>
-            <SavePanel selectedData={selectedData} setReset={setReset} />
+          <Col span={12}>
+            <NeighborPanel neighbors={neighbors} />
           </Col>
-          <Col span={8}>
-            <MaterialInformation dataPoint={dataPoint} />
+          <Col span={12}>
+          <SavePanel selectedData={selectedData} setReset={setReset} />
           </Col>
+        </Row>
+        <Row>
+          <MaterialInformation dataPoint={dataPoint} />
         </Row>
       </div>
     </div>

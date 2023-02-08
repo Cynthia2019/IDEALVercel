@@ -9,6 +9,8 @@ exports["default"] = void 0;
 
 var d3 = _interopRequireWildcard(require("d3"));
 
+var _constants = require("@/util/constants");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -20,7 +22,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var circleOriginalSize = 5;
-var circleFocusSize = 7;
+var circleFocusSize = 8;
 var legendSpacing = 4;
 var MARGIN = {
   TOP: 0,
@@ -48,7 +50,7 @@ function isBrushed(brush_coords, cx, cy) {
 var Scatter =
 /*#__PURE__*/
 function () {
-  function Scatter(element, legendElement, data, setDataPoint, selectedData, setSelectedData, view) {
+  function Scatter(element, legendElement, data, view) {
     _classCallCheck(this, Scatter);
 
     this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "scatter-plot-plot").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
@@ -65,7 +67,15 @@ function () {
     this.yScale;
     this.zoomedXScale;
     this.zoomedYScale;
-    this.update(data, element, legendElement, setDataPoint, this.query1, this.query2, selectedData, setSelectedData, view, false);
+    this.update({
+      data: data,
+      element: element,
+      legendElement: legendElement,
+      query1: this.query1,
+      query2: this.query2,
+      view: view,
+      reset: false
+    });
   }
 
   _createClass(Scatter, [{
@@ -83,14 +93,13 @@ function () {
                 req.push(data[col]);
               }
 
-              console.log("request: ", req);
               return _context.abrupt("return", fetch("http://localhost:8000/model?data=".concat(req)).then(function (res) {
                 return res.json();
               })["catch"](function (err) {
                 return console.log(err.message);
               }));
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -101,10 +110,22 @@ function () {
 
   }, {
     key: "update",
-    value: function update(data, element, legendElement, setDataPoint, query1, query2, selectedData, setSelectedData, view, reset, setReset) {
-      var _ref,
+    value: function update(_ref) {
+      var _ref2,
           _this = this;
 
+      var data = _ref.data,
+          element = _ref.element,
+          legendElement = _ref.legendElement,
+          setDataPoint = _ref.setDataPoint,
+          query1 = _ref.query1,
+          query2 = _ref.query2,
+          selectedData = _ref.selectedData,
+          setSelectedData = _ref.setSelectedData,
+          setNeighbors = _ref.setNeighbors,
+          view = _ref.view,
+          reset = _ref.reset,
+          setReset = _ref.setReset;
       this.data = data;
       this.query1 = query1;
       this.query2 = query2;
@@ -138,7 +159,7 @@ function () {
         datasets.push(d.data);
       });
 
-      var finalData = (_ref = []).concat.apply(_ref, datasets); //remove elements to avoid repeated append
+      var finalData = (_ref2 = []).concat.apply(_ref2, datasets); //remove elements to avoid repeated append
 
 
       d3.selectAll(".legend").remove();
@@ -207,8 +228,8 @@ function () {
               case 0:
                 _context2.next = 2;
                 return regeneratorRuntime.awrap(fetch("http://localhost:8000/model/?data=[".concat(data, "]&name=").concat(name), {
-                  method: 'GET',
-                  mode: 'cors'
+                  method: "GET",
+                  mode: "cors"
                 }).then(function (res) {
                   return res.json();
                 })["catch"](function (err) {
@@ -248,11 +269,26 @@ function () {
         getKnnData(inputData, d.name).then(function (indices) {
           d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
             return indices.includes(datum.index) && d.name == datum.name;
-          });
-          d3.selectAll(".dataCircle").data(finalData).classed("masked", function (datum) {
+          }).classed("highlighted_black", function (datum) {
+            return d.index == datum.index && d.name == datum.name;
+          }).classed("masked", function (datum) {
             return !(indices.includes(datum.index) && d.name == datum.name);
           });
         });
+        var neighborElements = d3.selectAll('.highlighted');
+        var masked = d3.selectAll('.masked');
+        masked.attr('fill', function (d) {
+          return d.color;
+        }).attr('r', circleOriginalSize);
+        var neighbors = [];
+        neighborElements.each(function (d, i) {
+          d['outline_color'] = _constants.nnColorAssignment[i];
+          return neighbors.push(d);
+        });
+        neighborElements.attr('fill', function (d) {
+          return d.outline_color;
+        }).attr('r', circleFocusSize);
+        setNeighbors(neighbors);
       };
 
       var zoomedXScale = this.xScale;
