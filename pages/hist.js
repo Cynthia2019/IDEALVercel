@@ -157,8 +157,7 @@ export default function Hist({fetchedNames}) {
                             max_num_datasets={availableDatasetNames.length}
                         />
                     </div>
-                    <div className={styles.subPlots}>
-                    </div>
+
                     <div className={styles.selectors}>
                         <Hist_dataSelector
                             setDatasets={setDatasets}
@@ -180,7 +179,7 @@ export default function Hist({fetchedNames}) {
                             filteredDatasets={filteredDatasets}
                             handleChange={handleRangeChange}
                         />
-                        <MaterialInformation dataPoint={dataPoint}/>
+                        {/*<MaterialInformation dataPoint={dataPoint}/>*/}
 
                     </div>
                 </Row>

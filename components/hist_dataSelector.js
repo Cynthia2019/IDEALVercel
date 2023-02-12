@@ -3,6 +3,7 @@ import styles from "../styles/dataSelector.module.css";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import Checkbox from '@mui/material/Checkbox';
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
 import {styled} from "@mui/material/styles";
@@ -19,6 +20,15 @@ import {colorAssignment, requiredColumns} from "@/util/constants";
 import {DragDropContext, Droppable, Draggable, resetServerContext} from 'react-beautiful-dnd';
 import {useDrag, useDrop, DndProvider, DragSource, DropTarget} from "react-dnd";
 import * as d3 from "d3";
+import * as React from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 
 resetServerContext()
 const datasetNames = [
@@ -201,29 +211,31 @@ const Hist_DataSelector = ({
             .style("left", e.pageX + 10 + "px");
     };
 
-    const onDragEnd = result => {
-        // logic to handle the end of a drag event
-        if (!result.destination) return;
-        const {source, destination} = result;
-        if (source.droppableId !== destination.droppableId) {
-            const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
-            const destinationData = destination.droppableId === "data-library" ? dataLibrary : activeData
-            const sourceItems = Array.from(sourceData);
-            const destItems = Array.from(destinationData);
-            const [removed] = sourceItems.splice(source.index, 1);
-            destItems.splice(destination.index, 0, removed)
-            sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
-            destinationData == activeData ? setActiveData(destItems) : setDataLibrary(destItems);
+    // const onDragEnd = result => {
+    //     // logic to handle the end of a drag event
+    //     if (!result.destination) return;
+    //     const {source, destination} = result;
+    //     if (source.droppableId !== destination.droppableId) {
+    //         const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
+    //         const destinationData = destination.droppableId === "data-library" ? dataLibrary : activeData
+    //         const sourceItems = Array.from(sourceData);
+    //         const destItems = Array.from(destinationData);
+    //         const [removed] = sourceItems.splice(source.index, 1);
+    //         destItems.splice(destination.index, 0, removed)
+    //         sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
+    //         destinationData == activeData ? setActiveData(destItems) : setDataLibrary(destItems);
+    //
+    //     } else {
+    //         const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
+    //         const sourceItems = Array.from(sourceData);
+    //         const [removed] = sourceItems.splice(result.source.index, 1);
+    //         sourceItems.splice(result.destination.index, 0, removed)
+    //         sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
+    //     }
+    //
+    // };
 
-        } else {
-            const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
-            const sourceItems = Array.from(sourceData);
-            const [removed] = sourceItems.splice(result.source.index, 1);
-            sourceItems.splice(result.destination.index, 0, removed)
-            sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
-        }
 
-    };
     return (
         <div className={styles["data-selector"]}>
             <div className={styles["data-row"]}>
@@ -235,82 +247,111 @@ const Hist_DataSelector = ({
             <div className={styles["data-content-line"]}>
                 <FormControl sx={{m: 1, maxWidth: "100%"}}>
                     <div>
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <p> Active Data </p>
-                            <Droppable droppableId="active-data">
-                                {(provided, snapshot) => (
-                                    <div {...provided.droppableProps}
-                                         ref={provided.innerRef}>
-                                        <Box sx={{
-                                            border: 2,
-                                            display: "flex column",
-                                            padding: 1,
-                                            color: "lightgrey",
-                                            background: snapshot.isDraggingOver ? 'lightblue' : 'white',
-                                        }}>
-                                            {activeData.map((dataset, index) => (
-                                                <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
-                                                    {(provided) => (
-                                                        <div {...provided.draggableProps}
-                                                             ref={provided.innerRef}
-                                                             {...provided.dragHandleProps}>
-                                                            <Button
-                                                                sx={{gap: 1}}
-                                                                className={styles.datasetButton}
-                                                                style={{backgroundColor: dataset.color}}
-                                                                disabled={selectedDatasetNames.includes(dataset.name)}
-                                                                onMouseOver={mouseover_data}
-                                                                onMouseLeave={mouseleave_data}
-                                                                onMouseMove={mousemove_data}
-                                                            >
-                                                                {dataset.name}
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </Box>
-                                    </div>
-                                )}
-                            </Droppable>
-                            <p> Data Library </p>
-                            <Droppable droppableId="data-library">
-                                {(provided, snapshot) => (
-                                    <div {...provided.droppableProps}
-                                         ref={provided.innerRef}>
-                                        <Box sx={{
-                                            border: 2,
-                                            display: "flex column",
-                                            padding: 1,
-                                            color: "lightgrey",
-                                            background: snapshot.isDraggingOver ? 'lightblue' : 'white',
-                                        }}>
-                                            {dataLibrary.map((dataset, index) => (
-                                                <Draggable key={dataset.name} draggableId={dataset.name} index={index}>
-                                                    {(provided) => (
-                                                        <div {...provided.draggableProps}
-                                                             ref={provided.innerRef}
-                                                             {...provided.dragHandleProps}>
-                                                            <Button
-                                                                sx={{gap: 1}}
-                                                                className={styles.datasetButton}
-                                                                style={{backgroundColor: dataset.color}}
-                                                                onClick={() => handleSelectedDatasetNameChange(dataset.name)}
-                                                                disabled={selectedDatasetNames.includes(dataset.name)}
-                                                            >
-                                                                {dataset.name}
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </Box>
-                                    </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                        <TableContainer component={Paper} sx={{maxHeight: 300, minWidth: 200}}>
+                            <Table stickyHeader aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell >Select</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {availableDatasetNames.map((dataset, index) => (
+                                        <TableRow
+                                            key={dataset.name}
+                                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                {dataset.name}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    defaultChecked
+                                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        {/*<DragDropContext onDragEnd={onDragEnd}>*/}
+                        {/*    <p> Active Data </p>*/}
+                        {/*    <Droppable droppableId="active-data">*/}
+                        {/*        {(provided, snapshot) => (*/}
+                        {/*            <div {...provided.droppableProps}*/}
+                        {/*                 ref={provided.innerRef}>*/}
+                        {/*                <Box sx={{*/}
+                        {/*                    border: 2,*/}
+                        {/*                    display: "flex column",*/}
+                        {/*                    padding: 1,*/}
+                        {/*                    color: "lightgrey",*/}
+                        {/*                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',*/}
+                        {/*                }}>*/}
+                        {/*                    {activeData.map((dataset, index) => (*/}
+                        {/*                        <Draggable key={dataset.name} draggableId={dataset.name} index={index}>*/}
+                        {/*                            {(provided) => (*/}
+                        {/*                                <div {...provided.draggableProps}*/}
+                        {/*                                     ref={provided.innerRef}*/}
+                        {/*                                     {...provided.dragHandleProps}>*/}
+                        {/*                                    <Button*/}
+                        {/*                                        sx={{gap: 1}}*/}
+                        {/*                                        className={styles.datasetButton}*/}
+                        {/*                                        style={{backgroundColor: dataset.color}}*/}
+                        {/*                                        disabled={selectedDatasetNames.includes(dataset.name)}*/}
+                        {/*                                        onMouseOver={mouseover_data}*/}
+                        {/*                                        onMouseLeave={mouseleave_data}*/}
+                        {/*                                        onMouseMove={mousemove_data}*/}
+                        {/*                                    >*/}
+                        {/*                                        {dataset.name}*/}
+                        {/*                                    </Button>*/}
+                        {/*                                </div>*/}
+                        {/*                            )}*/}
+                        {/*                        </Draggable>*/}
+                        {/*                    ))}*/}
+                        {/*                    {provided.placeholder}*/}
+                        {/*                </Box>*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    </Droppable>*/}
+                        {/*    <p> Inactive Data Library</p>*/}
+                        {/*    <Droppable droppableId="data-library">*/}
+                        {/*        {(provided, snapshot) => (*/}
+                        {/*            <div {...provided.droppableProps}*/}
+                        {/*                 ref={provided.innerRef}>*/}
+                        {/*                <Box sx={{*/}
+                        {/*                    border: 2,*/}
+                        {/*                    display: "flex column",*/}
+                        {/*                    padding: 1,*/}
+                        {/*                    color: "lightgrey",*/}
+                        {/*                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',*/}
+                        {/*                }}>*/}
+                        {/*                    {dataLibrary.map((dataset, index) => (*/}
+                        {/*                        <Draggable key={dataset.name} draggableId={dataset.name} index={index}>*/}
+                        {/*                            {(provided) => (*/}
+                        {/*                                <div {...provided.draggableProps}*/}
+                        {/*                                     ref={provided.innerRef}*/}
+                        {/*                                     {...provided.dragHandleProps}>*/}
+                        {/*                                    <Button*/}
+                        {/*                                        sx={{gap: 1}}*/}
+                        {/*                                        className={styles.datasetButton}*/}
+                        {/*                                        style={{backgroundColor: dataset.color}}*/}
+                        {/*                                        onClick={() => handleSelectedDatasetNameChange(dataset.name)}*/}
+                        {/*                                        disabled={selectedDatasetNames.includes(dataset.name)}*/}
+                        {/*                                    >*/}
+                        {/*                                        {dataset.name}*/}
+                        {/*                                    </Button>*/}
+                        {/*                                </div>*/}
+                        {/*                            )}*/}
+                        {/*                        </Draggable>*/}
+                        {/*                    ))}*/}
+                        {/*                    {provided.placeholder}*/}
+                        {/*                </Box>*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    </Droppable>*/}
+                        {/*</DragDropContext>*/}
                     </div>
                 </FormControl>
             </div>

@@ -1,12 +1,13 @@
 import * as d3 from "d3";
 import Header from "./header";
 
-const padding = 20// separation between adjacent cells, in pixels
-const marginTop = 10 // top margin, in pixels
-const marginRight = 20 // right margin, in pixels
-const marginBottom = 50 // bottom margin, in pixels
-const marginLeft = 100 // left margin, in pixels
+const padding = 10// separation between adjacent cells, in pixels
+const marginTop = 0 // top margin, in pixels
+const marginRight = 0 // right margin, in pixels
+const marginBottom = 0 // bottom margin, in pixels
+const marginLeft = 0 // left margin, in pixels
 const width = 968 // outer width, in pixels
+
 function expo(x, f) {
     if (x < 1000 && x > -1000) return x;
     return Number(x).toExponential(f);
@@ -70,7 +71,7 @@ class Hist {
             .append('svg')
             .attr("width", width)
             .attr("height", height)
-            .attr("viewBox", [-marginLeft, -marginTop, width, height])
+            .attr("viewBox", [padding * 2, padding * 5, width, height + padding * 13])
             .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
         this.cell = this.svg.append("g")
@@ -201,7 +202,7 @@ class Hist {
         const I = d3.range(Z.length).filter(i => zDomain.has(Z[i]));
 
         // Compute the inner dimensions of the cells.
-        const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding);
+        const cellWidth = (width - marginRight - (X.length - 1) * padding);
         const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding);
 
         // Construct scales and axes.
@@ -222,7 +223,7 @@ class Hist {
                     .selectAll("text")
                     .data([columns[index]])
                     .join("text")
-                    .attr("transform", (d, i) => `translate(${cellWidth / 2 - marginLeft / 2},${cellHeight + marginBottom + padding})`)
+                    .attr("transform", (d, i) => `translate(${width / 3},${width + padding * 2})`)
                     .attr("x", padding / 2)
                     .attr("y", padding / 2)
                     .text(d => d);
@@ -236,7 +237,7 @@ class Hist {
                     .selectAll("text")
                     .data(["Frequency"])
                     .join("text")
-                    .attr("transform", `translate(${0 - marginLeft},${cellHeight / 2 + padding}) rotate(270)`)
+                    .attr("transform", `translate(${-width / 10 - padding * 6},${cellHeight / 2 + padding}) rotate(270)`)
                     .attr("x", padding / 2)
                     .attr("y", padding / 2)
                     .text(d => d);
@@ -291,6 +292,8 @@ class Hist {
                             .on("mouseover", mouseover_hist)
                             .on("mouseleave", mouseleave_rec)
                             .on("mousemove", mousemove_hist)
+                            .attr("transform", `translate(${-width / 10}, ${0})`)
+
 
                         histogram.exit().remove();
                     }
@@ -315,7 +318,7 @@ class Hist {
             .selectAll("g")
             .data([hist_yScales])
             .join("g")
-            .attr("transform", `translate(${marginLeft + padding * 2.2},${marginTop * 3.5})`)
+            .attr("transform", `translate(${padding * 6 + 5},${padding * 16 - 5})`)
             .attr("class", "yAxisGroup")
             .call(yAxis.scale(hist_yScales));
 
@@ -331,7 +334,7 @@ class Hist {
             .selectAll(".xAxisGroup")
             .data(xScales)
             .join("g")
-            .attr("transform", `translate(${marginBottom * 2.9}, ${cellHeight + padding * 1.8})`)
+            .attr("transform", `translate(${width/15}, ${width + padding * 10 + 5})`)
             .attr("class", "xAxisGroup")
             .call(xAxis.scale(xScales[index]))
 
@@ -339,6 +342,8 @@ class Hist {
             .selectAll("text")
             .attr("font-size", 18)
             .attr("font-family", "sans-serif")
+            .attr("text-anchor", "middle")
+
 
 
     }
