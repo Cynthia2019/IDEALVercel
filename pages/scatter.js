@@ -13,9 +13,19 @@ import NeighborPanel from "@/components/neighborPanel";
 import { Row, Col } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
-import { s3BucketList, colorAssignment } from '@/util/constants'
+import { colorAssignment } from '@/util/constants'
 import processData from "../util/processData";
 import { useRouter } from 'next/router';
+
+const merge = (first, second) => {
+  for (let i = 0; i < second.length; i++) {
+    for (let j = 0; j < second[i].data.length; j++) {
+      first.push(second[i].data[j]);
+    }
+  }
+  return first;
+};
+
 
 
 export default function Scatter({fetchedNames}) {
@@ -122,7 +132,8 @@ export default function Scatter({fetchedNames}) {
     }
 
     availableDatasetNames.map((info, i) => fetchData(info))
-  }, []);
+
+  }, [availableDatasetNames]);
 
   return (
     <div>

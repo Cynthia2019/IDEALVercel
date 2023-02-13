@@ -1,6 +1,15 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
 
+const merge = (first, second) => {
+  for (let i = 0; i < second.length; i++) {
+    for (let j = 0; j < second[i].data.length; j++) {
+      first.push(second[i].data[j]);
+    }
+  }
+  return first;
+};
+
 const circleOriginalSize = 5;
 const circleFocusSize = 8;
 
@@ -95,16 +104,6 @@ class Scatter {
       reset: false,
     });
   }
-  async getKnnData(data) {
-    columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
-    req = [];
-    for (const col in columns) {
-      req.push(data[col]);
-    }
-    return fetch(`http://localhost:8000/model?data=${req}`)
-      .then((res) => res.json())
-      .catch((err) => console.log(err.message));
-  }
   //query1: x-axis
   //query2: y-axis
   update({
@@ -125,11 +124,16 @@ class Scatter {
     this.query1 = query1;
     this.query2 = query2;
     let datasets = [];
+    
+    let index = 0
 
     data.map((d, i) => {
-      for (let data of d.data) {
+      for(let j = 0; j < d.data.length; j++){
+        let data = d.data[j]
         data.name = d.name;
         data.color = d.color;
+        data.globalIndex = index
+        index += 1
       }
       datasets.push(d.data);
     });
@@ -241,9 +245,14 @@ class Scatter {
         .style("fill-opacity", 0.8);
     };
 
-    async function getKnnData(data, name) {
+    async function getKnnData(data) {
+      const env = process.env.NODE_ENV
+      let url= 'http://localhost:8000/model?data='
+      if (env == 'production') {
+          url = 'https://ideal-server-espy0exsw-cynthia2019.vercel.app/model?data='
+      }
       let response = await fetch(
-        `http://localhost:8000/model/?data=[${data}]&name=${name}`,
+        `${url}[${data}]`,
         {
           method: "GET",
           mode: "cors",
@@ -268,17 +277,14 @@ class Scatter {
       d3.selectAll(".selected").each((d, i) => selected.push(d));
       setSelectedData(selected);
 
-      getKnnData(inputData, d.name).then((indices) => {
+      getKnnData(inputData).then((indices) => {
         d3.selectAll(".dataCircle")
           .data(finalData)
           .classed("highlighted", function (datum) {
-            return indices.includes(datum.index) && d.name == datum.name;
-          })
-          .classed("highlighted_black", function (datum) {
-            return d.index == datum.index && d.name == datum.name;
+            return indices.includes(datum.globalIndex);
           })
           .classed("masked", function (datum) {
-            return !(indices.includes(datum.index) && d.name == datum.name);
+            return !(indices.includes(datum.globalIndex));
           })
           ;
       });

@@ -109,6 +109,11 @@
   display: flex;
 }
 
+.save-table-sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
 .save-table-button-group {
   display: flex;
 }

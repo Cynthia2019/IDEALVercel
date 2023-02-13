@@ -21,6 +21,16 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var merge = function merge(first, second) {
+  for (var i = 0; i < second.length; i++) {
+    for (var j = 0; j < second[i].data.length; j++) {
+      first.push(second[i].data[j]);
+    }
+  }
+
+  return first;
+};
+
 var circleOriginalSize = 5;
 var circleFocusSize = 8;
 var legendSpacing = 4;
@@ -76,39 +86,11 @@ function () {
       view: view,
       reset: false
     });
-  }
+  } //query1: x-axis
+  //query2: y-axis
+
 
   _createClass(Scatter, [{
-    key: "getKnnData",
-    value: function getKnnData(data) {
-      var col;
-      return regeneratorRuntime.async(function getKnnData$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
-              req = [];
-
-              for (col in columns) {
-                req.push(data[col]);
-              }
-
-              return _context.abrupt("return", fetch("http://localhost:8000/model?data=".concat(req)).then(function (res) {
-                return res.json();
-              })["catch"](function (err) {
-                return console.log(err.message);
-              }));
-
-            case 4:
-            case "end":
-              return _context.stop();
-          }
-        }
-      });
-    } //query1: x-axis
-    //query2: y-axis
-
-  }, {
     key: "update",
     value: function update(_ref) {
       var _ref2,
@@ -130,30 +112,14 @@ function () {
       this.query1 = query1;
       this.query2 = query2;
       var datasets = [];
+      var index = 0;
       data.map(function (d, i) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = d.data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var _data = _step.value;
-            _data.name = d.name;
-            _data.color = d.color;
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-              _iterator["return"]();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
+        for (var j = 0; j < d.data.length; j++) {
+          var _data = d.data[j];
+          _data.name = d.name;
+          _data.color = d.color;
+          _data.globalIndex = index;
+          index += 1;
         }
 
         datasets.push(d.data);
@@ -220,14 +186,21 @@ function () {
         d3.select(this).attr("r", circleOriginalSize).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8);
       };
 
-      function getKnnData(data, name) {
-        var response;
-        return regeneratorRuntime.async(function getKnnData$(_context2) {
+      function getKnnData(data) {
+        var env, url, response;
+        return regeneratorRuntime.async(function getKnnData$(_context) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context.prev = _context.next) {
               case 0:
-                _context2.next = 2;
-                return regeneratorRuntime.awrap(fetch("http://localhost:8000/model/?data=[".concat(data, "]&name=").concat(name), {
+                env = process.env.NODE_ENV;
+                url = 'http://localhost:8000/model?data=';
+
+                if (env == 'production') {
+                  url = 'https://ideal-server-espy0exsw-cynthia2019.vercel.app/model?data=';
+                }
+
+                _context.next = 5;
+                return regeneratorRuntime.awrap(fetch("".concat(url, "[").concat(data, "]"), {
                   method: "GET",
                   mode: "cors"
                 }).then(function (res) {
@@ -236,13 +209,13 @@ function () {
                   return console.log("fetch error", err.message);
                 }));
 
-              case 2:
-                response = _context2.sent;
-                return _context2.abrupt("return", response);
+              case 5:
+                response = _context.sent;
+                return _context.abrupt("return", response);
 
-              case 4:
+              case 7:
               case "end":
-                return _context2.stop();
+                return _context.stop();
             }
           }
         });
@@ -266,13 +239,11 @@ function () {
           return selected.push(d);
         });
         setSelectedData(selected);
-        getKnnData(inputData, d.name).then(function (indices) {
+        getKnnData(inputData).then(function (indices) {
           d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
-            return indices.includes(datum.index) && d.name == datum.name;
-          }).classed("highlighted_black", function (datum) {
-            return d.index == datum.index && d.name == datum.name;
+            return indices.includes(datum.globalIndex);
           }).classed("masked", function (datum) {
-            return !(indices.includes(datum.index) && d.name == datum.name);
+            return !indices.includes(datum.globalIndex);
           });
         });
         var neighborElements = d3.selectAll('.highlighted');

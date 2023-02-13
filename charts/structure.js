@@ -11,28 +11,33 @@ const HEIGHT = SIDE - MARGIN.TOP - MARGIN.BOTTOM;
 
 class Structure {
   constructor(element, data) {
+    console.log(data)
+    let height = data.height ? data.height : HEIGHT
+    let width = data.width ? data.width : WIDTH
+    let marginLeft = data.marginLeft ? data.marginLeft : MARGIN.LEFT
+    let marginTop = data.marginTop ? data.marginTop : MARGIN.TOP
     this.svg = d3
       .select(element)
       .append("svg")
-      .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-      .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-      .attr("viewBox", [0, 0,  WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM])
+      .attr("width", width + marginLeft * 2)
+      .attr("height", height + marginTop * 2)
+      .attr("viewBox", [0, 0,  width + marginLeft * 2, height + marginTop*2])
       .style("z-index", 10)
       .style("margin-top", "30px")
       .append("g")
-      .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.RIGHT})`);
+      .attr("transform", `translate(${marginLeft}, ${marginTop})`);
     
     this.svg.append("text")
-      .attr("x", (WIDTH / 2))             
-      .attr("y", 0 - (MARGIN.TOP / 2))
+      .attr("x", (width / 2))             
+      .attr("y", 0 - (marginTop / 2))
       .attr("text-anchor", "middle")  
       .style("font-size", "16px") 
       .style("font-family", 'Arial, sans-serif')
       .text("Unit Cell Geometry");
 
     this.svg.append("text")
-      .attr("x", (WIDTH / 2))             
-      .attr("y", SIDE - MARGIN.BOTTOM)
+      .attr("x", (width / 2))             
+      .attr("y", height + marginTop )
       .attr("class", "volumn-ratio")
       .attr("text-anchor", "middle")  
       .style("font-size", "16px") 
@@ -41,17 +46,22 @@ class Structure {
     this.update(data);
   }
   update(data) {
-    this.data = data?.geometry
+    this.data = data.geometry
+    this.color = data.outline_color
+    let height = data.height ? data.height : HEIGHT
+    let width = data.width ? data.width : WIDTH
+    let marginLeft = data.marginLeft ? data.marginLeft : MARGIN.LEFT
+    let marginTop = data.marginTop ? data.marginTop : MARGIN.TOP
     let res = []
-    res = this.pixelate(this.data);
-    const yScale = d3.scaleLinear().domain([0, 50]).range([HEIGHT, 0]);
+    res = this.pixelate(this.data, this.color);
+    const yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
 
-    const xScale = d3.scaleLinear().domain([0, 50]).range([0, WIDTH]);
+    const xScale = d3.scaleLinear().domain([0, 50]).range([0, width]);
 
-    const size = SIDE / 50; 
+    const size = (width + marginLeft * 2) / 50; 
 
 
-    let ratio = this.calculateRatio(this.data)
+    let ratio = this.calculateRatio(this.data, data.color)
     const volumn_ratio = this.svg.select(".volumn-ratio")
   
     this.svg.select(".volumn-ratio").text(`Volumn Ratio: ${ratio}`);
@@ -86,7 +96,7 @@ class Structure {
     return (count_1/(xSquares * ySquares)).toFixed(2)
   }
   
-  pixelate(data) {
+  pixelate(data, color) {
     if(!data) return [];
     const xSquares = 50;
     const ySquares = 50;
@@ -96,7 +106,7 @@ class Structure {
         d.push({
           x: i,
           y: j,
-          fill: data[i * xSquares + j] == "0" ? "white" : "black",
+          fill: data[i * xSquares + j] == "0" ? "white" : color,
         });
       }
     }

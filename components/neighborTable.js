@@ -1,80 +1,203 @@
-import { Table } from 'antd';
-import StructureWrapper from './structureWrapper';
+import { Table, Col, Row } from "antd";
+import StructureWrapper from "./structureWrapper";
 
 const columns = [
-    {
-      width:  'fit-content',
-      title: 'C11',
-      dataIndex: 'C11',
-      key: "C11", 
-      numeric: true,
+  {
+    key: "point0",
+    dataIndex: "point0",
+    render: (_, record) => {
+      if (record) {
+        const row = record["point0"];
+        return (
+          <Col justify="center">
+            <StructureWrapper
+              data={{
+                geometry: row["geometry"],
+                outline_color: row["outline_color"],
+                width: 100,
+                height: 100,
+                marginLeft: 0,
+                marginTop: 30,
+              }}
+            ></StructureWrapper>
+            <Row justify={"center"}>C11: {row["C11"]}</Row>
+            <Row justify={"center"}>C12: {row["C12"]}</Row>
+            <Row justify={"center"}>C22: {row["C22"]}</Row>
+            <Row justify={"center"}>C16: {row["C16"]}</Row>
+            <Row justify={"center"}>C26: {row["C26"]}</Row>
+            <Row justify={"center"}>C66: {row["C66"]}</Row>
+          </Col>
+        );
+      }
     },
-    {
-      width:  'fit-content',
-      title: 'C12',
-      dataIndex: 'C12',
-      key: "C12",
-      numeric: true,
+  },
+  {
+    key: "point1",
+    dataIndex: "point1",
+    render: (_, record) => {
+      if (record) {
+        const row = record["point1"];
+        return (
+          <Col justify="center">
+            <StructureWrapper
+              data={{
+                geometry: row["geometry"],
+                outline_color: row["outline_color"],
+                width: 100,
+                height: 100,
+                marginLeft: 0,
+                marginTop: 30,
+              }}
+            ></StructureWrapper>
+            <Row justify={"center"}>C11: {row["C11"]}</Row>
+            <Row justify={"center"}>C12: {row["C12"]}</Row>
+            <Row justify={"center"}>C22: {row["C22"]}</Row>
+            <Row justify={"center"}>C16: {row["C16"]}</Row>
+            <Row justify={"center"}>C26: {row["C26"]}</Row>
+            <Row justify={"center"}>C66: {row["C66"]}</Row>
+          </Col>
+        );
+      }
     },
-    {
-      width:  'fit-content',
-      title: 'C22',
-      dataIndex: 'C22',
-      key: 'C22', 
-      numeric: true,
+  },
+  {
+    key: "point2",
+    dataIndex: "point2",
+    render: (_, record) => {
+      if (record) {
+        const row = record["point2"];
+        return (
+          <Col justify="center">
+            <StructureWrapper
+              data={{
+                geometry: row["geometry"],
+                outline_color: row["outline_color"],
+                width: 100,
+                height: 100,
+                marginLeft: 0,
+                marginTop: 30,
+              }}
+            ></StructureWrapper>
+            <Row justify={"center"}>C11: {row["C11"]}</Row>
+            <Row justify={"center"}>C12: {row["C12"]}</Row>
+            <Row justify={"center"}>C22: {row["C22"]}</Row>
+            <Row justify={"center"}>C16: {row["C16"]}</Row>
+            <Row justify={"center"}>C26: {row["C26"]}</Row>
+            <Row justify={"center"}>C66: {row["C66"]}</Row>
+          </Col>
+        );
+      }
     },
-    {
-      width:  'fit-content',
-      title: 'C16',
-      dataIndex: 'C16',
-      key: 'C16', 
-      numeric: true,
+  },
+  {
+    key: "point3",
+    dataIndex: "point3",
+    render: (_, record) => {
+      if (record) {
+        const row = record["point3"];
+        return (
+          <Col justify="center">
+            <StructureWrapper
+              data={{
+                geometry: row["geometry"],
+                outline_color: row["outline_color"],
+                width: 100,
+                height: 100,
+                marginLeft: 0,
+                marginTop: 30,
+              }}
+            ></StructureWrapper>
+            <Row justify={"center"}>C11: {row["C11"]}</Row>
+            <Row justify={"center"}>C12: {row["C12"]}</Row>
+            <Row justify={"center"}>C22: {row["C22"]}</Row>
+            <Row justify={"center"}>C16: {row["C16"]}</Row>
+            <Row justify={"center"}>C26: {row["C26"]}</Row>
+            <Row justify={"center"}>C66: {row["C66"]}</Row>
+          </Col>
+        );
+      }
     },
-    {
-      width: 'fit-content',
-      title: 'C26',
-      dataIndex: 'C26',
-      key: "C26", 
-      numeric: true,
+  },
+  {
+    key: "point4",
+    dataIndex: "point4",
+    render: (_, record) => {
+      if (record) {
+        const row = record["point4"];
+        return (
+          <Col justify="center">
+            <StructureWrapper
+              data={{
+                geometry: row["geometry"],
+                outline_color: row["outline_color"],
+                width: 100,
+                height: 100,
+                marginLeft: 0,
+                marginTop: 30,
+              }}
+            ></StructureWrapper>
+            <Row justify={"center"}>C11: {row["C11"]}</Row>
+            <Row justify={"center"}>C12: {row["C12"]}</Row>
+            <Row justify={"center"}>C22: {row["C22"]}</Row>
+            <Row justify={"center"}>C16: {row["C16"]}</Row>
+            <Row justify={"center"}>C26: {row["C26"]}</Row>
+            <Row justify={"center"}>C66: {row["C66"]}</Row>
+          </Col>
+        );
+      }
     },
-    {
-      width: 'fit-content',
-      title: 'C66',
-      dataIndex: 'C66',
-      key: 'C66',
-      numeric: true,
-    },
-    {
-        width: 300, 
-        title: 'Unit Cell Geometry', 
-        dataIndex: 'geometry', 
-        render: (_, record) => 
-        <StructureWrapper data={record}></StructureWrapper>
-    },
-    {
-        width: 80,
-        title: 'Color',
-        dataIndex: 'outline_color',
-        key: 'outline_color',
-        fixed: 'right',
-        render: (_, record) => (
-            <svg height="50" width="50">
-                <circle cx="25" cy="25" r="5" fill={record.outline_color} />
-            </svg>
-        )
+  },
+];
+const NeighborTable = ({ data }) => {
+  console.log("neighbor", data);
+  let columns = []
+  if (data.length != 0 && data[0]) {
+    let flatten = Object.entries(data[0]);
+    columns = flatten.map(([key, value], i) => ({
+      key: key,
+      dataIndex: key,
+      render: (_, record) => {
+        if (record) {
+          const row = value;
+          return (
+            <Col justify="center">
+              <Row justify={"center"}>
+                <StructureWrapper
+                  data={{
+                    geometry: row["geometry"],
+                    outline_color: row["outline_color"],
+                    width: 100,
+                    height: 100,
+                    marginLeft: 0,
+                    marginTop: 30,
+                  }}
+                ></StructureWrapper>
+              </Row>
+              <Row justify={"center"}>C11: {row["C11"]}</Row>
+              <Row justify={"center"}>C12: {row["C12"]}</Row>
+              <Row justify={"center"}>C22: {row["C22"]}</Row>
+              <Row justify={"center"}>C16: {row["C16"]}</Row>
+              <Row justify={"center"}>C26: {row["C26"]}</Row>
+              <Row justify={"center"}>C66: {row["C66"]}</Row>
+            </Col>
+          );
+        }
       },
-  ];
-  const NeighborTable = ({data}) => (
+    }));
+  }
+  return (
     <Table
       columns={columns}
       dataSource={data}
+      showHeader={false}
       pagination={{
         pageSize: 50,
       }}
       scroll={{
         y: 240,
-        x: 1000
+        x: 1000,
       }}
     />
   );
-  export default NeighborTable;
+};
+export default NeighborTable;

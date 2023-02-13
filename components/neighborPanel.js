@@ -3,9 +3,27 @@ import styles from "../styles/Home.module.css";
 import NeighborTable from "./neighborTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import Box from '@mui/material/Box';
 import { CSVLink } from "react-csv";
+
+const transpose = (data) => {
+  if (data.length == 0) return []
+  let transposed = []
+  let point = {}
+  for (let i = 0; i < data.length; i++){
+    point[`point${i}`] = {
+      geometry: data[i]['geometry'],
+      outline_color: data[i]['outline_color'],
+      C11: data[i]['C11'],
+      C12: data[i]['C12'],
+      C22: data[i]['C22'], 
+      C16: data[i]['C16'],
+      C26: data[i]['C26'], 
+      C66: data[i]['C66']
+    }
+  }
+  transposed.push(point)
+  return transposed
+}
 
 
 const NeighborPanel = ({ neighbors }) => {
@@ -15,6 +33,7 @@ const NeighborPanel = ({ neighbors }) => {
         csvLink.current.link.click();
     })
   }
+  console.log('neigbor', neighbors, transpose(neighbors))
   return (
     <div className={styles.saveSection}>
       <div className={styles["save-data-content-line"]}>
@@ -27,7 +46,7 @@ const NeighborPanel = ({ neighbors }) => {
         </div>
       </div>
       <div className={styles["save-table-wrapper"]}>
-        <NeighborTable data={neighbors}/>
+        <NeighborTable data={[transpose(neighbors)[0]]}/>
       </div>
     </div>
   );
