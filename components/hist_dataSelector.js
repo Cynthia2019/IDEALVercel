@@ -28,6 +28,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Collapse from '@mui/material/Collapse';
+import PropTypes from 'prop-types';
+import Typography from '@mui/material/Typography';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import IconButton from '@mui/material/IconButton';
 
 
 resetServerContext()
@@ -109,6 +115,107 @@ const Hist_DataSelector = ({
                                setActiveData,
                                setDataLibrary,
                            }) => {
+    const [showData, setShowData] = useState(availableDatasetNames.map((dataset, index) => {
+        return index < 2;
+    }))
+    const onIconChange = (event, index) => {
+        if (event.target.checked) {
+            const sourceItems = Array.from(dataLibrary);
+            const destItems = Array.from(activeData);
+            const [removed] = destItems.splice(destItems.indexOf(availableDatasetNames[index]), 1);
+            sourceItems.splice(sourceItems.length, 0, removed)
+            setActiveData(destItems)
+            setDataLibrary(sourceItems);
+
+        } else {
+            const sourceItems = Array.from(activeData);
+            const destItems = Array.from(dataLibrary);
+            const [removed] = destItems.splice(destItems.indexOf(availableDatasetNames[index]), 1);
+            sourceItems.splice(sourceItems.length, 0, removed)
+            setActiveData(sourceItems)
+            setDataLibrary(destItems);
+        }
+        let temp = [...showData];
+        temp[index] = !temp[index]
+        setShowData(temp)
+
+    };
+
+    function Row(props) {
+        const onIconLoad = (event, index) => {
+            return index < 2;
+            console.log("on-load")
+            console.log(event.target.checked)
+        }
+        const [open, setOpen] = React.useState(false);
+        const dataset = props.dataset;
+        const index = props.index;
+        return (
+            <React.Fragment>
+                <TableRow
+                >
+                    <TableCell>
+                        <IconButton
+                            aria-label="expand row"
+                            size="small"
+                            onClick={() => setOpen(!open)}
+                        >
+                            {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {dataset.name}
+                    </TableCell>
+                    <TableCell>
+                        <Checkbox
+                            sx={{'& .MuiSvgIcon-root': {fontSize: 28}}}
+                            onChange={(e) => onIconChange(e, index)}
+                            checked={showData[index]}
+                        />
+                    </TableCell>
+                </TableRow>
+                <TableRow key={dataset.name + " details"}
+                          sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                    < TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box sx={{margin: 1}}>
+                                <Typography variant="h6" gutterBottom component="div">
+                                </Typography>
+                                <Box>
+                                    <h2> Data info: </h2>
+                                    <p> {dataset.name} </p>
+                                    <h2> Author(s): </h2>
+                                    <p> Author(s): Northwestern University
+                                    </p>
+                                    <h2>Description: </h2>
+                                    <p>
+                                        This database contains 248396
+                                        orthotropic microstructures represented by 50x50
+                                        pixelated matrices as well as the associated
+                                        independent components of the stiffness tensor
+                                        calculator by energy-based homogenization, i.e.,C11
+                                        ,C12 , C22 and C66. The microstructures are composed
+                                        of void (air) and solid (Young’s
+                                        modulus=1(normalized), Poisson’s ratio=0.49). We
+                                        first performed SIMP-based TO to find a
+                                        corresponding pixelated microstructure design for
+                                        each uniformly sampled target stiffness matrix. With
+                                        1400 microstructures generated by TO as initial
+                                        seeds, an iterative stochastic shape perturbation
+                                        algorithm is employed to perturb microstructure
+                                        geometries that correspond to extreme and sparse
+                                        properties. The CMAME version of database (240k) is
+                                        extended from the SMO version (88k).
+                                    </p>
+                                </Box>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+
+            </React.Fragment>
+        )
+    }
 
     const props = {
         multiple: false,
@@ -235,7 +342,6 @@ const Hist_DataSelector = ({
     //
     // };
 
-
     return (
         <div className={styles["data-selector"]}>
             <div className={styles["data-row"]}>
@@ -251,27 +357,14 @@ const Hist_DataSelector = ({
                             <Table stickyHeader aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
+                                        <TableCell></TableCell>
                                         <TableCell>Name</TableCell>
-                                        <TableCell >Select</TableCell>
+                                        <TableCell>Select</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {availableDatasetNames.map((dataset, index) => (
-                                        <TableRow
-                                            key={dataset.name}
-                                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                        >
-                                            <TableCell component="th" scope="row">
-                                                {dataset.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Checkbox
-                                                    defaultChecked
-                                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-
+                                        <Row key={dataset.name} dataset={dataset} index={index}/>
                                     ))}
                                 </TableBody>
                             </Table>
