@@ -29,6 +29,15 @@ class Structure {
       .style("font-size", "16px") 
       .style("font-family", 'Arial, sans-serif')
       .text("Unit Cell Geometry");
+
+    
+      this.svg.append("text")
+      .attr("x", (WIDTH / 2))             
+      .attr("y", HEIGHT + MARGIN.TOP )
+      .attr("class", "volumn-ratio")
+      .attr("text-anchor", "middle")  
+      .style("font-size", "16px") 
+      .style("font-family", 'Arial, sans-serif')
     this.update(data);
   }
   update(data) {
@@ -40,6 +49,9 @@ class Structure {
     const xScale = d3.scaleLinear().domain([0, 50]).range([0, WIDTH]);
 
     const size = SIDE / 50; 
+
+    let ratio = this.calculateRatio(this.data)
+    this.svg.select(".volumn-ratio").text(`Volumn Ratio: ${ratio}`);
 
     const pixels = this.svg.selectAll("rect").data(res);
     pixels
@@ -54,6 +66,21 @@ class Structure {
 
     pixels.exit().remove();
   }
+
+  calculateRatio(data) {
+    if(!data) return 0;
+    let count_1 = 0; 
+    const xSquares = 50;
+    const ySquares = 50;
+    let d = [];
+    for (let i = 0; i < xSquares; i++) {
+      for (let j = 0; j < ySquares; j++) {
+        if (data[i * xSquares + j] == '1') count_1++;  
+      }
+    }
+    return (count_1/(xSquares * ySquares)).toFixed(2)
+  }
+
   pixelate(data) {
     if(!data) return [];
     const xSquares = 50;
