@@ -81,6 +81,7 @@ class Hist {
             .attr("fill-opacity", fillOpacity)
             .attr("transform", `translate(${cellWidth + padding},${(cellHeight - 2 * marginBottom)})`);
     }
+
     update(data, {
                columns, // array of column names, or accessor functions
                x = columns, // array of x-accessors
@@ -125,69 +126,107 @@ class Hist {
             d3.selectAll(".group" + i).remove()
         }
 
-        // let tooltip_hist = d3
-        //     .select(container.current)
-        //     .append("div")
-        //     .attr("class", "tooltip_hist")
-        //     .style("position", "fixed")
-        //     .style("background-color", "white")
-        //     .style("border", "solid")
-        //     .style("border-width", "1px")
-        //     .style("border-radius", "5px")
-        //     .style("padding", "10px")
-        //     .style("visibility", "hidden")
+        let tooltip_hist = d3
+            .select(container.current)
+            .append("div")
+            .attr("class", "tooltip_hist")
+            .style("position", "fixed")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("visibility", "visible")
+            .html(
+                "Dataset 1 Range: " +
+                "1e9" +
+                " to " +
+                "3e9" +
+                "<br>Distribution Mean: " +
+                "1.5e9" +
+                "<br>Distribution Median: " +
+                "1.5e9" +
+                "<br>" +
+                "<br>Dataset 2 Range: " +
+                "3e9" +
+                " to " +
+                "6e9" +
+                "<br>Distribution Mean: " +
+                "4.5e9" +
+                "<br>Distribution Median: " +
+                "4.5e9"
+            )
+            .style("top", 200 + "px")
+            .style("left", 500 + "px");
 
+        let mouseleave_rec = function (e, d) {
+            tooltip_hist.style("visibility", "hidden").transition().duration(200);
+            // d3.select(this)
+            //     .style("stroke", "grey")
+            //     .style("stroke-width", 0)
+            //     .style("fill-opacity", 0.8);
+        };
 
+        let mouseover_hist = function (e, d) {
+            console.log("hist");
+            // d3.select(this)
+            //     .style("stroke", "black")
+            //     .style("stroke-width", 5)
+            //     .style("fill-opacity", 1);
+            tooltip_hist.style("visibility", "visible").transition().duration(200);
 
-        // let mouseleave_rec = function (e, d) {
-        //     tooltip_hist.style("visibility", "hidden").transition().duration(200);
-        //     d3.select(this)
-        //         .style("stroke", "grey")
-        //         .style("stroke-width", 0)
-        //         .style("fill-opacity", 0.8);
-        // };
+        };
 
-        // let mouseover_hist = function (e, d) {
-        //     console.log("hist");
-        //     d3.select(this)
-        //         .style("stroke", "black")
-        //         .style("stroke-width", 5)
-        //         .style("fill-opacity", 1);
-        //     tooltip_hist.style("visibility", "visible").transition().duration(200);
-        //
-        // };
-
-        // let mousemove_hist = function (e, d) {
-        //     // console.log('hist_tool_tip')
-        //     // console.log(e)
-        //     // console.log(d)
-        //     // let column = columns[parseInt(d)]
-        //     let temp_arr = [...finalData.map(data => data[columns[index]])]
-        //     tooltip_hist
-        //         .html(
-        //             "<br>Bar Range: " +
-        //             (d.x0) +
-        //             " to " +
-        //             (d.x1) +
-        //             "<br>Distribution Mean: " +
-        //             d3.mean(temp_arr) +
-        //             "<br>Distribution Median: " +
-        //             d3.median(temp_arr)
-        //
-        //             // "<br>symmetry: " +
-        //             // finalData[d]["symmetry"]
-        //             // "<br>Material_0: " +
-        //             // finalData[d].CM0 +
-        //             // "<br>Material_1: "
-        //             // d.CM1 +
-        //             // `<br>${query1}: ` +
-        //             // d[query1] +
-        //             // `<br>${query2}: ` +
-        //             // d[query2]
-        //         )
-        //         .style("top", e.pageY - 110 + "px")
-        //         .style("left", e.pageX + 10 + "px");
-        // };
+        let mousemove_hist = function (e, d) {
+            // console.log('hist_tool_tip')
+            // console.log(e)
+            // console.log(d)
+            // let column = columns[parseInt(d)]
+            // let temp_arr = [...finalData.map(data => data[columns[index]])]
+            tooltip_hist.html(
+                "Dataset 1 Range: " +
+                "1e9" +
+                " to " +
+                "3e9" +
+                "<br>Distribution Mean: " +
+                "1.5e9" +
+                "<br>Distribution Median: " +
+                "1.5e9" +
+                "<br>" +
+                "<br>Dataset 2 Range: " +
+                "3e9" +
+                " to " +
+                "6e9" +
+                "<br>Distribution Mean: " +
+                "4.5e9" +
+                "<br>Distribution Median: " +
+                "4.5e9"
+            )
+            // tooltip_hist
+            //     .html(
+            //         "<br>Dataset 1 Range: " +
+            //         (d.x0) +
+            //         " to " +
+            //         (d.x1) +
+            //         "<br>Distribution Mean: " +
+            //         d3.mean(temp_arr) +
+            //         "<br>Distribution Median: " +
+            //         d3.median(temp_arr)
+            //
+            //         // "<br>symmetry: " +
+            //         // finalData[d]["symmetry"]
+            //         // "<br>Material_0: " +
+            //         // finalData[d].CM0 +
+            //         // "<br>Material_1: "
+            //         // d.CM1 +
+            //         // `<br>${query1}: ` +
+            //         // d[query1] +
+            //         // `<br>${query2}: ` +
+            //         // d[query2]
+            //     )
+            //     .style("top", e.pageY - 110 + "px")
+            //     .style("left", e.pageX + 10 + "px");
+        };
 
         // Compute values (and promote column names to accessors).
         const X = d3.map(x, x => d3.map(finalData, typeof x === "function" ? x : d => +d[x]));
@@ -212,8 +251,14 @@ class Hist {
 
         let all_bins = [];
 
+        d3.select(container.current)
+            .selectAll("svg")
+            .on("mouseover", mouseover_hist)
+            .on("mousemove", mousemove_hist)
+
         this.cell.each(function ([x, y]) {
             if (x == index && y == index) {
+
                 d3.select(this)
                     .append("g")
                     .attr("class", "x-label")
@@ -334,7 +379,7 @@ class Hist {
             .selectAll(".xAxisGroup")
             .data(xScales)
             .join("g")
-            .attr("transform", `translate(${width/15}, ${width + padding * 10 + 5})`)
+            .attr("transform", `translate(${width / 15}, ${width + padding * 10 + 5})`)
             .attr("class", "xAxisGroup")
             .call(xAxis.scale(xScales[index]))
 
@@ -343,7 +388,6 @@ class Hist {
             .attr("font-size", 18)
             .attr("font-family", "sans-serif")
             .attr("text-anchor", "middle")
-
 
 
     }

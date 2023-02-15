@@ -34,7 +34,7 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
-
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 resetServerContext()
 const datasetNames = [
@@ -145,6 +145,20 @@ const Hist_DataSelector = ({
         const [open, setOpen] = React.useState(false);
         const dataset = props.dataset;
         const index = props.index;
+        const HtmlTooltip = styled(({ className, ...props }) => (
+            <Tooltip {...props} classes={{ popper: className }} />
+        ))(({ theme }) => ({
+            [`& .${tooltipClasses.tooltip}`]: {
+                backgroundColor: '#f5f5f9',
+                color: 'rgba(0, 0, 0, 0.87)',
+                maxWidth: 220,
+                fontSize: theme.typography.pxToRem(12),
+                border: '1px solid #dadde9',
+            },
+        }));
+        console.log("rendering table")
+        const data = activeData[index] ? activeData[index].data : [0];
+
         return (
             <React.Fragment>
                 <TableRow
@@ -158,9 +172,21 @@ const Hist_DataSelector = ({
                             {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                         </IconButton>
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                        {dataset.name}
-                    </TableCell>
+                    <HtmlTooltip
+                        title={
+                            <React.Fragment>
+                                <Typography color="inherit">Dataset overall metrics</Typography>
+                                {/*<em>{"Range: "}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}*/}
+                                {"Range: 1e9 to 3e9"}
+                            </React.Fragment>
+                        }
+                    >
+                        <TableCell component="th" scope="row">
+
+                            {dataset.name}
+                        </TableCell>
+                    </HtmlTooltip>
+
                     <TableCell>
                         <Checkbox
                             sx={{'& .MuiSvgIcon-root': {fontSize: 28}}}
@@ -171,7 +197,7 @@ const Hist_DataSelector = ({
                 </TableRow>
                 <TableRow key={dataset.name + " details"}
                           sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                    < TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
+                    <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                         <Collapse in={open} timeout="auto" unmountOnExit>
                             <Box sx={{margin: 1}}>
                                 <Typography variant="h6" gutterBottom component="div">
@@ -267,50 +293,6 @@ const Hist_DataSelector = ({
             })
         }
     }
-
-    let tooltip_data = d3
-        .select(this)
-        .append("div")
-        .attr("class", "tooltip_hist")
-        .style("position", "fixed")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "1px")
-        .style("border-radius", "5px")
-        .style("padding", "10px")
-        .style("visibility", "hidden")
-
-    let mouseover_data = function (e, d) {
-        console.log("data");
-        tooltip_data.style("visibility", "visible").transition().duration(200);
-
-    };
-
-    let mouseleave_data = function (e, d) {
-        tooltip_data.style("visibility", "hidden").transition().duration(200);
-    };
-
-    let mousemove_data = function (e, d) {
-        console.log('data tool tip')
-        console.log(e)
-        console.log(d)
-        // let column = columns[parseInt(d)]
-        //let temp_arr = [...finalData.map(data => data[columns[index]])]
-        tooltip_data
-            .html(
-                "<br>Data: "
-                // (d.x0) +
-                // " to " +
-                // (d.x1) +
-                // "<br>Distribution Mean: " +
-                // d3.mean(temp_arr) +
-                // "<br>Distribution Median: " +
-                // d3.median(temp_arr)
-
-            )
-            .style("top", e.pageY - 110 + "px")
-            .style("left", e.pageX + 10 + "px");
-    };
 
     // const onDragEnd = result => {
     //     // logic to handle the end of a drag event
