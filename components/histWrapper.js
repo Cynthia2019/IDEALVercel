@@ -25,7 +25,7 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_
                 setDataPoint,
                 query1,
                 max_num_datasets
-                );
+            );
 
         }
     }, [data, query1]);

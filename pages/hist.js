@@ -17,6 +17,7 @@ import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from "@/pages/api/aws";
 import {colorAssignment} from "@/util/constants";
 import processData from "@/util/processData";
+import {act} from "react-dom/test-utils";
 
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
@@ -29,7 +30,8 @@ export default function Hist({fetchedNames}) {
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
-    const [selectedData, setSelectedData] = useState([])
+    const [selectedData, setSelectedData] = useState([]);
+    const [onLoad, setOnLoad] = useState(true);
 
     const router = useRouter();
     const {pairwise_query1} = router.query;
@@ -130,7 +132,6 @@ export default function Hist({fetchedNames}) {
                 });
             });
         }
-
         availableDatasetNames.map((info, i) => fetchData(info))
     }, []);
 

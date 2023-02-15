@@ -97,8 +97,8 @@ class Hist {
            setDataPoint,
            query1,
            max_num_datasets) {
-        console.log("updating")
-        //console.log(data)
+        console.log("updating...")
+        console.log(data)
         let index = columns.indexOf(query1)
         let datasets = [];
         let dataset_dic = {};

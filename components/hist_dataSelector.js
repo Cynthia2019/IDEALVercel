@@ -116,10 +116,10 @@ const Hist_DataSelector = ({
                                setDataLibrary,
                            }) => {
     const [showData, setShowData] = useState(availableDatasetNames.map((dataset, index) => {
-        return index < 2;
+        return true;
     }))
     const onIconChange = (event, index) => {
-        if (event.target.checked) {
+        if (!event.target.checked) {
             const sourceItems = Array.from(dataLibrary);
             const destItems = Array.from(activeData);
             const [removed] = destItems.splice(destItems.indexOf(availableDatasetNames[index]), 1);
@@ -142,11 +142,6 @@ const Hist_DataSelector = ({
     };
 
     function Row(props) {
-        const onIconLoad = (event, index) => {
-            return index < 2;
-            console.log("on-load")
-            console.log(event.target.checked)
-        }
         const [open, setOpen] = React.useState(false);
         const dataset = props.dataset;
         const index = props.index;
@@ -212,7 +207,6 @@ const Hist_DataSelector = ({
                         </Collapse>
                     </TableCell>
                 </TableRow>
-
             </React.Fragment>
         )
     }
