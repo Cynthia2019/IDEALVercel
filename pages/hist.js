@@ -1,14 +1,11 @@
 import {useState, useEffect, useMemo} from "react";
 import Header from "../components/header";
-import styles from "../styles/Home.module.css";
-import ScatterWrapper from "../components/scatterWrapper";
-import StructureWrapper from "../components/structureWrapper";
+import styles from "../styles/hist.Home.module.css";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
 import Hist_dataSelector from "../components/hist_dataSelector";
-import DataSelector from "../components/dataSelector";
 // import DataSelector from "@/components/dataSelector";
-import RangeSelector from "../components/rangeSelector";
+import Hist_RangeSelector from "../components/hist_rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histWrapper";
@@ -175,7 +172,7 @@ export default function Hist({fetchedNames}) {
                             setActiveData={setActiveData}
                             setDataLibrary={setDataLibrary}
                         />
-                        <RangeSelector
+                        <Hist_RangeSelector
                             datasets={datasets}
                             filteredDatasets={filteredDatasets}
                             handleChange={handleRangeChange}

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import styles from "../styles/dataSelector.module.css";
+import styles from "../styles/hist.dataSelector.module.css";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";

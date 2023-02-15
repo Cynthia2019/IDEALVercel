@@ -1,21 +1,20 @@
-.data-selector {
-    width: 94.5%;
+.property-range {
+    width: 180%;
     border: 3px solid #E4E0EE;
-    margin: 10px 10px;
+    margin: 0 50px;
     padding: 20px;
-    z-index: 10;
 }
-.data-content-line {
+.range-content-line {
     display: flex;
     flex-direction: column;
 }
-.data-row {
+.range-selection-line {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
-.data-title {
+.range-title {
     font-size: 20px;
     font-weight: bold;
-    margin: 5px 0; 
+    margin: 5px 0;
 }
