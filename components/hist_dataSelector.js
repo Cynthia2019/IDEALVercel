@@ -18,7 +18,6 @@ import processData from "@/util/processData";
 import Papa, {parse} from 'papaparse'
 import {colorAssignment, requiredColumns} from "@/util/constants";
 import {DragDropContext, Droppable, Draggable, resetServerContext} from 'react-beautiful-dnd';
-import {useDrag, useDrop, DndProvider, DragSource, DropTarget} from "react-dnd";
 import * as d3 from "d3";
 import * as React from 'react';
 import Table from '@mui/material/Table';
@@ -34,7 +33,7 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Tooltip, {tooltipClasses} from '@mui/material/Tooltip';
 
 resetServerContext()
 const datasetNames = [
@@ -145,9 +144,9 @@ const Hist_DataSelector = ({
         const [open, setOpen] = React.useState(false);
         const dataset = props.dataset;
         const index = props.index;
-        const HtmlTooltip = styled(({ className, ...props }) => (
-            <Tooltip {...props} classes={{ popper: className }} />
-        ))(({ theme }) => ({
+        const HtmlTooltip = styled(({className, ...props}) => (
+            <Tooltip {...props} classes={{popper: className}}/>
+        ))(({theme}) => ({
             [`& .${tooltipClasses.tooltip}`]: {
                 backgroundColor: '#f5f5f9',
                 color: 'rgba(0, 0, 0, 0.87)',
@@ -172,20 +171,20 @@ const Hist_DataSelector = ({
                             {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                         </IconButton>
                     </TableCell>
-                    <HtmlTooltip
-                        title={
-                            <React.Fragment>
-                                <Typography color="inherit">Dataset overall metrics</Typography>
-                                {/*<em>{"Range: "}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}*/}
-                                {"Range: 1e9 to 3e9"}
-                            </React.Fragment>
-                        }
-                    >
-                        <TableCell component="th" scope="row">
+                    {/*<HtmlTooltip*/}
+                    {/*    title={*/}
+                    {/*        <React.Fragment>*/}
+                    {/*            /!*<Typography color="inherit">Dataset overall metrics</Typography>*!/*/}
+                    {/*            /!*<em>{"Range: "}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}*!/*/}
+                    {/*            /!*{"Range: 1e9 to 3e9"}*!/*/}
+                    {/*        </React.Fragment>*/}
+                    {/*    }*/}
+                    {/*>*/}
+                    <TableCell component="th" scope="row">
 
-                            {dataset.name}
-                        </TableCell>
-                    </HtmlTooltip>
+                        {dataset.name}
+                    </TableCell>
+                    {/*</HtmlTooltip>*/}
 
                     <TableCell>
                         <Checkbox
@@ -203,12 +202,12 @@ const Hist_DataSelector = ({
                                 <Typography variant="h6" gutterBottom component="div">
                                 </Typography>
                                 <Box>
-                                    <h2> Data info: </h2>
+                                    <h3> Data info: </h3>
                                     <p> {dataset.name} </p>
-                                    <h2> Author(s): </h2>
-                                    <p> Author(s): Northwestern University
+                                    <h3> Author(s): </h3>
+                                    <p> Northwestern University
                                     </p>
-                                    <h2>Description: </h2>
+                                    <h3>Description: </h3>
                                     <p>
                                         This database contains 248396
                                         orthotropic microstructures represented by 50x50
@@ -323,7 +322,7 @@ const Hist_DataSelector = ({
             <div className={styles["data-row"]}>
                 <p className={styles["data-title"]}>Data</p>
                 <Upload {...props} accept='text/csv'>
-                    <Button icon={<UploadOutlined/>}>Click to Upload</Button>
+                    <Button icon={<UploadOutlined/>}>Upload</Button>
                 </Upload>
             </div>
             <div className={styles["data-content-line"]}>
@@ -446,8 +445,7 @@ const Hist_DataSelector = ({
                 </FormControl>
             </div>
         </div>
-    )
-        ;
+    );
 };
 
 export default Hist_DataSelector;
