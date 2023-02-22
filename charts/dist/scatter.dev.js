@@ -15,6 +15,14 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -111,21 +119,9 @@ function () {
       this.data = data;
       this.query1 = query1;
       this.query2 = query2;
-      var datasets = [];
-      var index = 0;
-      data.map(function (d, i) {
-        for (var j = 0; j < d.data.length; j++) {
-          var _data = d.data[j];
-          _data.name = d.name;
-          _data.color = d.color;
-          _data.globalIndex = index;
-          index += 1;
-        }
+      var datasets = data;
 
-        datasets.push(d.data);
-      });
-
-      var finalData = (_ref2 = []).concat.apply(_ref2, datasets); //remove elements to avoid repeated append
+      var finalData = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(datasets)); //remove elements to avoid repeated append
 
 
       d3.selectAll(".legend").remove();
@@ -241,9 +237,9 @@ function () {
         setSelectedData(selected);
         getKnnData(inputData).then(function (indices) {
           d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
-            return indices.includes(datum.globalIndex);
+            return indices.includes(datum.index);
           }).classed("masked", function (datum) {
-            return !indices.includes(datum.globalIndex);
+            return !indices.includes(datum.index);
           });
         });
         var neighborElements = d3.selectAll('.highlighted');

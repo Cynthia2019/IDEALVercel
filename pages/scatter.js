@@ -12,10 +12,10 @@ import SavePanel from "../components/savePanel";
 import NeighborPanel from "@/components/neighborPanel";
 import { Row, Col } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
-import s3Client from './api/aws'
-import { colorAssignment } from '@/util/constants'
+import s3Client from "./api/aws";
+import { colorAssignment } from "@/util/constants";
 import processData from "../util/processData";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const merge = (first, second) => {
   for (let i = 0; i < second.length; i++) {
@@ -26,24 +26,25 @@ const merge = (first, second) => {
   return first;
 };
 
-
-
-export default function Scatter({fetchedNames}) {
+export default function Scatter({}) {
   const [datasets, setDatasets] = useState([]);
-  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+  const [availableDatasetNames, setAvailableDatasetNames] = useState([]);
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
-  const [neighbors, setNeighbors] = useState([]); 
+  const [neighbors, setNeighbors] = useState([]);
   const [reset, setReset] = useState(false);
 
   const router = useRouter();
-  const {pairwise_query1, pairwise_query2} = router.query;
+  const { pairwise_query1, pairwise_query2 } = router.query;
 
-  const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
-  const [query2, setQuery2] = useState(pairwise_query2 ? pairwise_query2 : "C12");
-
+  const [query1, setQuery1] = useState(
+    pairwise_query1 ? pairwise_query1 : "C11"
+  );
+  const [query2, setQuery2] = useState(
+    pairwise_query2 ? pairwise_query2 : "C12"
+  );
 
   const Youngs = dynamic(() => import("../components/youngs"), {
     ssr: false,
@@ -83,57 +84,51 @@ export default function Scatter({fetchedNames}) {
       return { name: set.name, data: filtered, color: set.color };
     });
     filtered_datasets = filtered_datasets.filter((s) => {
-     let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name) 
-     return names.includes(s.name)
-    }
-    );
+      let names = selectedDatasetNames
+        .map((v) => JSON.parse(v))
+        .map((v) => v.name);
+      return names.includes(s.name);
+    });
     setFilteredDatasets(filtered_datasets);
   };
 
-  useEffect(() => {
-    async function fetchData(info) {
-      const command = new GetObjectCommand({
-        Bucket: info.bucket_name,
-        Key: info.name,
-      })
-      
-      await s3Client.send(command).then((res) => {
-        let body = res.Body.transformToByteArray();
-        body.then((stream) => {
-          new Response(stream, { headers: { "Content-Type": "text/csv" } })
-            .text()
-            .then((data) => {
-              let parsed = csvParse(data)
-              const processedData = processData(parsed.slice(0, 5000))
-              setDatasets((datasets) => [
-                ...datasets,
-                {
-                  name: info.name,
-                  data: processedData,
-                  color: info.color,
-                },
-              ]);
-              setFilteredDatasets((datasets) => [
-                ...datasets,
-                {
-                  name: info.name,
-                  data: processedData,
-                  color: info.color,
-                },
-              ]);
-              setSelectedDatasetNames((datasets) => [
-                ...datasets,
-                JSON.stringify({ name: info.name, color: info.color }),
-              ]);
-              setDataPoint(processedData[0]);
-            });
-        });
-      });
+  async function getAllData() {
+    const env = process.env.NODE_ENV;
+    let url = "http://localhost:8000/model/";
+    if (env == "production") {
+      url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
     }
+    let response = await fetch(`${url}`, {
+      method: "POST",
+      mode: "cors",
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log("fetch error", err.message));
+    return response;
+  }
 
-    availableDatasetNames.map((info, i) => fetchData(info))
-
-  }, [availableDatasetNames]);
+  useEffect(() => {
+    getAllData().then((res) => {
+      res = JSON.parse(res)
+      const processedData = res.map((dataset, i) => {
+        return processData(dataset, i);
+      });
+      const dataset_names = [...new Set(processedData.map(item => item.name))]; 
+      const dataset_color = [...new Set(processedData.map(item => item.color))]; 
+      let dataset_info_json = []
+      for (let i = 0; i < dataset_names.length; i++) {
+        dataset_info_json.push(JSON.stringify({
+          name: dataset_names[i], 
+          color: dataset_color[i]
+        }))
+      }
+      setDatasets(processedData);
+      setFilteredDatasets(processedData);
+      setSelectedDatasetNames(dataset_info_json);
+      setDataPoint(processedData[0]);
+    });
+    console.log(filteredDatasets)
+  }, []);
 
   return (
     <div>
@@ -190,7 +185,7 @@ export default function Scatter({fetchedNames}) {
             <NeighborPanel neighbors={neighbors} />
           </Col>
           <Col span={12}>
-          <SavePanel selectedData={selectedData} setReset={setReset} />
+            <SavePanel selectedData={selectedData} setReset={setReset} />
           </Col>
         </Row>
         <Row>
@@ -201,25 +196,42 @@ export default function Scatter({fetchedNames}) {
   );
 }
 
-export async function getStaticProps() {
-  let fetchedNames = []
-  const listObjectCommand = new ListObjectsCommand({
-    Bucket: 'ideal-dataset-1'
-  })
-  await s3Client.send(listObjectCommand).then((res) => {
-    const names = res.Contents.map(content => content.Key)
-    for (let i = 0; i < names.length; i++) {
-      fetchedNames.push({
-        bucket_name: 'ideal-dataset-1',
-        name: names[i], 
-        color: colorAssignment[i]
-      })
-    }
-  })
-  return {
-    props: {
-      fetchedNames: fetchedNames
-    }
-  }
-}
+// async function fetchData(name, i) {
+//   const command = new GetObjectCommand({
+//     Bucket: 'ideal-dataset-1',
+//     Key: name,
+//   })
 
+//   await s3Client.send(command).then((res) => {
+//     let body = res.Body.transformToByteArray();
+//     body.then((stream) => {
+//       new Response(stream, { headers: { "Content-Type": "text/csv" } })
+//         .text()
+//         .then((data) => {
+//           let parsed = csvParse(data)
+//           const processedData = processData(parsed)
+//           setDatasets((datasets) => [
+//             ...datasets,
+//             {
+//               name: name,
+//               data: processedData,
+//               color: colorAssignment[i],
+//             },
+//           ]);
+//           setFilteredDatasets((datasets) => [
+//             ...datasets,
+//             {
+//               name: name,
+//               data: processedData,
+//               color: colorAssignment[i],
+//             },
+//           ]);
+//           setSelectedDatasetNames((datasets) => [
+//             ...datasets,
+//             JSON.stringify({ name: name, color: colorAssignment[i]}),
+//           ]);
+//           setDataPoint(processedData[0]);
+//         });
+//     });
+//   });
+// }

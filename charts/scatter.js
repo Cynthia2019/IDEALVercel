@@ -123,20 +123,8 @@ class Scatter {
     this.data = data;
     this.query1 = query1;
     this.query2 = query2;
-    let datasets = [];
+    let datasets = data;
     
-    let index = 0
-
-    data.map((d, i) => {
-      for(let j = 0; j < d.data.length; j++){
-        let data = d.data[j]
-        data.name = d.name;
-        data.color = d.color;
-        data.globalIndex = index
-        index += 1
-      }
-      datasets.push(d.data);
-    });
 
     let finalData = [].concat(...datasets);
 
@@ -281,10 +269,10 @@ class Scatter {
         d3.selectAll(".dataCircle")
           .data(finalData)
           .classed("highlighted", function (datum) {
-            return indices.includes(datum.globalIndex);
+            return indices.includes(datum.index);
           })
           .classed("masked", function (datum) {
-            return !(indices.includes(datum.globalIndex));
+            return !(indices.includes(datum.index));
           })
           ;
       });
