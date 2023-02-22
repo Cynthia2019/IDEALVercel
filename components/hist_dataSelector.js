@@ -119,17 +119,23 @@ const Hist_DataSelector = ({
     }))
     const onIconChange = (event, index) => {
         if (!event.target.checked) {
+            console.log("unchecked")
             const sourceItems = Array.from(dataLibrary);
             const destItems = Array.from(activeData);
-            const [removed] = destItems.splice(destItems.indexOf(availableDatasetNames[index]), 1);
+            const unchecked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
+            // console.log(unchecked)
+            // console.log(destItems.indexOf(unchecked))
+            const [removed] = destItems.splice(destItems.indexOf(unchecked), 1);
             sourceItems.splice(sourceItems.length, 0, removed)
             setActiveData(destItems)
             setDataLibrary(sourceItems);
 
         } else {
+            console.log("checked")
             const sourceItems = Array.from(activeData);
             const destItems = Array.from(dataLibrary);
-            const [removed] = destItems.splice(destItems.indexOf(availableDatasetNames[index]), 1);
+            const checked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
+            const [removed] = destItems.splice(destItems.indexOf(checked), 1);
             sourceItems.splice(sourceItems.length, 0, removed)
             setActiveData(sourceItems)
             setDataLibrary(destItems);
@@ -139,23 +145,13 @@ const Hist_DataSelector = ({
         setShowData(temp)
 
     };
+    console.log("hist data selector")
+    console.log(availableDatasetNames)
 
     function Row(props) {
         const [open, setOpen] = React.useState(false);
         const dataset = props.dataset;
         const index = props.index;
-        const HtmlTooltip = styled(({className, ...props}) => (
-            <Tooltip {...props} classes={{popper: className}}/>
-        ))(({theme}) => ({
-            [`& .${tooltipClasses.tooltip}`]: {
-                backgroundColor: '#f5f5f9',
-                color: 'rgba(0, 0, 0, 0.87)',
-                maxWidth: 220,
-                fontSize: theme.typography.pxToRem(12),
-                border: '1px solid #dadde9',
-            },
-        }));
-        console.log("rendering table")
         const data = activeData[index] ? activeData[index].data : [0];
 
         return (
@@ -171,20 +167,16 @@ const Hist_DataSelector = ({
                             {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                         </IconButton>
                     </TableCell>
-                    {/*<HtmlTooltip*/}
-                    {/*    title={*/}
-                    {/*        <React.Fragment>*/}
-                    {/*            /!*<Typography color="inherit">Dataset overall metrics</Typography>*!/*/}
-                    {/*            /!*<em>{"Range: "}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}*!/*/}
-                    {/*            /!*{"Range: 1e9 to 3e9"}*!/*/}
-                    {/*        </React.Fragment>*/}
-                    {/*    }*/}
-                    {/*>*/}
+
                     <TableCell component="th" scope="row">
 
-                        {dataset.name}
+                        {/*{dataset.name}*/}
+                        <Chip
+                            key={dataset.name}
+                            label={dataset.name}
+                            sx={{ backgroundColor: dataset.color, color: "white" }}
+                        />
                     </TableCell>
-                    {/*</HtmlTooltip>*/}
 
                     <TableCell>
                         <Checkbox

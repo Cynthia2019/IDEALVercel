@@ -114,6 +114,8 @@ class Hist {
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
+        console.log("hist graph colors")
+        console.log(colors)
         let finalData = [].concat(...datasets);
         //clean up before updating visuals
         d3.selectAll(".xAxisGroup").remove();
@@ -317,8 +319,8 @@ class Hist {
             .attr("font-family", "sans-serif")
             .attr("text-anchor", "middle")
 
-        console.log('final_tool_tip')
-        console.log(tooltip)
+        // console.log('final_tool_tip')
+        // console.log(tooltip)
         setTooltip(tooltip);
         let tooltip_hist = d3
             .select(container.current)
