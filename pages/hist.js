@@ -139,7 +139,7 @@ export default function Hist({fetchedNames}) {
                 <Row>
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
-                            <p className={styles.mainPlotTitle}>Material Data Explorer (Histogram)</p>
+                            <p className={styles.mainPlotTitle}></p>
                             {/*<p className={styles.mainPlotSub}>*/}
                             {/*    Select properties from the dropdown menus below to graph on the*/}
                             {/*    x and y axes. Hovering over data points provides additional*/}

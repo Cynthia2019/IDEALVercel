@@ -119,79 +119,29 @@ class Hist {
         d3.selectAll(".xAxisGroup").remove();
         d3.selectAll(".yAxisGroup").remove();
         d3.selectAll(".x-label").remove();
-
+        d3.selectAll(".tooltip_hist").remove();
 
         for (let i = 0; i < max_num_datasets; i++) {
             d3.selectAll(".group" + i).remove()
         }
 
+
         let mouseleave_rec = function (e, d) {
-            tooltip_hist.style("visibility", "hidden").transition().duration(200);
-            // d3.select(this)
-            //     .style("stroke", "grey")
-            //     .style("stroke-width", 0)
-            //     .style("fill-opacity", 0.8);
+            // tooltip_hist.style("visibility", "hidden").transition().duration(200);
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0)
+                .style("fill-opacity", 0.8);
         };
 
         let mouseover_hist = function (e, d) {
             console.log("hist");
-            // d3.select(this)
-            //     .style("stroke", "black")
-            //     .style("stroke-width", 5)
-            //     .style("fill-opacity", 1);
-            tooltip_hist.style("visibility", "visible").transition().duration(200);
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 5)
+                .style("fill-opacity", 1);
         };
 
-        // let mousemove_hist = function (e, d) {
-        //     // console.log('hist_tool_tip')
-        //     // console.log(e)
-        //     // console.log(d)
-        //     // let column = columns[parseInt(d)]
-        //     // let temp_arr = [...finalData.map(data => data[columns[index]])]
-        //     tooltip_hist.html(
-        //         "Dataset 1 Range: " +
-        //         "1e9" +
-        //         " to " +
-        //         "3e9" +
-        //         "<br>Distribution Mean: " +
-        //         "1.5e9" +
-        //         "<br>Distribution Median: " +
-        //         "1.5e9" +
-        //         "<br>" +
-        //         "<br>Dataset 2 Range: " +
-        //         "3e9" +
-        //         " to " +
-        //         "6e9" +
-        //         "<br>Distribution Mean: " +
-        //         "4.5e9" +
-        //         "<br>Distribution Median: " +
-        //         "4.5e9"
-        //     )
-        //     // tooltip_hist
-        //     //     .html(
-        //     //         "<br>Dataset 1 Range: " +
-        //     //         (d.x0) +
-        //     //         " to " +
-        //     //         (d.x1) +
-        //     //         "<br>Distribution Mean: " +
-        //     //         d3.mean(temp_arr) +
-        //     //         "<br>Distribution Median: " +
-        //     //         d3.median(temp_arr)
-        //     //
-        //     //         // "<br>symmetry: " +
-        //     //         // finalData[d]["symmetry"]
-        //     //         // "<br>Material_0: " +
-        //     //         // finalData[d].CM0 +
-        //     //         // "<br>Material_1: "
-        //     //         // d.CM1 +
-        //     //         // `<br>${query1}: ` +
-        //     //         // d[query1] +
-        //     //         // `<br>${query2}: ` +
-        //     //         // d[query2]
-        //     //     )
-        //     //     .style("top", e.pageY - 110 + "px")
-        //     //     .style("left", e.pageX + 10 + "px");
-        // };
 
         // Compute values (and promote column names to accessors).
         const X = d3.map(x, x => d3.map(finalData, typeof x === "function" ? x : d => +d[x]));
@@ -216,10 +166,6 @@ class Hist {
 
         let all_bins = [];
 
-        d3.select(container.current)
-            .selectAll("svg")
-            .on("mouseover", mouseover_hist)
-            // .on("mousemove", mousemove_hist)
 
         this.cell.each(function ([x, y]) {
             if (x == index && y == index) {
@@ -273,12 +219,12 @@ class Hist {
                         // temp_tooltip["min"] = d3.min(temp_arr)
                         temp_tooltip["name"] = data[i].name
                         temp_tooltip["color"] = data[i].color
-                        temp_tooltip["range"] = d3.extent(temp_arr)
+                        temp_tooltip["min"] = d3.min(temp_arr)
+                        temp_tooltip["max"] = d3.max(temp_arr)
                         temp_tooltip["mean"] = d3.mean(temp_arr)
                         temp_tooltip["median"] = d3.median(temp_arr)
-
+                        tooltip.push(temp_tooltip)
                     }
-                    tooltip.push(temp_tooltip)
                     // console.log("bins")
                     // console.log(data[i] ? data[i].data.map((d, i) => d[query1]) : null)
                     // console.log(temp_tooltip)
@@ -315,12 +261,13 @@ class Hist {
                             .attr("width", d => (bins.length == 1) ? 5 : Math.max(0, xScale(d.x1) - xScale(d.x0) - insetLeft - insetRight))
                             .attr("y", (d, i) => yScale(Y1[i]))
                             .attr("height", (d, i) => yScale(0) - yScale(Y1[i]))
-                            // .on("mouseover", mouseover_hist)
                             // .on("mouseleave", mouseleave_rec)
                             // .on("mousemove", mousemove_hist)
                             .attr("transform", `translate(${-width / 10}, ${0})`)
 
-
+                        d3.selectAll(".group" + i)
+                            .on("mouseover", mouseover_hist)
+                            .on("mouseleave", mouseleave_rec)
                         histogram.exit().remove();
                     }
 
@@ -369,42 +316,39 @@ class Hist {
             .attr("font-size", 18)
             .attr("font-family", "sans-serif")
             .attr("text-anchor", "middle")
-        //
-        // console.log('final_tool_tip')
-        // console.log(tooltip)
+
+        console.log('final_tool_tip')
+        console.log(tooltip)
         setTooltip(tooltip);
         let tooltip_hist = d3
             .select(container.current)
             .append("div")
             .style("overflow-y", "auto")
-            // .attr("viewBox", "0, 0, 100, 100")
-            // .attr("width", 100)
-            // .attr("height", 100)
             .style("width", '280px')
             .style("height", '200px')
             .attr("class", "tooltip_hist")
             .style("position", "fixed")
             .style("background-color", "white")
             .style("border", "solid")
+            .style("stroke", "white")
+            .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")
             .style("border-width", "2px")
             .style("border-radius", "5px")
             .style("padding", "10px")
             .style("visibility", "visible")
-            .html(tooltip.map((d, i ) => (
-                "range<br>" + d.range +
-                "range<br>" + d.range +
-                "range<br>" + d.range +
-                "range<br>" + d.range +
-                "range<br>" + d.range +
-                "range<br>" + d.range
-
-            ))
-
+            .html((tooltip.map((d, i) => (
+                        "<b>Dataset: </b>" + d.name + "<br>" +
+                        "<b>Range: </b>" + expo(d.min, 2) + " to " + expo(d.max, 2) + "<br>" +
+                        "<b>Mean: </b>" + expo(d.mean, 2) + "<br>" +
+                        "<b>Median: </b>" + expo(d.median, 2) + "<br><br>"
+                    )
+                ))
             )
-            .style("top", 100 + "px")
+            .style("top", 60 + "px")
             .style("left", 500 + "px");
 
     }
+
 
 }
 

@@ -424,7 +424,7 @@ const Hist_DataSelector = ({
                 </FormControl>
             </div>
             <div className={styles["data-content-line"]}>
-                <p>X-axis</p>
+                {/*<p>X-axis</p>*/}
                 <FormControl variant="standard" fullWidth>
                     <InputLabel id="x-axis-select-label">{query1}</InputLabel>
                     <Select
