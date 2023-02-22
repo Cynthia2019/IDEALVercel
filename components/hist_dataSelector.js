@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styles from "../styles/hist.dataSelector.module.css";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -117,6 +117,28 @@ const Hist_DataSelector = ({
     const [showData, setShowData] = useState(availableDatasetNames.map((dataset, index) => {
         return true;
     }))
+    //
+    // useEffect(() => {
+    //     availableDatasetNames.map((dataset, index) => {
+    //         if (index >= 2) {
+    //             console.log("unchecked")
+    //             const sourceItems = Array.from(dataLibrary);
+    //             const destItems = Array.from(activeData);
+    //             const unchecked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
+    //             // console.log(unchecked)
+    //             // console.log(destItems.indexOf(unchecked))
+    //             const [removed] = destItems.splice(destItems.indexOf(unchecked), 1);
+    //             sourceItems.splice(sourceItems.length, 0, removed)
+    //             setActiveData(destItems)
+    //             setDataLibrary(sourceItems);
+    //         }
+    //         let temp = [...showData];
+    //         temp[index] = !temp[index]
+    //         setShowData(temp)
+    //
+    //     })
+    // }, [])
+
     const onIconChange = (event, index) => {
         if (!event.target.checked) {
             console.log("unchecked")
