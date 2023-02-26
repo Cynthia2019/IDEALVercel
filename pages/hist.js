@@ -67,7 +67,7 @@ export default function Hist({fetchedNames}) {
     };
 
     const handleRangeChange = (name, value) => {
-        let filtered_datasets = datasets.map((set, i) => {
+        let filtered_datasets = activeData.map((set, i) => {
             let filtered = set.data.filter(
                 (d) => d[name] >= value[0] && d[name] <= value[1]
             );
@@ -174,7 +174,7 @@ export default function Hist({fetchedNames}) {
                         />
                         <Hist_RangeSelector
                             datasets={datasets}
-                            filteredDatasets={filteredDatasets}
+                            filteredDatasets={activeData}
                             handleChange={handleRangeChange}
                         />
                         {/*<MaterialInformation dataPoint={dataPoint}/>*/}
