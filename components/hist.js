@@ -139,10 +139,22 @@ class Hist {
 
         let mouseover_hist = function (e, d) {
             console.log("hist");
+            console.log(e)
+            console.log(d)
+            // index = d3.select(this).attr("class")[5]
             d3.select(this)
+                .raise()
                 .style("stroke", "black")
                 .style("stroke-width", 5)
                 .style("fill-opacity", 1);
+
+            // d3.selectAll('.mean-line' + index)
+            //     .raise()
+            //     .style("stroke-width", 10)
+            //     .style("fill-opacity", 1)
+            //     .style("stroke-dasharray", ("0, 0"))
+
+
         };
 
 
@@ -334,47 +346,48 @@ class Hist {
 
         tooltip.map((d, i) => {
             let mean = tooltip[i].mean
-            console.log('mean-line')
-            console.log(dataset_dic[i])
-            console.log(mean)
-            console.log(xScales[0](mean))
+            // console.log('mean-line')
+            // console.log(dataset_dic[i])
+            // console.log(mean)
+            // console.log(xScales[index](mean))
             d3.select('svg')
                 .append('g')
                 .append('line')
                 .attr('class', 'mean-line' + i)
                 .raise()
                 .transition(updateTransition)
-                .attr("x1", xScales[0](mean))
+                .attr("x1", xScales[index](mean) + width / 15)
                 .attr("y1", width + padding * 10 + 5)
-                .attr("x2", xScales[0](mean))
+                .attr("x2", xScales[index](mean) + width / 15)
                 .attr("y2", padding * 16 - 5)
                 .attr("stroke", colors[dataset_dic[i]])
                 .attr("stroke-width", 6)
                 .attr("fill", "None")
                 .style("stroke-dasharray", ("5, 5"))
+
         })
 
-        let legend = d3.select('svg')
-            .append('g')
-            .append("line");
-
-
-
-        legend//making a line for legend
-            .raise()
-            .attr("x1", width - 28)
-            .attr("x2", width)
-            .attr("y1", 10)
-            .attr("y2", 10)
-            .style("stroke-dasharray","5,5")//dashed array for line
-            .style("stroke", "black");
-
-        legend.append("text")
-            .attr("x", width - 44)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "end")
-            .text("Mean");
+        // let legend = d3.select('svg')
+        //     .append('g')
+        //     .append("line");
+        //
+        //
+        //
+        // legend//making a line for legend
+        //     .raise()
+        //     .attr("x1", width - 28)
+        //     .attr("x2", width)
+        //     .attr("y1", 10)
+        //     .attr("y2", 10)
+        //     .style("stroke-dasharray","5,5")//dashed array for line
+        //     .style("stroke", "black");
+        //
+        // legend.append("text")
+        //     .attr("x", width - 44)
+        //     .attr("y", 9)
+        //     .attr("dy", ".35em")
+        //     .style("text-anchor", "end")
+        //     .text("Mean");
         // let tooltip_hist = d3
         //     .select(container.current)
         //     .append("div")
