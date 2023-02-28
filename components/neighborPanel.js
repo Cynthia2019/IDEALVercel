@@ -33,11 +33,10 @@ const NeighborPanel = ({ neighbors }) => {
         csvLink.current.link.click();
     })
   }
-  console.log('neigbor', neighbors, transpose(neighbors))
   return (
     <div className={styles.saveSection}>
       <div className={styles["save-data-content-line"]}>
-        <p className={styles["data-title"]}>Nearest Five Neighbors Panel</p>
+        <p className={styles["data-title"]}>Nearest Neighbors Panel</p>
         <div className={styles["save-table-button-group"]}>
         <Button className={styles["save-table-button"]} variant="contained" endIcon={<DownloadIcon />} onClick={handleDownloadClick}>
           Download

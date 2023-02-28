@@ -31,7 +31,7 @@ class Structure {
       .attr("x", (width / 2))             
       .attr("y", 0 - (marginTop / 2))
       .attr("text-anchor", "middle")  
-      .style("font-size", "16px") 
+      .style("font-size", data.fontSize ? data.fontSize : "16px") 
       .style("font-family", 'Arial, sans-serif')
       .text("Unit Cell Geometry");
 
@@ -40,7 +40,7 @@ class Structure {
       .attr("y", height + marginTop )
       .attr("class", "volumn-ratio")
       .attr("text-anchor", "middle")  
-      .style("font-size", "16px") 
+      .style("font-size", data.fontSize ? data.fontSize : "16px") 
       .style("font-family", 'Arial, sans-serif')
     
     this.update(data);

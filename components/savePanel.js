@@ -70,11 +70,11 @@ const SavePanel = ({ selectedData, setReset }) => {
           ></CSVLink>
         </div>
       </div>
-      <Row className={styles["save-table-wrapper"]}>
-        <Col xs={18}>
+      <div className={styles["save-table-wrapper"]}>
+        <Row>
         <SaveDataTable data={selectedData} />
-        </Col>
-        <Col className={styles["save-table-sidebar"]} xs={6}>
+        </Row>
+        <Row className={styles["save-table-sidebar"]}>
           <Box component="span" sx={{ p: 2 }}>
             <h3>Total:&nbsp;{selectedData.length}</h3>
           </Box>
@@ -84,8 +84,8 @@ const SavePanel = ({ selectedData, setReset }) => {
           <Box component="span" sx={{ p: 2 }}>
             <h3>Diversity standardized:&nbsp;{diversity?.standardized}</h3>
           </Box>
-        </Col>
-      </Row>
+        </Row>
+      </div>
     </div>
   );
 };

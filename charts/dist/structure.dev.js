@@ -41,8 +41,8 @@ function () {
     var marginLeft = data.marginLeft ? data.marginLeft : MARGIN.LEFT;
     var marginTop = data.marginTop ? data.marginTop : MARGIN.TOP;
     this.svg = d3.select(element).append("svg").attr("width", width + marginLeft * 2).attr("height", height + marginTop * 2).attr("viewBox", [0, 0, width + marginLeft * 2, height + marginTop * 2]).style("z-index", 10).style("margin-top", "30px").append("g").attr("transform", "translate(".concat(marginLeft, ", ").concat(marginTop, ")"));
-    this.svg.append("text").attr("x", width / 2).attr("y", 0 - marginTop / 2).attr("text-anchor", "middle").style("font-size", "16px").style("font-family", 'Arial, sans-serif').text("Unit Cell Geometry");
-    this.svg.append("text").attr("x", width / 2).attr("y", height + marginTop).attr("class", "volumn-ratio").attr("text-anchor", "middle").style("font-size", "16px").style("font-family", 'Arial, sans-serif');
+    this.svg.append("text").attr("x", width / 2).attr("y", 0 - marginTop / 2).attr("text-anchor", "middle").style("font-size", data.fontSize ? data.fontSize : "16px").style("font-family", 'Arial, sans-serif').text("Unit Cell Geometry");
+    this.svg.append("text").attr("x", width / 2).attr("y", height + marginTop).attr("class", "volumn-ratio").attr("text-anchor", "middle").style("font-size", data.fontSize ? data.fontSize : "16px").style("font-family", 'Arial, sans-serif');
     this.update(data);
   }
 

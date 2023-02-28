@@ -20,13 +20,13 @@ const columns = [
       numeric: true,
     },
     {
-      width: 'fit-content',
+      width: 80,
       title: 'C16',
       dataIndex: 'C16',
       numeric: true,
     },
     {
-      width: 'fit-content',
+      width: 80,
       title: 'C26',
       dataIndex: 'C26',
       numeric: true,
@@ -47,7 +47,7 @@ const columns = [
       }}
       scroll={{
         y: 240,
-        x: 1000
+        x: 700
       }}
     />
   );

@@ -29,16 +29,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var merge = function merge(first, second) {
-  for (var i = 0; i < second.length; i++) {
-    for (var j = 0; j < second[i].data.length; j++) {
-      first.push(second[i].data[j]);
-    }
-  }
-
-  return first;
-};
-
 var circleOriginalSize = 5;
 var circleFocusSize = 8;
 var legendSpacing = 4;
@@ -179,7 +169,8 @@ function () {
 
       var mouseleave = function mouseleave(e, d) {
         tooltip.style("visibility", "hidden").transition().duration(200);
-        d3.select(this).attr("r", circleOriginalSize).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8);
+        var circle = d3.select(this);
+        d3.select(this).attr("r", circle.classed("highlighted") ? circleFocusSize : circleOriginalSize).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8);
       };
 
       function getKnnData(data) {
@@ -235,27 +226,31 @@ function () {
           return selected.push(d);
         });
         setSelectedData(selected);
-        getKnnData(inputData).then(function (indices) {
-          d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
-            return indices.includes(datum.index);
-          }).classed("masked", function (datum) {
-            return !indices.includes(datum.index);
+
+        if (view == 'neighbor') {
+          target.classed("selected", true);
+          getKnnData(inputData).then(function (indices) {
+            d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
+              return indices.includes(datum.index);
+            }).classed("masked", function (datum) {
+              return !indices.includes(datum.index);
+            });
           });
-        });
-        var neighborElements = d3.selectAll('.highlighted');
-        var masked = d3.selectAll('.masked');
-        masked.attr('fill', function (d) {
-          return d.color;
-        }).attr('r', circleOriginalSize);
-        var neighbors = [];
-        neighborElements.each(function (d, i) {
-          d['outline_color'] = _constants.nnColorAssignment[i];
-          return neighbors.push(d);
-        });
-        neighborElements.attr('fill', function (d) {
-          return d.outline_color;
-        }).attr('r', circleFocusSize);
-        setNeighbors(neighbors);
+          var neighborElements = d3.selectAll('.highlighted');
+          var masked = d3.selectAll('.masked');
+          masked.attr('fill', function (d) {
+            return d.color;
+          }).attr('r', circleOriginalSize).classed('selected', false);
+          var neighbors = [];
+          neighborElements.each(function (d, i) {
+            d['outline_color'] = _constants.nnColorAssignment[i];
+            return neighbors.push(d);
+          });
+          neighborElements.attr('fill', function (d) {
+            return d.outline_color;
+          }).attr('r', circleFocusSize);
+          setNeighbors(neighbors);
+        }
       };
 
       var zoomedXScale = this.xScale;

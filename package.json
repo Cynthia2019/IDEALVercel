@@ -27,6 +27,7 @@
     "react": "18.2.0",
     "react-csv": "^2.2.2",
     "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.6.2",
     "swr": "^2.0.3"

@@ -1,15 +1,6 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
 
-const merge = (first, second) => {
-  for (let i = 0; i < second.length; i++) {
-    for (let j = 0; j < second[i].data.length; j++) {
-      first.push(second[i].data[j]);
-    }
-  }
-  return first;
-};
-
 const circleOriginalSize = 5;
 const circleFocusSize = 8;
 
@@ -226,8 +217,9 @@ class Scatter {
 
     let mouseleave = function (e, d) {
       tooltip.style("visibility", "hidden").transition().duration(200);
+      const circle = d3.select(this)
       d3.select(this)
-        .attr("r", circleOriginalSize)
+        .attr("r", circle.classed("highlighted") ? circleFocusSize : circleOriginalSize)
         .style("stroke", "none")
         .style("stroke-width", 2)
         .style("fill-opacity", 0.8);
@@ -265,30 +257,33 @@ class Scatter {
       d3.selectAll(".selected").each((d, i) => selected.push(d));
       setSelectedData(selected);
 
-      getKnnData(inputData).then((indices) => {
-        d3.selectAll(".dataCircle")
-          .data(finalData)
-          .classed("highlighted", function (datum) {
-            return indices.includes(datum.index);
-          })
-          .classed("masked", function (datum) {
-            return !(indices.includes(datum.index));
-          })
-          ;
-      });
-
-      let neighborElements = d3.selectAll('.highlighted')
-      let masked = d3.selectAll('.masked')
-      masked.attr('fill', d => d.color).attr('r', circleOriginalSize)
-
-
-      let neighbors = [];
-      neighborElements.each((d, i) => {
-        d['outline_color'] = nnColorAssignment[i]
-        return neighbors.push(d)
-      });
-      neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
-      setNeighbors(neighbors);
+      if (view == 'neighbor') {
+        target.classed("selected", true);
+        getKnnData(inputData).then((indices) => {
+          d3.selectAll(".dataCircle")
+            .data(finalData)
+            .classed("highlighted", function (datum) {
+              return indices.includes(datum.index);
+            })
+            .classed("masked", function (datum) {
+              return !(indices.includes(datum.index));
+            })
+            ;
+        });
+  
+        let neighborElements = d3.selectAll('.highlighted')
+        let masked = d3.selectAll('.masked')
+        masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
+  
+  
+        let neighbors = [];
+        neighborElements.each((d, i) => {
+          d['outline_color'] = nnColorAssignment[i]
+          return neighbors.push(d)
+        });
+        neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
+        setNeighbors(neighbors);
+      }
     };
     let zoomedXScale = this.xScale;
     let zoomedYScale = this.yScale;
