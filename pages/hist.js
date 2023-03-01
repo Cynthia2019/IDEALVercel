@@ -1,31 +1,39 @@
 import {useState, useEffect, useMemo} from "react";
 import Header from "../components/header";
-import styles from "../styles/Home.module.css";
-import ScatterWrapper from "../components/scatterWrapper";
-import StructureWrapper from "../components/structureWrapper";
+import styles from "../styles/hist.Home.module.css";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-import Pairwise_DataSelector from "../components/pairwise_dataSelector";
+import Hist_dataSelector from "../components/hist_dataSelector";
 // import DataSelector from "@/components/dataSelector";
-import RangeSelector from "../components/rangeSelector";
+import Hist_RangeSelector from "../components/hist_rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histWrapper";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import s3Client from './api/aws'
-import { s3BucketList } from '@/util/constants'
-import processData from "../util/processData";
+import { useRouter } from 'next/router';
+import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
+import s3Client from "@/pages/api/aws";
+import {colorAssignment} from "@/util/constants";
+import processData from "@/util/processData";
+import {act} from "react-dom/test-utils";
+
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Hist({data}) {
+export default function Hist({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
+    const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+    const [activeData, setActiveData] = useState(datasets);
+    const [dataLibrary, setDataLibrary] = useState([])
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
-    const [selectedData, setSelectedData] = useState([])
+    const [selectedData, setSelectedData] = useState([]);
+    const [onLoad, setOnLoad] = useState(true);
 
-    const [query1, setQuery1] = useState("C11");
+    const router = useRouter();
+    const {pairwise_query1} = router.query;
+
+    const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
     const [query2, setQuery2] = useState("C12");
 
     const Youngs = dynamic(() => import("../components/youngs"), {
@@ -59,7 +67,7 @@ export default function Hist({data}) {
     };
 
     const handleRangeChange = (name, value) => {
-        let filtered_datasets = datasets.map((set, i) => {
+        let filtered_datasets = activeData.map((set, i) => {
             let filtered = set.data.filter(
                 (d) => d[name] >= value[0] && d[name] <= value[1]
             );
@@ -70,75 +78,58 @@ export default function Hist({data}) {
                 return names.includes(s.name)
             }
         );
-        setFilteredDatasets(filtered_datasets);
+        setActiveData(filtered_datasets);
     };
 
-    const datasetLinks = [
-        {
-            name: "free form 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/837a01c52c4c17d7b31dbd8ad3045878/raw/703d9fcdefcf28a084709ad6a98f403303aba5bd/ideal_freeform_2d_sample.csv",
-            color: "#8A8BD0",
-        },
-        {
-            name: "lattice 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/d840d03813d9b0fc13956430b8c42886/raw/6c82615e1bcce639938a008cc4af212f771627da/ideal_lattice_2d.csv",
-            color: "#FFB347",
-        },
-    ];
     useEffect(() => {
-        datasetLinks.map((d, i) => {
-            csv(d.src).then((data) => {
-                const processedData = data.map((d) => {
-                    let youngs = d.youngs.match(regex).map(parseFloat);
-                    let poisson = d.poisson.match(regex).map(parseFloat);
-                    let processed = {
-                        C11: parseFloat(d.C11),
-                        C12: parseFloat(d.C12),
-                        C22: parseFloat(d.C22),
-                        C16: parseFloat(d.C16),
-                        C26: parseFloat(d.C26),
-                        C66: parseFloat(d.C66),
-                        condition: d.condition,
-                        symmetry: d.symmetry,
-                        CM0: d.CM0,
-                        CM1: d.CM1,
-                        CM0_E: d.CM0_E,
-                        CM0_nu: d.CM0_nu,
-                        CM1_E: d.CM1_E,
-                        CM1_nu: d.CM1_nu,
-                        geometry: d.geometry_full,
-                        youngs: youngs,
-                        poisson: poisson,
-                        "Minimal directional Young's modulus [N/m]": Math.min(...youngs),
-                        "Maximal directional Young's modulus [N/m]": Math.max(...youngs),
-                        "Minimal Poisson's ratio [-]": Math.min(...poisson),
-                        "Maximal Poisson's ratio [-]": Math.max(...poisson),
-                    };
-                    return processed;
+        async function fetchData(info) {
+            const command = new GetObjectCommand({
+                Bucket: info.bucket_name,
+                Key: info.name,
+            })
+
+            await s3Client.send(command).then((res) => {
+                let body = res.Body.transformToByteArray();
+                body.then((stream) => {
+                    new Response(stream, { headers: { "Content-Type": "text/csv" } })
+                        .text()
+                        .then((data) => {
+                            let parsed = csvParse(data)
+                            const processedData = processData(parsed.slice(0, 5000))
+                            setDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setFilteredDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setActiveData((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setSelectedDatasetNames((datasets) => [
+                                ...datasets,
+                                JSON.stringify({ name: info.name, color: info.color }),
+                            ]);
+                            setDataPoint(processedData[0]);
+                        });
                 });
-                setDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setFilteredDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setSelectedDatasetNames((datasets) => [
-                    ...datasets,
-                    JSON.stringify({ name: d.name, color: d.color }),
-                ]);
-                setDataPoint(processedData[0]);
             });
-        });
+        }
+        availableDatasetNames.map((info, i) => fetchData(info))
     }, []);
 
     return (
@@ -148,7 +139,7 @@ export default function Hist({data}) {
                 <Row>
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
-                            <p className={styles.mainPlotTitle}>Material Data Explorer (Histogram)</p>
+                            <p className={styles.mainPlotTitle}></p>
                             {/*<p className={styles.mainPlotSub}>*/}
                             {/*    Select properties from the dropdown menus below to graph on the*/}
                             {/*    x and y axes. Hovering over data points provides additional*/}
@@ -157,32 +148,63 @@ export default function Hist({data}) {
                             {/*</p>*/}
                         </div>
                         <HistWrapper
-                            data={filteredDatasets}
+                            data={activeData}
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
+                            query1={query1}
+                            max_num_datasets={availableDatasetNames.length}
                         />
                     </div>
-                    <div className={styles.subPlots}>
-                    </div>
+
                     <div className={styles.selectors}>
-                        <Pairwise_DataSelector
+                        <Hist_dataSelector
+                            setDatasets={setDatasets}
+                            availableDatasetNames={availableDatasetNames}
+                            setAvailableDatasetNames={setAvailableDatasetNames}
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                             query1={query1}
                             handleQuery1Change={handleQuery1Change}
                             query2={query2}
                             handleQuery2Change={handleQuery2Change}
+                            activeData={activeData}
+                            dataLibrary={dataLibrary}
+                            setActiveData={setActiveData}
+                            setDataLibrary={setDataLibrary}
                         />
-                        <RangeSelector
+                        <Hist_RangeSelector
                             datasets={datasets}
-                            filteredDatasets={filteredDatasets}
+                            filteredDatasets={activeData}
                             handleChange={handleRangeChange}
                         />
-                        <MaterialInformation dataPoint={dataPoint}/>
+                        {/*<MaterialInformation dataPoint={dataPoint}/>*/}
 
                     </div>
                 </Row>
             </div>
         </div>
     );
+}
+
+export async function getStaticProps() {
+    let fetchedNames = []
+    const listObjectCommand = new ListObjectsCommand({
+        Bucket: 'ideal-dataset-1'
+    })
+    await s3Client.send(listObjectCommand).then((res) => {
+        const names = res.Contents.map(content => content.Key)
+        for (let i = 0; i < names.length; i++) {
+            fetchedNames.push({
+                bucket_name: 'ideal-dataset-1',
+                name: names[i],
+                color: colorAssignment[i]
+            })
+        }
+    })
+    return {
+        props: {
+            fetchedNames: fetchedNames
+        }
+    }
+
 }

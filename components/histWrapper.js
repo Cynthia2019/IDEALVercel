@@ -1,10 +1,12 @@
-import React, {useRef, useState, useEffect} from "react";
+import {useRef, useState, useEffect} from "react";
+import * as React from "react";
 import Hist from "./hist";
 
-const HistWrapper = ({data, element, setDataPoint, setSelectedData}) => {
+const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_num_datasets}) => {
     const histContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
+    const [tooltip, setTooltip] = useState(null);
 
     useEffect(() => {
         if (!chart) {
@@ -21,23 +23,20 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData}) => {
                     ]
                 }, histContainer,
                 legendContainer.current,
-                setDataPoint);
+                setDataPoint,
+                query1,
+                max_num_datasets,
+                setTooltip
+            );
 
         }
-    }, [data]);
+    }, [data, query1]);
 
     return (
         <div style={{display: "flex", flexDirection: "column"}}>
             <div id="main-plot" ref={histContainer}
                  style={{display: "flex", flexDirection: "column"}}
             ></div>
-            {/*<div*/}
-            {/*    id="main-plot-legend"*/}
-            {/*    style={{display: "flex", flexDirection: "column"}}*/}
-            {/*    ref={legendContainer}*/}
-            {/*>*/}
-
-            {/*</div>*/}
 
         </div>
 

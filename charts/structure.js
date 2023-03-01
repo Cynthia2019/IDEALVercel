@@ -61,11 +61,8 @@ class Structure {
     const size = (width + marginLeft * 2) / 50; 
 
 
-    let ratio = this.calculateRatio(this.data, data.color)
-    const volumn_ratio = this.svg.select(".volumn-ratio")
-  
+    let ratio = this.calculateRatio(this.data)
     this.svg.select(".volumn-ratio").text(`Volumn Ratio: ${ratio}`);
-
 
     const pixels = this.svg.selectAll("rect").data(res);
     pixels

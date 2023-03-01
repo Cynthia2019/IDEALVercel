@@ -329,14 +329,11 @@ class Pairwise_d3 {
         };
 
         let mousedown_non_hist = function (e, d) {
-            console.log("clicked")
-            console.log(d)
             d3.select(container.current).remove()
             router.push({
                 pathname: "/scatter",
                 query: {
-                    pairwise_query1 : x[d[0]],
-                    pairwise_query2 : x[d[1]]
+                    pairwise_query1 : x[d[0]]
                 }
             });
 
@@ -348,13 +345,14 @@ class Pairwise_d3 {
         }
 
         let mousedown_hist = function (e, d) {
-            console.log("clicked_hist")
-            console.log(d)
             d3.select(container.current).remove()
-            window.open(
-                '/hist',
-                '_self' // <- This is what makes it open in a new window.
-            );
+            router.push({
+                pathname: "/hist",
+                query: {
+                    pairwise_query1 : x[d[0]],
+                    pairwise_query2 : x[d[1]]
+                }
+            });
 
         }
 

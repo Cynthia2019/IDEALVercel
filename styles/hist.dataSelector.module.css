@@ -1,13 +1,14 @@
 .data-selector {
-    width: 94.5%;
+    width: 180%;
     border: 3px solid #E4E0EE;
-    margin: 10px 10px;
+    margin: 10px 50px;
     padding: 20px;
     z-index: 10;
 }
 .data-content-line {
     display: flex;
     flex-direction: column;
+    margin: 5px 0px;
 }
 .data-row {
     display: flex;
