@@ -8,10 +8,7 @@ const marginBottom = 0 // bottom margin, in pixels
 const marginLeft = 0 // left margin, in pixels
 const width = 968 // outer width, in pixels
 
-function expo(x, f) {
-    if (x < 1000 && x > -1000) return x;
-    return Number(x).toExponential(f);
-}
+
 
 class Hist {
     constructor(data, container, legendContainer) {
@@ -95,9 +92,21 @@ class Hist {
            setDataPoint,
            query1,
            max_num_datasets,
-           setTooltip) {
+           setTooltip,
+           toggled) {
         console.log("updating...")
         console.log(data)
+        function expo(x, f) {
+            if (x < 1000 && x > -1000) return x;
+            console.log("number format")
+            console.log(x)
+            if (!toggled) {
+                return (x / 1e6) + "e+6"
+            } else {
+                return (x / 1e9) + "e+9"
+            }
+            // return Number(x).toExponential(f);
+        }
         let index = columns.indexOf(query1)
         let datasets = [];
         let dataset_dic = {};
@@ -139,8 +148,8 @@ class Hist {
 
         let mouseover_hist = function (e, d) {
             console.log("hist");
-            console.log(e)
-            console.log(d)
+            // console.log(e)
+            // console.log(d)
             // index = d3.select(this).attr("class")[5]
             d3.select(this)
                 .raise()
@@ -337,7 +346,7 @@ class Hist {
         setTooltip(tooltip);
 
 
-        let transitionDuration = 500;
+        let transitionDuration = 200;
 
         const exitTransition = d3.transition().duration(transitionDuration);
         const updateTransition = exitTransition
