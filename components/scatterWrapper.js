@@ -6,6 +6,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import {FcMindMap} from 'react-icons/fc'
 
 const ScatterWrapper = ({
   data,
@@ -14,13 +15,14 @@ const ScatterWrapper = ({
   query2,
   selectedData,
   setSelectedData,
+  setNeighbors, 
   reset,
   setReset
 }) => {
   const chartArea = useRef(null);
   const legendArea = useRef(null);
   const [chart, setChart] = useState(null);
-  const [view, setView] = useState("brush-on");
+  const [view, setView] = useState("zoom");
 
   const handleChange = (e, nextView) => {
     setView(nextView);
@@ -40,17 +42,20 @@ const ScatterWrapper = ({
       );
     } else {
       chart.update(
-        data,
-        chartArea.current,
-        legendArea.current,
-        setDataPoint,
-        query1,
-        query2,
-        selectedData,
-        setSelectedData,
-        view,
-        reset,
-        setReset
+        {
+          data,
+          element: chartArea.current,
+          legendElement: legendArea.current,
+          setDataPoint,
+          query1,
+          query2,
+          selectedData,
+          setSelectedData,
+          setNeighbors,
+          view,
+          reset,
+          setReset
+        }
       );
     }
   }, [chart, query1, query2, data, view, reset]);
@@ -62,11 +67,6 @@ const ScatterWrapper = ({
         id="main-plot-side-bar"
         style={{ display: "flex", flexDirection: "column", zIndex: 10, marginLeft: 10 }}
       >
-        {/* <div
-          id="main-plot-legend"
-          style={{ display: "flex", flexDirection: "column" }}
-          ref={legendArea}
-        ></div> */}
         <ToggleButtonGroup
           orientation="vertical"
           value={view}
@@ -87,6 +87,11 @@ const ScatterWrapper = ({
           <CancelOutlinedIcon style={{ fontSize: "15px", color: "red" }} />
               <span style={{ fontSize: "10px" }}>Deselect Data</span>
           </ToggleButton>
+          <ToggleButton value='neighbor' aria-label="find nearest neighbors">
+            <FcMindMap style={{fontSize: '25px'}}/>
+            <span style={{ fontSize: "10px" }}>Find Nearest Neighbors</span>
+          </ToggleButton>
+
         </ToggleButtonGroup>
       </div>
     </div>

@@ -17,17 +17,6 @@ import processData from "@/util/processData";
 import Papa, { parse } from 'papaparse'
 import { colorAssignment, requiredColumns } from "@/util/constants";
 
-const datasetNames = [
-  {
-    name: "free form 2D",
-    color: "#8A8BD0",
-  },
-  {
-    name: "lattice 2D",
-    color: "#FFB347",
-  },
-];
-
 const AxisSelections = [
   "C11",
   "C12",
