@@ -1,8 +1,10 @@
 import {useRef, useState, useEffect} from "react";
 import * as React from "react";
 import Hist from "./hist";
-import Switch from '@material-ui/core/Switch';
-import { useN01SwitchStyles } from '@mui-treasury/styles/switch/n01';
+import Switch from '@mui/material/Switch';
+
+//import Switch from '@material-ui/core/Switch';
+// import { useN01SwitchStyles } from '@mui-treasury/styles/switch/n01';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 
@@ -12,7 +14,7 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_
     const [chart, setChart] = useState(null);
     const [tooltip, setTooltip] = useState(null);
     const [toggled, setToggled] = React.useState(false);
-    const switchStyles = useN01SwitchStyles();
+    // const switchStyles = useN01SwitchStyles();
 
     useEffect(() => {
         if (!chart) {

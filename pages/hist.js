@@ -14,8 +14,6 @@ import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from "@/pages/api/aws";
 import {colorAssignment} from "@/util/constants";
 import processData from "@/util/processData";
-import {act} from "react-dom/test-utils";
-
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 

@@ -5,7 +5,8 @@ import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
-import DataSelector from "../components/dataSelector";
+import Scatter_dataSelector from "../components/scatter_dataSelector";
+//import DataSelector from "../components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
@@ -20,6 +21,8 @@ import { useRouter } from 'next/router';
 export default function Scatter({fetchedNames}) {
   const [datasets, setDatasets] = useState([]);
   const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+  const [activeData, setActiveData] = useState(datasets);
+  const [dataLibrary, setDataLibrary] = useState([])
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -76,6 +79,7 @@ export default function Scatter({fetchedNames}) {
     }
     );
     setFilteredDatasets(filtered_datasets);
+    setActiveData(filtered_datasets);
   };
 
   useEffect(() => {
@@ -113,6 +117,14 @@ export default function Scatter({fetchedNames}) {
                 ...datasets,
                 JSON.stringify({ name: info.name, color: info.color }),
               ]);
+              setActiveData((datasets) => [
+                ...datasets,
+                {
+                    name: info.name,
+                    data: processedData,
+                    color: info.color,
+                },
+            ]);
               setDataPoint(processedData[0]);
             });
         });
@@ -129,7 +141,7 @@ export default function Scatter({fetchedNames}) {
         <Row className={styles.firstScreen}>
           <div className={styles.mainPlot}>
             <div className={styles.mainPlotHeader}>
-              <p className={styles.mainPlotTitle}>Material Data Explorer</p>
+              <p className={styles.mainPlotTitle}>Material Data Explorer (Individual Scatter Plot)</p>
               <p className={styles.mainPlotSub}>
                 Select properties from the dropdown menus to graph on the x and
                 y axes. Hovering over data points provides additional
@@ -137,7 +149,7 @@ export default function Scatter({fetchedNames}) {
               </p>
             </div>
             <ScatterWrapper
-              data={filteredDatasets}
+              data={activeData}
               setDataPoint={setDataPoint}
               query1={query1}
               query2={query2}
@@ -153,7 +165,7 @@ export default function Scatter({fetchedNames}) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div className={styles.selectors}>
-            <DataSelector
+            {/* <Scatter_dataSelector
               setDatasets={setDatasets}
               availableDatasetNames={availableDatasetNames}
               setAvailableDatasetNames={setAvailableDatasetNames}
@@ -163,10 +175,25 @@ export default function Scatter({fetchedNames}) {
               handleQuery1Change={handleQuery1Change}
               query2={query2}
               handleQuery2Change={handleQuery2Change}
-            />
+            /> */}
+            <Scatter_dataSelector
+                  setDatasets={setDatasets}
+                  availableDatasetNames={availableDatasetNames}
+                  setAvailableDatasetNames={setAvailableDatasetNames}
+                  selectedDatasetNames={selectedDatasetNames}
+                  handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
+                  query1={query1}
+                  handleQuery1Change={handleQuery1Change}
+                  query2={query2}
+                  handleQuery2Change={handleQuery2Change}
+                  activeData={activeData}
+                  dataLibrary={dataLibrary}
+                  setActiveData={setActiveData}
+                  setDataLibrary={setDataLibrary}
+              />
             <RangeSelector
               datasets={datasets}
-              filteredDatasets={filteredDatasets}
+              filteredDatasets={activeData}
               handleChange={handleRangeChange}
             />
           </div>

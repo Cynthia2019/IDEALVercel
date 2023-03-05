@@ -6,9 +6,6 @@
   max-width: 100vw;
 }
 
-.firstScreen {
-  min-height: 100vh;
-}
 .mainPlot {
   width: 50%;
 }
@@ -33,7 +30,8 @@
   justify-content: flex-start;
   align-items: center;
   width: 25%;
-  height: 110vh;
+  height: 80vh;
+  overflow-y: hidden;
 }
 .selectors {
   width: 25%;

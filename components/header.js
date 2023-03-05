@@ -1,7 +1,8 @@
+import Link from "next/link"
 export default function Header() {
     return (
         <div className='header'>
-            <p className='headerText'>Northwestern Engineering IDEAL LAB</p>
+            <Link className='headerText' href="/">Northwestern Engineering IDEAL LAB</Link>
         </div>
     )
 }
