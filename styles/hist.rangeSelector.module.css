@@ -1,8 +1,8 @@
 .property-range {
     width: 180%;
-    height: 80%;
+    height: 35%;
     border: 3px solid #E4E0EE;
-    margin: 0 50px;
+    margin: 10px 50px;
     padding: 20px;
 }
 .range-content-line {

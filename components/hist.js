@@ -397,32 +397,32 @@ class Hist {
         //     .attr("dy", ".35em")
         //     .style("text-anchor", "end")
         //     .text("Mean");
-        // let tooltip_hist = d3
-        //     .select(container.current)
-        //     .append("div")
-        //     .style("overflow-y", "auto")
-        //     .style("width", '280px')
-        //     .style("height", '200px')
-        //     .attr("class", "tooltip_hist")
-        //     .style("position", "fixed")
-        //     .style("background-color", "white")
-        //     .style("border", "solid")
-        //     .style("stroke", "white")
-        //     .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")
-        //     .style("border-width", "2px")
-        //     .style("border-radius", "5px")
-        //     .style("padding", "10px")
-        //     .style("visibility", "visible")
-        //     .html((tooltip.map((d, i) => (
-        //                 "<b>Dataset: </b>" + d.name + "<br>" +
-        //                 "<b>Range: </b>" + expo(d.min, 2) + " to " + expo(d.max, 2) + "<br>" +
-        //                 "<b>Mean: </b>" + expo(d.mean, 2) + "<br>" +
-        //                 "<b>Median: </b>" + expo(d.median, 2) + "<br><br>"
-        //             )
-        //         ))
-        //     )
-        //     .style("top", 60 + "px")
-        //     .style("left", 500 + "px");
+        let tooltip_hist = d3
+            .select(container.current)
+            .append("div")
+            .style("overflow-y", "auto")
+            .style("width", '280px')
+            .style("height", '200px')
+            .attr("class", "tooltip_hist")
+            .style("position", "fixed")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("stroke", "white")
+            .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("visibility", "visible")
+            .html((tooltip.map((d, i) => (
+                        "<b>Dataset: </b>" + d.name + "<br>" +
+                        "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" +
+                        "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" +
+                        "<b>Median: </b>" + expo(d.median, 0) + "<br><br>"
+                    )
+                ))
+            )
+            .style("top", 60 + "px")
+            .style("left", 500 + "px");
 
     }
 

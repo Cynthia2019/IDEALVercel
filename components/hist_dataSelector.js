@@ -17,7 +17,6 @@ import {PutObjectCommand} from '@aws-sdk/client-s3'
 import processData from "@/util/processData";
 import Papa, {parse} from 'papaparse'
 import {colorAssignment, requiredColumns} from "@/util/constants";
-import {DragDropContext, Droppable, Draggable, resetServerContext} from 'react-beautiful-dnd';
 import * as d3 from "d3";
 import * as React from 'react';
 import Table from '@mui/material/Table';
@@ -33,9 +32,7 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
-import Tooltip, {tooltipClasses} from '@mui/material/Tooltip';
 
-resetServerContext()
 const datasetNames = [
     {
         name: "free form 2D",
