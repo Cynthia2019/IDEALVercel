@@ -75,13 +75,13 @@ const SavePanel = ({ selectedData, setReset }) => {
         <SaveDataTable data={selectedData} />
         </Row>
         <Row className={styles["save-table-sidebar"]}>
-          <Box component="span" sx={{ p: 2 }}>
+          <Box component="span">
             <h3>Total:&nbsp;{selectedData.length}</h3>
           </Box>
-          <Box component="span" sx={{ p: 2 }}>
+          <Box component="span">
             <h3>Diversity raw:&nbsp;{diversity?.raw}</h3>
           </Box>
-          <Box component="span" sx={{ p: 2 }}>
+          <Box component="span">
             <h3>Diversity standardized:&nbsp;{diversity?.standardized}</h3>
           </Box>
         </Row>
