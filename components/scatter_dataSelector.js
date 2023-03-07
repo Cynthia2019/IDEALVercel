@@ -79,6 +79,8 @@ const Scatter_DataSelector = ({
   handleSelectedDatasetNameChange,
   query1,
   handleQuery1Change,
+                                query2,
+                                handleQuery2Change,
   activeData,
   dataLibrary,
   setActiveData,
@@ -298,7 +300,7 @@ const Scatter_DataSelector = ({
         </FormControl>
       </div>
       <div className={styles["data-content-line"]}>
-        {/*<p>X-axis</p>*/}
+        <p>X-axis</p>
         <FormControl variant="standard" fullWidth>
           <InputLabel id="x-axis-select-label">{query1}</InputLabel>
           <Select
@@ -313,6 +315,27 @@ const Scatter_DataSelector = ({
                 <MenuItem value={item} key={index}>
                   {item}
                 </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </div>
+      <div className={styles["data-content-line"]}>
+        <p>Y-axis</p>
+        <FormControl variant="standard" fullWidth>
+          <InputLabel id="x-axis-select-label">{query2}</InputLabel>
+          <Select
+              labelId="x-axis-select-label"
+              id="x-axis-select"
+              value={query2}
+              onChange={handleQuery2Change}
+              input={<BootstrapInput />}
+          >
+            {AxisSelections.map((item, index) => {
+              return (
+                  <MenuItem value={item} key={index}>
+                    {item}
+                  </MenuItem>
               );
             })}
           </Select>

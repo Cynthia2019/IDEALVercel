@@ -54,15 +54,15 @@ export default function Pairwise_page({fetchedNames}) {
 
     const handleRangeChange = (name, value) => {
         let filtered_datasets = datasets.map((set, i) => {
-          let filtered = set.data.filter(
-            (d) => d[name] >= value[0] && d[name] <= value[1]
-          );
-          return { name: set.name, data: filtered, color: set.color };
+            let filtered = set.data.filter(
+                (d) => d[name] >= value[0] && d[name] <= value[1]
+            );
+            return { name: set.name, data: filtered, color: set.color };
         });
         filtered_datasets = filtered_datasets.filter((s) => {
-         let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name)
-         return names.includes(s.name)
-        }
+                let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name)
+                return names.includes(s.name)
+            }
         );
         setFilteredDatasets(filtered_datasets);
         setActiveData(filtered_datasets);
@@ -161,7 +161,7 @@ export default function Pairwise_page({fetchedNames}) {
                         />
                         <RangeSelector
                             datasets={datasets}
-                            filteredDatasets={filteredDatasets}
+                            filteredDatasets={activeData}
                             handleChange={handleRangeChange}
                         />
                         <MaterialInformation dataPoint={dataPoint}/>
@@ -171,27 +171,4 @@ export default function Pairwise_page({fetchedNames}) {
             </div>
         </div>
     );
-}
-
-export async function getStaticProps() {
-    let fetchedNames = []
-    const listObjectCommand = new ListObjectsCommand({
-        Bucket: 'ideal-dataset-1'
-    })
-    await s3Client.send(listObjectCommand).then((res) => {
-        const names = res.Contents.map(content => content.Key)
-        for (let i = 0; i < names.length; i++) {
-            fetchedNames.push({
-                bucket_name: 'ideal-dataset-1',
-                name: names[i],
-                color: colorAssignment[i]
-            })
-        }
-    })
-    console.log("fetching")
-    return {
-        props: {
-            fetchedNames: fetchedNames
-        }
-    }
 }
