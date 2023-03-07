@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import dynamic from "next/dynamic";
-import Pairwise from "./pairwise_page";
+import Pairwise_page from "./pairwise_page";
 import processData from '@/util/processData';
 import { S3Client } from '@aws-sdk/client-s3';
 import { s3BucketList } from '@/util/constants'
@@ -34,7 +34,7 @@ export default function Home() {
     // }, [])
     return (
         <div>
-                <Pairwise />
+                <Pairwise_page />
         </div>
     );
 }

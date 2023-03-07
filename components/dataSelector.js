@@ -177,7 +177,7 @@ const DataSelector = ({
       <div className={styles["data-row"]}>
         <p className={styles["data-title"]}>Data</p>
         <Upload {...props} accept='text/csv'>
-          <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
       </div>
       <div className={styles["data-content-line"]}>
