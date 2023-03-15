@@ -1,7 +1,6 @@
 import {useState, useEffect, useMemo} from "react";
 import Header from "../components/header";
 import styles from "../styles/Home.module.css";
-import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
@@ -11,15 +10,18 @@ import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
 import PairwiseWrapper from "../components/pairwiseWrapper";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
-import { s3BucketList } from '@/util/constants'
+import {colorAssignment, s3BucketList} from '@/util/constants'
 import processData from "../util/processData";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Scatter({data}) {
+export default function Pairwise_page({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
+    const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+    const [activeData, setActiveData] = useState(datasets);
+    const [dataLibrary, setDataLibrary] = useState([])
     const [filteredDatasets, setFilteredDatasets] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -38,107 +40,85 @@ export default function Scatter({data}) {
 
     const handleSelectedDatasetNameChange = (e) => {
         const {
-          target: { value },
+            target: { value },
         } = e;
         setSelectedDatasetNames(value);
         let newDatasets = datasets.filter((s) =>
-          value
-            .map((v) => JSON.parse(v))
-            .map((v) => v.name)
-            .includes(s.name)
+            value
+                .map((v) => JSON.parse(v))
+                .map((v) => v.name)
+                .includes(s.name)
         );
         setFilteredDatasets(newDatasets);
-      };
-
-    const handleQuery1Change = (e) => {
-        setQuery1(e.target.value);
-    };
-
-    const handleQuery2Change = (e) => {
-        setQuery2(e.target.value);
     };
 
     const handleRangeChange = (name, value) => {
         let filtered_datasets = datasets.map((set, i) => {
-          let filtered = set.data.filter(
-            (d) => d[name] >= value[0] && d[name] <= value[1]
-          );
-          return { name: set.name, data: filtered, color: set.color };
+            let filtered = set.data.filter(
+                (d) => d[name] >= value[0] && d[name] <= value[1]
+            );
+            return { name: set.name, data: filtered, color: set.color };
         });
         filtered_datasets = filtered_datasets.filter((s) => {
-         let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name) 
-         return names.includes(s.name)
-        }
+                let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name)
+                return names.includes(s.name)
+            }
         );
         setFilteredDatasets(filtered_datasets);
-      };
+        setActiveData(filtered_datasets);
 
-    const datasetLinks = [
-        {
-            name: "free form 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/837a01c52c4c17d7b31dbd8ad3045878/raw/703d9fcdefcf28a084709ad6a98f403303aba5bd/ideal_freeform_2d_sample.csv",
-            color: "#8A8BD0",
-        },
-        {
-            name: "lattice 2D",
-            src: "https://gist.githubusercontent.com/Cynthia2019/d840d03813d9b0fc13956430b8c42886/raw/6c82615e1bcce639938a008cc4af212f771627da/ideal_lattice_2d.csv",
-            color: "#FFB347",
-        },
-    ];
+    };
+
     useEffect(() => {
-        datasetLinks.map((d, i) => {
-            csv(d.src).then((data) => {
-                const processedData = data.map((d) => {
-                    let youngs = d.youngs.match(regex).map(parseFloat);
-                    let poisson = d.poisson.match(regex).map(parseFloat);
-                    let processed = {
-                        C11: parseFloat(d.C11),
-                        C12: parseFloat(d.C12),
-                        C22: parseFloat(d.C22),
-                        C16: parseFloat(d.C16),
-                        C26: parseFloat(d.C26),
-                        C66: parseFloat(d.C66),
-                        condition: d.condition,
-                        symmetry: d.symmetry,
-                        CM0: d.CM0,
-                        CM1: d.CM1,
-                        CM0_E: d.CM0_E,
-                        CM0_nu: d.CM0_nu,
-                        CM1_E: d.CM1_E,
-                        CM1_nu: d.CM1_nu,
-                        geometry: d.geometry_full,
-                        youngs: youngs,
-                        poisson: poisson,
-                        "Minimal directional Young's modulus [N/m]": Math.min(...youngs),
-                        "Maximal directional Young's modulus [N/m]": Math.max(...youngs),
-                        "Minimal Poisson's ratio [-]": Math.min(...poisson),
-                        "Maximal Poisson's ratio [-]": Math.max(...poisson),
-                    };
-                    return processed;
+        async function fetchData(info) {
+            const command = new GetObjectCommand({
+                Bucket: info.bucket_name,
+                Key: info.name,
+            })
+
+            await s3Client.send(command).then((res) => {
+                let body = res.Body.transformToByteArray();
+                body.then((stream) => {
+                    new Response(stream, { headers: { "Content-Type": "text/csv" } })
+                        .text()
+                        .then((data) => {
+                            let parsed = csvParse(data)
+                            const processedData = processData(parsed.slice(0, 5000))
+                            setDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setFilteredDatasets((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setSelectedDatasetNames((datasets) => [
+                                ...datasets,
+                                JSON.stringify({ name: info.name, color: info.color }),
+                            ]);
+                            setActiveData((datasets) => [
+                                ...datasets,
+                                {
+                                    name: info.name,
+                                    data: processedData,
+                                    color: info.color,
+                                },
+                            ]);
+                            setDataPoint(processedData[0]);
+                        });
                 });
-                setDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setFilteredDatasets((datasets) => [
-                    ...datasets,
-                    {
-                        name: d.name,
-                        data: processedData,
-                        color: d.color,
-                    },
-                ]);
-                setSelectedDatasetNames((datasets) => [
-                    ...datasets,
-                    JSON.stringify({ name: d.name, color: d.color }),
-                  ]);
-                setDataPoint(processedData[0]);
             });
-        });
+        }
+
+        availableDatasetNames.map((info, i) => fetchData(info))
     }, []);
 
     return (
@@ -157,7 +137,7 @@ export default function Scatter({data}) {
                             {/*</p>*/}
                         </div>
                         <PairwiseWrapper
-                            data={filteredDatasets}
+                            data={activeData}
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
                         />
@@ -169,16 +149,19 @@ export default function Scatter({data}) {
                     </div>
                     <div className={styles.selectors}>
                         <Pairwise_DataSelector
+                            setDatasets={setDatasets}
                             selectedDatasetNames={selectedDatasetNames}
                             handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
-                            query1={query1}
-                            handleQuery1Change={handleQuery1Change}
-                            query2={query2}
-                            handleQuery2Change={handleQuery2Change}
+                            availableDatasetNames={availableDatasetNames}
+                            setAvailableDatasetNames={setAvailableDatasetNames}
+                            activeData={activeData}
+                            dataLibrary={dataLibrary}
+                            setActiveData={setActiveData}
+                            setDataLibrary={setDataLibrary}
                         />
                         <RangeSelector
                             datasets={datasets}
-                            filteredDatasets={filteredDatasets}
+                            filteredDatasets={activeData}
                             handleChange={handleRangeChange}
                         />
                         <MaterialInformation dataPoint={dataPoint}/>
