@@ -2,7 +2,7 @@ import React, {useRef, useState, useEffect} from "react";
 import Pairwise from "../charts/pairwise";
 import {useRouter} from "next/router";
 
-const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
+const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_datasets}) => {
     const pairwiseContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
@@ -27,7 +27,8 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
                 }, pairwiseContainer,
                 legendContainer.current,
                 setDataPoint,
-                router);
+                router,
+                max_num_datasets);
         }
     }, [data]);
 

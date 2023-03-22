@@ -19,7 +19,7 @@ import Umap_page from "@/pages/umap";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Pairwise_page({fetchedNames}) {
+export default function Pairwise({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
     const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
     const [activeData, setActiveData] = useState(datasets);
@@ -145,6 +145,7 @@ export default function Pairwise_page({fetchedNames}) {
                             data={activeData}
                             setDataPoint={setDataPoint}
                             setSelectedData={setSelectedData}
+                            max_num_datasets={availableDatasetNames.length}
                         />
                     </div>
                     <div className={styles.subPlots}>

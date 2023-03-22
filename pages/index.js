@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import dynamic from "next/dynamic";
-import Pairwise_page from "./pairwise_page";
+import Pairwise from "./pairwise";
 import processData from '@/util/processData';
 import {ListObjectsCommand, S3Client} from '@aws-sdk/client-s3';
 import {colorAssignment, s3BucketList} from '@/util/constants'
@@ -35,7 +35,7 @@ export default function Home({fetchedNames}) {
     // }, [])
     return (
         <div>
-            <Pairwise_page
+            <Pairwise
                 fetchedNames={fetchedNames}
             />
         </div>

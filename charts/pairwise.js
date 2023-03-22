@@ -211,15 +211,19 @@ class Pairwise {
            } = {}, container,
            legendContainer,
            setDataPoint,
-           router) {
+           router,
+           max_num_datasets) {
         console.log("updating...");
 
         const circleFocusSize = 7;
         const circleSize = 3.5;
         const legendCircleSize = 5.0;
         const legendSpacing = 4;
-        let datasets = [[], []];
+        let datasets = [];
         let dataset_dic = {}
+        for (let i = 0; i < max_num_datasets; i++) {
+            datasets.push([])
+        }
         data.map((d, i) => {
             for (let data of d.data) {
                 data.name = d.name;
@@ -238,7 +242,7 @@ class Pairwise {
         d3.selectAll("circle").remove();
         d3.selectAll(".tooltip_circ").remove();
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < max_num_datasets; i++) {
             d3.selectAll(".group" + i).remove()
         }
         this.renderAxis(finalData,
@@ -498,7 +502,7 @@ class Pairwise {
                     .on("mousemove", mousemove_hist)
                     .on("mousedown", mousedown_hist)
 
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < max_num_datasets; i++) {
                     let a = columns;
                     let b = columns;
 
