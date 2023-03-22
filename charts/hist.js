@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import Header from "./header";
+import Header from "../components/header";
 
 const padding = 10// separation between adjacent cells, in pixels
 const marginTop = 0 // top margin, in pixels

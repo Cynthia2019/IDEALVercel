@@ -12,7 +12,7 @@ function expo(x, f) {
 }
 
 
-class Pairwise_d3 {
+class Pairwise {
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
@@ -333,9 +333,11 @@ class Pairwise_d3 {
             router.push({
                 pathname: "/scatter",
                 query: {
-                    pairwise_query1 : x[d[0]]
+                    pairwise_query1 : x[d[0]],
+                    pairwise_query2 : x[d[1]]
                 }
             });
+
 
             // window.open(
             //     '/scatter',
@@ -349,8 +351,7 @@ class Pairwise_d3 {
             router.push({
                 pathname: "/hist",
                 query: {
-                    pairwise_query1 : x[d[0]],
-                    pairwise_query2 : x[d[1]]
+                    pairwise_query1 : x[d[0]]
                 }
             });
 
@@ -500,6 +501,7 @@ class Pairwise_d3 {
                 for (let i = 0; i < 2; i++) {
                     let a = columns;
                     let b = columns;
+
                     let X0 = d3.map(a, a => d3.map(datasets[i], typeof a === "function" ? a : d => +d[a]));
                     let Y0 = d3.map(b, b => d3.map(datasets[i], typeof b === "function" ? b : d => +d[b]));
                     console.log("Y0")
@@ -564,4 +566,4 @@ class Pairwise_d3 {
 }
 
 
-export default Pairwise_d3;
+export default Pairwise;

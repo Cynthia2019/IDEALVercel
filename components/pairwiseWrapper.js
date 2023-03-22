@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect} from "react";
-import Pairwise_d3 from "./pairwise_d3";
+import Pairwise from "../charts/pairwise";
 import {useRouter} from "next/router";
 
 const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
@@ -11,7 +11,7 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData}) => {
 
     useEffect(() => {
         if (!chart) {
-            setChart(new Pairwise_d3(data,
+            setChart(new Pairwise(data,
                                     pairwiseContainer,
                                     legendContainer.current));
         } else {

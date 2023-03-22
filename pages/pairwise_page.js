@@ -14,6 +14,8 @@ import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
 import {colorAssignment, s3BucketList} from '@/util/constants'
 import processData from "../util/processData";
+import Link from 'next/link';
+import Umap_page from "@/pages/umap";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -129,6 +131,9 @@ export default function Pairwise_page({fetchedNames}) {
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
                             <p className={styles.mainPlotTitle}>Material Data Explorer (Pairwise)</p>
+                            <Link href="/umap">
+                                UMAP Dimension Reduction
+                            </Link>
                             {/*<p className={styles.mainPlotSub}>*/}
                             {/*    Select properties from the dropdown menus below to graph on the*/}
                             {/*    x and y axes. Hovering over data points provides additional*/}
