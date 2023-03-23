@@ -1,12 +1,16 @@
 import {useRef, useState, useEffect} from "react";
 import * as React from "react";
-import Hist from "./hist";
+import Hist from "../charts/hist";
+import Switch from '@mui/material/Switch';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_num_datasets}) => {
     const histContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
     const [tooltip, setTooltip] = useState(null);
+    const [toggled, setToggled] = React.useState(false);
 
     useEffect(() => {
         if (!chart) {
@@ -26,17 +30,28 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_
                 setDataPoint,
                 query1,
                 max_num_datasets,
-                setTooltip
+                setTooltip,
+                toggled
             );
 
         }
-    }, [data, query1]);
+    }, [data, query1, toggled]);
 
     return (
         <div style={{display: "flex", flexDirection: "column"}}>
             <div id="main-plot" ref={histContainer}
                  style={{display: "flex", flexDirection: "column"}}
-            ></div>
+
+            >
+                <Stack direction="row" spacing={0} fontSize={4} alignItems="center">
+                    <Typography>10^6</Typography>
+                    <Switch
+                        checked={toggled}
+                        onChange={e => setToggled(e.target.checked)}
+                    />
+                    <Typography>10^9</Typography>
+                </Stack>
+            </div>
 
         </div>
 

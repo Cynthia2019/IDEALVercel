@@ -25,9 +25,9 @@ function expo(x, f) {
 
 function isBrushed(brush_coords, cx, cy) {
   var x0 = brush_coords[0][0],
-    x1 = brush_coords[1][0],
-    y0 = brush_coords[0][1],
-    y1 = brush_coords[1][1];
+      x1 = brush_coords[1][0],
+      y0 = brush_coords[0][1],
+      y1 = brush_coords[1][1];
   return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
 }
 
@@ -51,11 +51,11 @@ class Scatter {
 
     //Legend
     this.legend = d3
-      .select(legendElement)
-      .append("svg")
-      .attr("width", 120)
-      .append("g")
-      .attr("class", "scatter-plot-legend");
+        .select(legendElement)
+        .append("svg")
+        .attr("width", 120)
+        .append("g")
+        .attr("class", "scatter-plot-legend");
 
     // Labels
     this.xLabel = this.svg
@@ -75,8 +75,8 @@ class Scatter {
 
     // Append group el to display both axes
     this.xAxisGroup = this.svg
-      .append("g")
-      .attr("transform", `translate(0, ${HEIGHT})`);
+        .append("g")
+        .attr("transform", `translate(0, ${HEIGHT})`);
 
     // Append group el to display both axes
     this.yAxisGroup = this.svg.append("g");
@@ -84,6 +84,7 @@ class Scatter {
     this.yScale;
     this.zoomedXScale;
     this.zoomedYScale;
+
 
     this.update({
       data: data,
@@ -128,12 +129,12 @@ class Scatter {
     d3.selectAll(".clipPath").remove();
 
     let yScale = d3
-      .scaleLinear()
-      .domain([
-        d3.min(finalData, (d) => d[query2]),
-        d3.max(finalData, (d) => d[query2]),
-      ])
-      .range([HEIGHT, 0]);
+        .scaleLinear()
+        .domain([
+          d3.min(finalData, (d) => d[query2]),
+          d3.max(finalData, (d) => d[query2]),
+        ])
+        .range([HEIGHT, 0]);
 
     let xScale = d3
       .scaleLinear()
@@ -155,18 +156,18 @@ class Scatter {
 
     // Add a clipPath: everything out of this area won't be drawn.
     this.svg
-      .append("defs")
-      .append("SVG:clipPath")
-      .attr("id", "clip")
-      .append("SVG:rect")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
-      .attr("x", 0)
-      .attr("y", 0);
+        .append("defs")
+        .append("SVG:clipPath")
+        .attr("id", "clip")
+        .append("SVG:rect")
+        .attr("width", WIDTH)
+        .attr("height", HEIGHT)
+        .attr("x", 0)
+        .attr("y", 0);
 
     let xAxisCall = d3
-      .axisBottom(this.xScale)
-      .tickFormat((x) => `${expo(x, 2)}`);
+        .axisBottom(this.xScale)
+        .tickFormat((x) => `${expo(x, 2)}`);
     this.xAxisGroup.transition().duration(500).call(xAxisCall);
 
     let yAxisCall = d3.axisLeft(this.yScale).tickFormat((y) => `${expo(y, 2)}`);
@@ -175,44 +176,44 @@ class Scatter {
     this.yLabel.text(this.query2);
 
     let tooltip = d3
-      .select(element)
-      .append("div")
-      .attr("class", "tooltip")
-      .style("background-color", "white")
-      .style("border", "solid")
-      .style("border-width", "1px")
-      .style("border-radius", "5px")
-      .style("padding", "10px")
-      .style("visibility", "hidden");
+        .select(element)
+        .append("div")
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "1px")
+        .style("border-radius", "5px")
+        .style("padding", "10px")
+        .style("visibility", "hidden");
 
     let mouseover = function (e, d) {
       d3.select(this)
-        .attr("r", circleFocusSize)
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .style("fill-opacity", 1);
+          .attr("r", circleFocusSize)
+          .style("stroke", "black")
+          .style("stroke-width", 2)
+          .style("fill-opacity", 1);
       setDataPoint(d);
       tooltip.style("visibility", "visible").transition().duration(200);
     };
 
     let mousemove = function (e, d) {
       tooltip
-        .html(
-          "Dataset: " +
-            d["name"] +
-            "<br>symmetry: " +
-            d["symmetry"] +
-            "<br>Material_0: " +
-            d.CM0 +
-            "<br>Material_1: " +
-            d.CM1 +
-            `<br>${query1}: ` +
-            d[query1] +
-            `<br>${query2}: ` +
-            d[query2]
-        )
-        .style("top", e.pageY + 10 + "px")
-        .style("left", e.pageX + 10 + "px");
+          .html(
+              "Dataset: " +
+              d["name"] +
+              "<br>symmetry: " +
+              d["symmetry"] +
+              "<br>Material_0: " +
+              d.CM0 +
+              "<br>Material_1: " +
+              d.CM1 +
+              `<br>${query1}: ` +
+              d[query1] +
+              `<br>${query2}: ` +
+              d[query2]
+          )
+          .style("top", e.pageY + 10 + "px")
+          .style("left", e.pageX + 10 + "px");
     };
 
     let mouseleave = function (e, d) {
@@ -325,74 +326,75 @@ class Scatter {
         }.bind(this)
       );
 
+
     this.xScale = zoomedXScale;
     this.yScale = zoomedYScale;
 
     let brush = d3
-      .brush()
-      .extent([
-        [0, 0],
-        [WIDTH, HEIGHT],
-      ])
-      .on(
-        "start brush end",
-        function brushed(event) {
-          let xScale = this.xScale;
-          let yScale = this.yScale;
-          if (event.selection) {
-            if (view == "brush-on") {
-              d3.selectAll(".dataCircle")
-                .data(finalData)
-                .classed("selected", function (d) {
-                  return (
-                    d3.select(this).classed("selected") ||
-                    isBrushed(
-                      event.selection,
-                      xScale(d[query1]),
-                      yScale(d[query2])
+        .brush()
+        .extent([
+          [0, 0],
+          [WIDTH, HEIGHT],
+        ])
+        .on(
+            "start brush end",
+            function brushed(event) {
+              let xScale = this.xScale;
+              let yScale = this.yScale;
+              if (event.selection) {
+                if (view == "brush-on") {
+                  d3.selectAll(".dataCircle")
+                      .data(finalData)
+                      .classed("selected", function (d) {
+                        return (
+                            d3.select(this).classed("selected") ||
+                            isBrushed(
+                                event.selection,
+                                xScale(d[query1]),
+                                yScale(d[query2])
+                            )
+                        );
+                      });
+                } else if (view == "brush-off") {
+                  d3.selectAll(".selected").classed("selected", function (d) {
+                    return isBrushed(
+                        event.selection,
+                        xScale(d[query1]),
+                        yScale(d[query2])
                     )
-                  );
-                });
-            } else if (view == "brush-off") {
-              d3.selectAll(".selected").classed("selected", function (d) {
-                return isBrushed(
-                  event.selection,
-                  xScale(d[query1]),
-                  yScale(d[query2])
-                )
-                  ? false
-                  : true;
-              });
-            }
-            let selected = [];
-            d3.selectAll(".selected").each((d, i) => selected.push(d));
-            setSelectedData(selected);
-          }
-        }.bind(this)
-      );
+                        ? false
+                        : true;
+                  });
+                }
+                let selected = [];
+                d3.selectAll(".selected").each((d, i) => selected.push(d));
+                setSelectedData(selected);
+              }
+            }.bind(this)
+        );
 
     let legend = this.legend.selectAll(".legend").data(data);
 
     legend.exit().remove();
 
     legend
-      .enter()
-      .append("circle")
-      .attr("class", "legend")
-      .attr("r", circleOriginalSize)
-      .attr("cx", 10)
-      .attr("cy", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
-      .style("fill", (d) => d.color);
+        .enter()
+        .append("circle")
+        .attr("class", "legend")
+        .attr("r", circleOriginalSize)
+        .attr("cx", 10)
+        .attr("cy", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
+        .style("fill", (d) => d.color);
     //Create legend labels
     legend
-      .enter()
-      .append("text")
-      .attr("class", "legend")
-      .attr("x", 20)
-      .attr("y", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
-      .text((d) => d.name)
-      .attr("text-anchor", "left")
-      .style("alignment-baseline", "middle");
+        .enter()
+        .append("text")
+        .attr("class", "legend")
+        .attr("x", 20)
+        .attr("y", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
+        .text((d) => d.name)
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle");
 
     legend.exit().remove();
     if (view === "brush-on" || view === "brush-off") {
@@ -402,40 +404,40 @@ class Scatter {
     } else if (view === "zoom") {
       brush.on("start brush end", null);
       this.svg
-        .append("rect")
-        .attr("class", "rectZoom")
-        .attr("width", WIDTH)
-        .attr("height", HEIGHT)
-        .call(zoom);
+          .append("rect")
+          .attr("class", "rectZoom")
+          .attr("width", WIDTH)
+          .attr("height", HEIGHT)
+          .call(zoom);
     }
 
     let circles = this.svg
-      .append("g")
-      .attr("clip-path", "url(#clip)")
-      .attr("class", "clipPath")
-      .selectAll(".dataCircle")
-      .data(finalData);
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("class", "clipPath")
+        .selectAll(".dataCircle")
+        .data(finalData);
 
     circles.exit().transition().attr("r", 0).remove();
     circles
-      .enter()
-      .append("circle")
-      .join(circles)
-      .attr("r", circleOriginalSize)
-      .attr("class", "dataCircle")
-      .attr("fill", (d) => d.color)
-      .classed("selected", function (d) {
-        return selectedData.includes(d);
-      })
-      .style("stroke", "none")
-      .style("stroke-width", 2)
-      .style("fill-opacity", 0.8)
-      .on("mousedown", mousedown)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave)
-      .attr("cx", (d) => this.xScale(d[query1]))
-      .attr("cy", (d) => this.yScale(d[query2]));
+        .enter()
+        .append("circle")
+        .join(circles)
+        .attr("r", circleOriginalSize)
+        .attr("class", "dataCircle")
+        .attr("fill", (d) => d.color)
+        .classed("selected", function (d) {
+          return selectedData.includes(d);
+        })
+        .style("stroke", "none")
+        .style("stroke-width", 2)
+        .style("fill-opacity", 0.8)
+        .on("mousedown", mousedown)
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
+        .attr("cx", (d) => this.xScale(d[query1]))
+        .attr("cy", (d) => this.yScale(d[query2]));
 
     circles.exit().transition().attr("r", 0).remove();
     if (reset) {

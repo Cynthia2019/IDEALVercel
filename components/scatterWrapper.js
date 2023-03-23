@@ -30,17 +30,18 @@ const ScatterWrapper = ({
   useEffect(() => {
     if (!chart) {
       setChart(
-        new Scatter(
-          chartArea.current,
-          legendArea.current,
-          data,
-          setDataPoint,
-          selectedData,
-          setSelectedData,
-          view
-        )
+          new Scatter(
+              chartArea.current,
+              legendArea.current,
+              data,
+              setDataPoint,
+              selectedData,
+              setSelectedData,
+              view
+          )
       );
-    } else {
+    } 
+     else {
       chart.update(
         {
           data,
@@ -56,6 +57,7 @@ const ScatterWrapper = ({
           reset,
           setReset
         }
+
       );
     }
   }, [chart, query1, query2, data, view, reset]);
@@ -80,11 +82,12 @@ const ScatterWrapper = ({
           <ToggleButton value="brush-on" aria-label="brush-on">
           <CheckCircleOutlinedIcon
                 style={{ fontSize: "15px", color: "green" }}
+
               />
               <span style={{ fontSize: "10px" }}>Select Data</span>
-          </ToggleButton>
-          <ToggleButton value="brush-off" aria-label="brush-off">
-          <CancelOutlinedIcon style={{ fontSize: "15px", color: "red" }} />
+            </ToggleButton>
+            <ToggleButton value="brush-off" aria-label="brush-off">
+              <CancelOutlinedIcon style={{ fontSize: "15px", color: "red" }} />
               <span style={{ fontSize: "10px" }}>Deselect Data</span>
           </ToggleButton>
           <ToggleButton value='neighbor' aria-label="find nearest neighbors">
@@ -93,8 +96,8 @@ const ScatterWrapper = ({
           </ToggleButton>
 
         </ToggleButtonGroup>
+
       </div>
-    </div>
   );
 };
 

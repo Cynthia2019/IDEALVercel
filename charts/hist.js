@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import Header from "./header";
+import Header from "../components/header";
 
 const padding = 10// separation between adjacent cells, in pixels
 const marginTop = 0 // top margin, in pixels
@@ -8,10 +8,7 @@ const marginBottom = 0 // bottom margin, in pixels
 const marginLeft = 0 // left margin, in pixels
 const width = 968 // outer width, in pixels
 
-function expo(x, f) {
-    if (x < 1000 && x > -1000) return x;
-    return Number(x).toExponential(f);
-}
+
 
 class Hist {
     constructor(data, container, legendContainer) {
@@ -95,9 +92,21 @@ class Hist {
            setDataPoint,
            query1,
            max_num_datasets,
-           setTooltip) {
+           setTooltip,
+           toggled) {
         console.log("updating...")
         console.log(data)
+        function expo(x, f) {
+            if (x < 1000 && x > -1000) return x;
+            console.log("number format")
+            console.log(x)
+            if (!toggled) {
+                return (x / 1e6) + "e+6"
+            } else {
+                return (x / 1e9) + "e+9"
+            }
+            // return Number(x).toExponential(f);
+        }
         let index = columns.indexOf(query1)
         let datasets = [];
         let dataset_dic = {};
@@ -139,8 +148,8 @@ class Hist {
 
         let mouseover_hist = function (e, d) {
             console.log("hist");
-            console.log(e)
-            console.log(d)
+            // console.log(e)
+            // console.log(d)
             // index = d3.select(this).attr("class")[5]
             d3.select(this)
                 .raise()
@@ -337,7 +346,7 @@ class Hist {
         setTooltip(tooltip);
 
 
-        let transitionDuration = 500;
+        let transitionDuration = 200;
 
         const exitTransition = d3.transition().duration(transitionDuration);
         const updateTransition = exitTransition
@@ -388,32 +397,32 @@ class Hist {
         //     .attr("dy", ".35em")
         //     .style("text-anchor", "end")
         //     .text("Mean");
-        // let tooltip_hist = d3
-        //     .select(container.current)
-        //     .append("div")
-        //     .style("overflow-y", "auto")
-        //     .style("width", '280px')
-        //     .style("height", '200px')
-        //     .attr("class", "tooltip_hist")
-        //     .style("position", "fixed")
-        //     .style("background-color", "white")
-        //     .style("border", "solid")
-        //     .style("stroke", "white")
-        //     .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")
-        //     .style("border-width", "2px")
-        //     .style("border-radius", "5px")
-        //     .style("padding", "10px")
-        //     .style("visibility", "visible")
-        //     .html((tooltip.map((d, i) => (
-        //                 "<b>Dataset: </b>" + d.name + "<br>" +
-        //                 "<b>Range: </b>" + expo(d.min, 2) + " to " + expo(d.max, 2) + "<br>" +
-        //                 "<b>Mean: </b>" + expo(d.mean, 2) + "<br>" +
-        //                 "<b>Median: </b>" + expo(d.median, 2) + "<br><br>"
-        //             )
-        //         ))
-        //     )
-        //     .style("top", 60 + "px")
-        //     .style("left", 500 + "px");
+        let tooltip_hist = d3
+            .select(container.current)
+            .append("div")
+            .style("overflow-y", "auto")
+            .style("width", '280px')
+            .style("height", '200px')
+            .attr("class", "tooltip_hist")
+            .style("position", "fixed")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("stroke", "white")
+            .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("visibility", "visible")
+            .html((tooltip.map((d, i) => (
+                        "<b>Dataset: </b>" + d.name + "<br>" +
+                        "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" +
+                        "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" +
+                        "<b>Median: </b>" + expo(d.median, 0) + "<br><br>"
+                    )
+                ))
+            )
+            .style("top", 60 + "px")
+            .style("left", 500 + "px");
 
     }
 

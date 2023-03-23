@@ -17,9 +17,11 @@
     "@mui/material": "^5.11.4",
     "@next/font": "13.1.2",
     "antd": "^5.1.5",
+    "classnames": "^2.3.2",
     "d3": "^7.8.1",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.2",
+    "fs": "^0.0.1-security",
     "next": "13.1.2",
     "numjs": "^0.16.1",
     "papaparse": "^5.3.2",
@@ -31,7 +33,11 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
     "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.6.2",
-    "swr": "^2.0.3"
+    "react-router-dom": "^6.6.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7"
   }
 }

@@ -5,7 +5,8 @@ import ScatterWrapper from "../components/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
-import DataSelector from "../components/dataSelector";
+import Scatter_dataSelector from "../components/scatter_dataSelector";
+//import DataSelector from "../components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
@@ -28,7 +29,10 @@ const merge = (first, second) => {
 
 export default function Scatter({}) {
   const [datasets, setDatasets] = useState([]);
-  const [availableDatasetNames, setAvailableDatasetNames] = useState([]);
+
+  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+  const [activeData, setActiveData] = useState(datasets);
+  const [dataLibrary, setDataLibrary] = useState([])
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
@@ -60,10 +64,10 @@ export default function Scatter({}) {
     } = e;
     setSelectedDatasetNames(value);
     let newDatasets = datasets.filter((s) =>
-      value
-        .map((v) => JSON.parse(v))
-        .map((v) => v.name)
-        .includes(s.name)
+        value
+            .map((v) => JSON.parse(v))
+            .map((v) => v.name)
+            .includes(s.name)
     );
     setFilteredDatasets(newDatasets);
   };
@@ -79,7 +83,7 @@ export default function Scatter({}) {
   const handleRangeChange = (name, value) => {
     let filtered_datasets = datasets.map((set, i) => {
       let filtered = set.data.filter(
-        (d) => d[name] >= value[0] && d[name] <= value[1]
+          (d) => d[name] >= value[0] && d[name] <= value[1]
       );
       return { name: set.name, data: filtered, color: set.color };
     });
@@ -90,6 +94,7 @@ export default function Scatter({}) {
       return names.includes(s.name);
     });
     setFilteredDatasets(filtered_datasets);
+    setActiveData(filtered_datasets);
   };
 
   async function getAllData() {
@@ -98,6 +103,7 @@ export default function Scatter({}) {
     if (env == "production") {
       url = "http://localhost:8000/model/";
    //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
+
     }
     let response = await fetch(`${url}`, {
       method: "POST",
@@ -132,19 +138,19 @@ export default function Scatter({}) {
   }, []);
 
   return (
-    <div>
-      <Header />
-      <div className={styles.body}>
-        <Row className={styles.firstScreen}>
-          <div className={styles.mainPlot}>
-            <div className={styles.mainPlotHeader}>
-              <p className={styles.mainPlotTitle}>Material Data Explorer</p>
-              <p className={styles.mainPlotSub}>
-                Select properties from the dropdown menus to graph on the x and
-                y axes. Hovering over data points provides additional
-                information. Scroll to zoom, click and drag to pan.
-              </p>
-            </div>
+      <div>
+        <Header />
+        <div className={styles.body}>
+          <Row className={styles.firstScreen}>
+            <div className={styles.mainPlot}>
+              <div className={styles.mainPlotHeader}>
+                <p className={styles.mainPlotTitle}>Material Data Explorer (Individual Scatter Plot)</p>
+                <p className={styles.mainPlotSub}>
+                  Select properties from the dropdown menus to graph on the x and
+                  y axes. Hovering over data points provides additional
+                  information. Scroll to zoom, click and drag to pan.
+                </p>
+              </div>
             <ScatterWrapper
               data={filteredDatasets}
               setDataPoint={setDataPoint}
@@ -163,76 +169,38 @@ export default function Scatter({}) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div className={styles.selectors}>
-            <DataSelector
-              setDatasets={setDatasets}
-              availableDatasetNames={availableDatasetNames}
-              setAvailableDatasetNames={setAvailableDatasetNames}
-              selectedDatasetNames={selectedDatasetNames}
-              handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
-              query1={query1}
-              handleQuery1Change={handleQuery1Change}
-              query2={query2}
-              handleQuery2Change={handleQuery2Change}
-            />
-            <RangeSelector
-              datasets={datasets}
-              filteredDatasets={filteredDatasets}
-              handleChange={handleRangeChange}
-            />
-          </div>
-        </Row>
-        <Row>
-          <Col span={12}>
-            <NeighborPanel neighbors={neighbors} />
-          </Col>
-          <Col span={12}>
-            <SavePanel selectedData={selectedData} setReset={setReset} />
-          </Col>
-        </Row>
-        <Row>
-          <MaterialInformation dataPoint={dataPoint} />
-        </Row>
+            /> */}
+              <Scatter_dataSelector
+                  setDatasets={setDatasets}
+                  availableDatasetNames={availableDatasetNames}
+                  setAvailableDatasetNames={setAvailableDatasetNames}
+                  selectedDatasetNames={selectedDatasetNames}
+                  handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
+                  query1={query1}
+                  handleQuery1Change={handleQuery1Change}
+                  query2={query2}
+                  handleQuery2Change={handleQuery2Change}
+                  activeData={activeData}
+                  dataLibrary={dataLibrary}
+                  setActiveData={setActiveData}
+                  setDataLibrary={setDataLibrary}
+              />
+              <RangeSelector
+                  datasets={datasets}
+                  filteredDatasets={activeData}
+                  handleChange={handleRangeChange}
+              />
+            </div>
+          </Row>
+          <Row>
+            <Col span={16}>
+              <SavePanel selectedData={selectedData} setReset={setReset} />
+            </Col>
+            <Col span={8}>
+              <MaterialInformation dataPoint={dataPoint} />
+            </Col>
+          </Row>
+        </div>
       </div>
-    </div>
   );
 }
-
-// async function fetchData(name, i) {
-//   const command = new GetObjectCommand({
-//     Bucket: 'ideal-dataset-1',
-//     Key: name,
-//   })
-
-//   await s3Client.send(command).then((res) => {
-//     let body = res.Body.transformToByteArray();
-//     body.then((stream) => {
-//       new Response(stream, { headers: { "Content-Type": "text/csv" } })
-//         .text()
-//         .then((data) => {
-//           let parsed = csvParse(data)
-//           const processedData = processData(parsed)
-//           setDatasets((datasets) => [
-//             ...datasets,
-//             {
-//               name: name,
-//               data: processedData,
-//               color: colorAssignment[i],
-//             },
-//           ]);
-//           setFilteredDatasets((datasets) => [
-//             ...datasets,
-//             {
-//               name: name,
-//               data: processedData,
-//               color: colorAssignment[i],
-//             },
-//           ]);
-//           setSelectedDatasetNames((datasets) => [
-//             ...datasets,
-//             JSON.stringify({ name: name, color: colorAssignment[i]}),
-//           ]);
-//           setDataPoint(processedData[0]);
-//         });
-//     });
-//   });
-// }

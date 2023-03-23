@@ -12,7 +12,7 @@ function expo(x, f) {
 }
 
 
-class Pairwise_d3 {
+class Pairwise {
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
@@ -211,15 +211,19 @@ class Pairwise_d3 {
            } = {}, container,
            legendContainer,
            setDataPoint,
-           router) {
+           router,
+           max_num_datasets) {
         console.log("updating...");
 
         const circleFocusSize = 7;
         const circleSize = 3.5;
         const legendCircleSize = 5.0;
         const legendSpacing = 4;
-        let datasets = [[], []];
+        let datasets = [];
         let dataset_dic = {}
+        for (let i = 0; i < max_num_datasets; i++) {
+            datasets.push([])
+        }
         data.map((d, i) => {
             for (let data of d.data) {
                 data.name = d.name;
@@ -238,7 +242,7 @@ class Pairwise_d3 {
         d3.selectAll("circle").remove();
         d3.selectAll(".tooltip_circ").remove();
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < max_num_datasets; i++) {
             d3.selectAll(".group" + i).remove()
         }
         this.renderAxis(finalData,
@@ -333,9 +337,11 @@ class Pairwise_d3 {
             router.push({
                 pathname: "/scatter",
                 query: {
-                    pairwise_query1 : x[d[0]]
+                    pairwise_query1 : x[d[0]],
+                    pairwise_query2 : x[d[1]]
                 }
             });
+
 
             // window.open(
             //     '/scatter',
@@ -349,8 +355,7 @@ class Pairwise_d3 {
             router.push({
                 pathname: "/hist",
                 query: {
-                    pairwise_query1 : x[d[0]],
-                    pairwise_query2 : x[d[1]]
+                    pairwise_query1 : x[d[0]]
                 }
             });
 
@@ -497,9 +502,10 @@ class Pairwise_d3 {
                     .on("mousemove", mousemove_hist)
                     .on("mousedown", mousedown_hist)
 
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < max_num_datasets; i++) {
                     let a = columns;
                     let b = columns;
+
                     let X0 = d3.map(a, a => d3.map(datasets[i], typeof a === "function" ? a : d => +d[a]));
                     let Y0 = d3.map(b, b => d3.map(datasets[i], typeof b === "function" ? b : d => +d[b]));
                     console.log("Y0")
@@ -564,4 +570,4 @@ class Pairwise_d3 {
 }
 
 
-export default Pairwise_d3;
+export default Pairwise;
