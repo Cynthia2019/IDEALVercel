@@ -26,3 +26,7 @@ export const colorAssignment = [
 export const requiredColumns = [
   "symmetry", "unit_cell_x", "unit_cell_y", "geometry_full", 'C11', 'C12', 'C22', 'C16', 'C26', 'C66'
 ]
+
+export const nnColorAssignment = [
+  "#EA1A7F", "#FEC603", "#A8F387", "#16D6FA", '#6020a4'
+]

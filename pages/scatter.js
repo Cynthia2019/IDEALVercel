@@ -10,16 +10,26 @@ import Scatter_dataSelector from "../components/scatter_dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
+import NeighborPanel from "@/components/neighborPanel";
 import { Row, Col } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
-import s3Client from './api/aws'
-import { s3BucketList, colorAssignment } from '@/util/constants'
+import s3Client from "./api/aws";
+import { colorAssignment } from "@/util/constants";
 import processData from "../util/processData";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
+const merge = (first, second) => {
+  for (let i = 0; i < second.length; i++) {
+    for (let j = 0; j < second[i].data.length; j++) {
+      first.push(second[i].data[j]);
+    }
+  }
+  return first;
+};
 
-export default function Scatter({fetchedNames}) {
+export default function Scatter({}) {
   const [datasets, setDatasets] = useState([]);
+
   const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
   const [activeData, setActiveData] = useState(datasets);
   const [dataLibrary, setDataLibrary] = useState([])
@@ -27,14 +37,18 @@ export default function Scatter({fetchedNames}) {
   const [dataPoint, setDataPoint] = useState({});
   const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
+  const [neighbors, setNeighbors] = useState([]);
   const [reset, setReset] = useState(false);
 
   const router = useRouter();
-  const {pairwise_query1, pairwise_query2} = router.query;
+  const { pairwise_query1, pairwise_query2 } = router.query;
 
-  const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
-  const [query2, setQuery2] = useState(pairwise_query2 ? pairwise_query2 : "C12");
-
+  const [query1, setQuery1] = useState(
+    pairwise_query1 ? pairwise_query1 : "C11"
+  );
+  const [query2, setQuery2] = useState(
+    pairwise_query2 ? pairwise_query2 : "C12"
+  );
 
   const Youngs = dynamic(() => import("../components/youngs"), {
     ssr: false,
@@ -74,64 +88,53 @@ export default function Scatter({fetchedNames}) {
       return { name: set.name, data: filtered, color: set.color };
     });
     filtered_datasets = filtered_datasets.filter((s) => {
-          let names = selectedDatasetNames.map(v => JSON.parse(v)).map((v) => v.name)
-          return names.includes(s.name)
-        }
-    );
+      let names = selectedDatasetNames
+        .map((v) => JSON.parse(v))
+        .map((v) => v.name);
+      return names.includes(s.name);
+    });
     setFilteredDatasets(filtered_datasets);
     setActiveData(filtered_datasets);
   };
 
-  useEffect(() => {
-    async function fetchData(info) {
-      const command = new GetObjectCommand({
-        Bucket: info.bucket_name,
-        Key: info.name,
-      })
+  async function getAllData() {
+    const env = process.env.NODE_ENV;
+    let url = "http://localhost:8000/model/";
+    if (env == "production") {
+      url = "http://localhost:8000/model/";
+   //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
 
-      await s3Client.send(command).then((res) => {
-        let body = res.Body.transformToByteArray();
-        body.then((stream) => {
-          new Response(stream, { headers: { "Content-Type": "text/csv" } })
-              .text()
-              .then((data) => {
-                let parsed = csvParse(data)
-                const processedData = processData(parsed.slice(0, 5000))
-                setDatasets((datasets) => [
-                  ...datasets,
-                  {
-                    name: info.name,
-                    data: processedData,
-                    color: info.color,
-                  },
-                ]);
-                setFilteredDatasets((datasets) => [
-                  ...datasets,
-                  {
-                    name: info.name,
-                    data: processedData,
-                    color: info.color,
-                  },
-                ]);
-                setSelectedDatasetNames((datasets) => [
-                  ...datasets,
-                  JSON.stringify({ name: info.name, color: info.color }),
-                ]);
-                setActiveData((datasets) => [
-                  ...datasets,
-                  {
-                    name: info.name,
-                    data: processedData,
-                    color: info.color,
-                  },
-                ]);
-                setDataPoint(processedData[0]);
-              });
-        });
-      });
     }
+    let response = await fetch(`${url}`, {
+      method: "POST",
+      mode: "cors",
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log("fetch error", err.message));
+    return response;
+  }
 
-    availableDatasetNames.map((info, i) => fetchData(info))
+  useEffect(() => {
+    getAllData().then((res) => {
+      res = JSON.parse(res)
+      const processedData = res.map((dataset, i) => {
+        return processData(dataset, i);
+      });
+      const dataset_names = [...new Set(processedData.map(item => item.name))]; 
+      const dataset_color = [...new Set(processedData.map(item => item.color))]; 
+      let dataset_info_json = []
+      for (let i = 0; i < dataset_names.length; i++) {
+        dataset_info_json.push(JSON.stringify({
+          name: dataset_names[i], 
+          color: dataset_color[i]
+        }))
+      }
+      setDatasets(processedData);
+      setFilteredDatasets(processedData);
+      setSelectedDatasetNames(dataset_info_json);
+      setDataPoint(processedData[0]);
+    });
+    console.log(filteredDatasets)
   }, []);
 
   return (
@@ -148,33 +151,24 @@ export default function Scatter({fetchedNames}) {
                   information. Scroll to zoom, click and drag to pan.
                 </p>
               </div>
-              <ScatterWrapper
-                  data={activeData}
-                  setDataPoint={setDataPoint}
-                  query1={query1}
-                  query2={query2}
-                  selectedData={selectedData}
-                  setSelectedData={setSelectedData}
-                  reset={reset}
-                  setReset={setReset}
-              />
-            </div>
-            <div className={styles.subPlots}>
-              <StructureWrapper data={dataPoint} />
-              <Youngs dataPoint={dataPoint} />
-              <Poisson dataPoint={dataPoint} />
-            </div>
-            <div className={styles.selectors}>
-              {/* <Scatter_dataSelector
-              setDatasets={setDatasets}
-              availableDatasetNames={availableDatasetNames}
-              setAvailableDatasetNames={setAvailableDatasetNames}
-              selectedDatasetNames={selectedDatasetNames}
-              handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
+            <ScatterWrapper
+              data={filteredDatasets}
+              setDataPoint={setDataPoint}
               query1={query1}
-              handleQuery1Change={handleQuery1Change}
               query2={query2}
-              handleQuery2Change={handleQuery2Change}
+              selectedData={selectedData}
+              setSelectedData={setSelectedData}
+              setNeighbors={setNeighbors}
+              reset={reset}
+              setReset={setReset}
+            />
+          </div>
+          <div className={styles.subPlots}>
+            <StructureWrapper data={dataPoint} />
+            <Youngs dataPoint={dataPoint} />
+            <Poisson dataPoint={dataPoint} />
+          </div>
+          <div className={styles.selectors}>
             /> */}
               <Scatter_dataSelector
                   setDatasets={setDatasets}
@@ -209,26 +203,4 @@ export default function Scatter({fetchedNames}) {
         </div>
       </div>
   );
-}
-
-export async function getStaticProps() {
-  let fetchedNames = []
-  const listObjectCommand = new ListObjectsCommand({
-    Bucket: 'ideal-dataset-1'
-  })
-  await s3Client.send(listObjectCommand).then((res) => {
-    const names = res.Contents.map(content => content.Key)
-    for (let i = 0; i < names.length; i++) {
-      fetchedNames.push({
-        bucket_name: 'ideal-dataset-1',
-        name: names[i],
-        color: colorAssignment[i]
-      })
-    }
-  })
-  return {
-    props: {
-      fetchedNames: fetchedNames
-    }
-  }
 }
