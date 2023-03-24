@@ -1,7 +1,23 @@
 import classNames from "classnames";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useState, useMemo } from "react";
+import {useRouter} from "next/router";
+import React, {useState, useMemo} from "react";
+import Header from "../components/header";
+import styles from "../styles/Home.module.css";
+import UmapWrapper from "../components/umapWrapper";
+import StructureWrapper from "../components/structureWrapper";
+import {csv, csvParse} from "d3";
+import dynamic from "next/dynamic";
+import Umap_DataSelector from "../components/umap_dataSelector";
+//import DataSelector from "../components/dataSelector";
+import RangeSelector from "../components/rangeSelector";
+import MaterialInformation from "../components/materialInfo";
+import SavePanel from "../components/savePanel";
+import {Row, Col} from "antd";
+import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
+import {s3BucketList, colorAssignment} from '@/util/constants'
+import processData from "../util/processData";
+
 import {
     ArticleIcon,
     CollapsIcon,
@@ -13,10 +29,10 @@ import {
 } from "./icons";
 
 const menuItems = [
-    { id: 1, label: "Home", icon: HomeIcon, link: "/test" },
-    { id: 2, label: "Manage Posts", icon: ArticleIcon, link: "/posts" },
-    { id: 3, label: "Manage Users", icon: UsersIcon, link: "/users" },
-    { id: 4, label: "Manage Tutorials", icon: VideosIcon, link: "/tutorials" },
+    {id: 1, label: "Dataset", icon: HomeIcon, link: "/test"},
+    {id: 2, label: "Range selector", icon: ArticleIcon, link: "/posts"},
+    {id: 3, label: "Axis selection", icon: UsersIcon, link: "/users"},
+    {id: 4, label: "Materials Information", icon: VideosIcon, link: "/tutorials"},
 ];
 
 const Sidebar = () => {
@@ -67,12 +83,12 @@ const Sidebar = () => {
             className={wrapperClasses}
             onMouseEnter={onMouseOver}
             onMouseLeave={onMouseOver}
-            style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
+            style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
         >
             <div className="flex flex-col">
                 <div className="flex items-center justify-between relative">
                     <div className="flex items-center pl-1 gap-4">
-                        <LogoIcon />
+                        <LogoIcon/>
                         <span
                             className={classNames("mt-2 text-lg font-medium text-text", {
                                 hidden: toggleCollapse,
@@ -86,20 +102,20 @@ const Sidebar = () => {
                             className={collapseIconClasses}
                             onClick={handleSidebarToggle}
                         >
-                            <CollapsIcon />
+                            <CollapsIcon/>
                         </button>
                     )}
                 </div>
 
                 <div className="flex flex-col items-start mt-24">
-                    {menuItems.map(({ icon: Icon, ...menu }) => {
+                    {menuItems.map(({icon: Icon, ...menu}) => {
                         const classes = getNavItemClasses(menu);
                         return (
                             <div className={classes}>
                                 <Link legacyBehavior href={menu.link}>
                                     <a className="flex py-4 px-3 items-center w-full h-full">
-                                        <div style={{ width: "2.5rem" }}>
-                                            <Icon />
+                                        <div style={{width: "2.5rem"}}>
+                                            <Icon/>
                                         </div>
                                         {!toggleCollapse && (
                                             <span
@@ -119,8 +135,8 @@ const Sidebar = () => {
             </div>
 
             <div className={`${getNavItemClasses({})} px-3 py-4`}>
-                <div style={{ width: "2.5rem" }}>
-                    <LogoutIcon />
+                <div style={{width: "2.5rem"}}>
+                    <LogoutIcon/>
                 </div>
                 {!toggleCollapse && (
                     <span className={classNames("text-md font-medium text-text-light")}>
