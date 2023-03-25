@@ -25,7 +25,7 @@ export default function Pairwise({ fetchedNames }) {
   const [datasets, setDatasets] = useState([]);
    // record all available data names in the data library
   const [availableDatasetNames, setAvailableDatasetNames] =
-    useState(fetchedNames);
+    useState(fetchedNames || []);
     // record all currently selected data
   const [activeData, setActiveData] = useState(datasets);
   // record all non active data 
