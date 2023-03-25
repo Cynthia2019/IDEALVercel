@@ -22,7 +22,7 @@ const ScatterWrapper = ({
   const chartArea = useRef(null);
   const legendArea = useRef(null);
   const [chart, setChart] = useState(null);
-  const [view, setView] = useState("zoom");
+  const [view, setView] = useState("brush-on");
 
   const handleChange = (e, nextView) => {
     setView(nextView);
@@ -40,8 +40,7 @@ const ScatterWrapper = ({
               view
           )
       );
-    } 
-     else {
+    } else {
       chart.update(
         {
           data,
@@ -57,7 +56,6 @@ const ScatterWrapper = ({
           reset,
           setReset
         }
-
       );
     }
   }, [chart, query1, query2, data, view, reset]);
@@ -98,6 +96,7 @@ const ScatterWrapper = ({
         </ToggleButtonGroup>
 
       </div>
+    </div>
   );
 };
 

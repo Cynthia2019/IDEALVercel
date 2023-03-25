@@ -35,7 +35,6 @@ function () {
   function Structure(element, data) {
     _classCallCheck(this, Structure);
 
-    console.log(data);
     var height = data.height ? data.height : HEIGHT;
     var width = data.width ? data.width : WIDTH;
     var marginLeft = data.marginLeft ? data.marginLeft : MARGIN.LEFT;
@@ -60,8 +59,7 @@ function () {
       var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
       var xScale = d3.scaleLinear().domain([0, 50]).range([0, width]);
       var size = (width + marginLeft * 2) / 50;
-      var ratio = this.calculateRatio(this.data, data.color);
-      var volumn_ratio = this.svg.select(".volumn-ratio");
+      var ratio = this.calculateRatio(this.data);
       this.svg.select(".volumn-ratio").text("Volumn Ratio: ".concat(ratio));
       var pixels = this.svg.selectAll("rect").data(res);
       pixels.enter().append("rect").merge(pixels).attr("x", function (d) {

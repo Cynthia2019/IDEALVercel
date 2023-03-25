@@ -75,8 +75,6 @@ const Scatter_DataSelector = ({
                                   setDatasets,
                                   availableDatasetNames,
                                   setAvailableDatasetNames,
-                                  selectedDatasetNames,
-                                  handleSelectedDatasetNameChange,
                                   query1,
                                   handleQuery1Change,
                                   query2,
@@ -93,35 +91,34 @@ const Scatter_DataSelector = ({
     );
 
     const onIconChange = (event, index) => {
+        //if unchecked, remove from activeData and add to dataLibrary
         if (!event.target.checked) {
-            console.log("unchecked");
-            const sourceItems = Array.from(dataLibrary);
-            const destItems = Array.from(activeData);
-            const unchecked = destItems.filter(
-                (item) => item.name == availableDatasetNames[index].name
-            )[0];
-
-            const [removed] = destItems.splice(destItems.indexOf(unchecked), 1);
-            sourceItems.splice(sourceItems.length, 0, removed);
-            setActiveData(destItems);
-            setDataLibrary(sourceItems);
+          let sourceItems = dataLibrary;
+          let destItems = activeData;
+          const unchecked = destItems.filter(
+              (item) => item.name == availableDatasetNames[index].name
+          )
+    
+          destItems = destItems.filter((item) => item.name != availableDatasetNames[index].name);
+          sourceItems = sourceItems.concat(unchecked);
+          setActiveData(destItems);
+          setDataLibrary(sourceItems);
         } else {
-            const sourceItems = Array.from(activeData);
-            const destItems = Array.from(dataLibrary);
-            const checked = destItems.filter(
-                (item) => item.name == availableDatasetNames[index].name
-            )[0];
-            const [removed] = destItems.splice(destItems.indexOf(checked), 1);
-            sourceItems.splice(sourceItems.length, 0, removed);
-            setActiveData(sourceItems);
-            setDataLibrary(destItems);
+          let sourceItems = activeData;
+          let destItems = dataLibrary;
+          const checked = destItems.filter(
+              (item) => item.name == availableDatasetNames[index].name
+          );
+          destItems = destItems.filter((item) => item.name != availableDatasetNames[index].name);
+          sourceItems = sourceItems.concat(checked);
+          setActiveData(sourceItems);
+          setDataLibrary(destItems);
         }
         let temp = [...showData];
         temp[index] = !temp[index];
         setShowData(temp);
-    };
-    console.log("scatter data selector");
-    console.log(availableDatasetNames);
+      };
+    
 
     function Row(props) {
         const [open, setOpen] = React.useState(false);

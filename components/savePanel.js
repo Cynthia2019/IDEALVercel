@@ -33,12 +33,18 @@ const SavePanel = ({ selectedData, setReset }) => {
   //      url =
 //          "https://ideal-server-espy0exsw-cynthia2019.vercel.app/diversity/";
       }
-      const response = await fetch(`${url}`, {
-        body: body,
-        method: "POST",
-      });
-      const jsonData = await response.json();
-      setDiversity(jsonData[0]);
+      try {
+        const response = await fetch(`${url}`, {
+          body: body,
+          method: "POST",
+        });
+        const jsonData = await response.json();
+        setDiversity(jsonData[0]);
+      }
+      catch (err) {
+        console.log("Server not up");
+        setDiversity({})
+      }
     }
     getDiversity(JSON.stringify(formated));
   }, [selectedData]);

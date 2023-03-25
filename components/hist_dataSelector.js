@@ -102,8 +102,6 @@ const Hist_DataSelector = ({
                                setDatasets,
                                availableDatasetNames,
                                setAvailableDatasetNames,
-                               selectedDatasetNames,
-                               handleSelectedDatasetNameChange,
                                query1,
                                handleQuery1Change,
                                activeData,
@@ -114,56 +112,36 @@ const Hist_DataSelector = ({
     const [showData, setShowData] = useState(availableDatasetNames.map((dataset, index) => {
         return true;
     }))
-    //
-    // useEffect(() => {
-    //     availableDatasetNames.map((dataset, index) => {
-    //         if (index >= 2) {
-    //             console.log("unchecked")
-    //             const sourceItems = Array.from(dataLibrary);
-    //             const destItems = Array.from(activeData);
-    //             const unchecked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
-    //             // console.log(unchecked)
-    //             // console.log(destItems.indexOf(unchecked))
-    //             const [removed] = destItems.splice(destItems.indexOf(unchecked), 1);
-    //             sourceItems.splice(sourceItems.length, 0, removed)
-    //             setActiveData(destItems)
-    //             setDataLibrary(sourceItems);
-    //         }
-    //         let temp = [...showData];
-    //         temp[index] = !temp[index]
-    //         setShowData(temp)
-    //
-    //     })
-    // }, [])
+
 
     const onIconChange = (event, index) => {
+        //if unchecked, remove from activeData and add to dataLibrary
         if (!event.target.checked) {
-            console.log("unchecked")
-            const sourceItems = Array.from(dataLibrary);
-            const destItems = Array.from(activeData);
-            const unchecked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
-            // console.log(unchecked)
-            // console.log(destItems.indexOf(unchecked))
-            const [removed] = destItems.splice(destItems.indexOf(unchecked), 1);
-            sourceItems.splice(sourceItems.length, 0, removed)
-            setActiveData(destItems)
-            setDataLibrary(sourceItems);
-
+          let sourceItems = dataLibrary;
+          let destItems = activeData;
+          const unchecked = destItems.filter(
+              (item) => item.name == availableDatasetNames[index].name
+          )
+    
+          destItems = destItems.filter((item) => item.name != availableDatasetNames[index].name);
+          sourceItems = sourceItems.concat(unchecked);
+          setActiveData(destItems);
+          setDataLibrary(sourceItems);
         } else {
-            console.log("checked")
-            const sourceItems = Array.from(activeData);
-            const destItems = Array.from(dataLibrary);
-            const checked = destItems.filter(item => item.name == availableDatasetNames[index].name)[0]
-            const [removed] = destItems.splice(destItems.indexOf(checked), 1);
-            sourceItems.splice(sourceItems.length, 0, removed)
-            setActiveData(sourceItems)
-            setDataLibrary(destItems);
+          let sourceItems = activeData;
+          let destItems = dataLibrary;
+          const checked = destItems.filter(
+              (item) => item.name == availableDatasetNames[index].name
+          );
+          destItems = destItems.filter((item) => item.name != availableDatasetNames[index].name);
+          sourceItems = sourceItems.concat(checked);
+          setActiveData(sourceItems);
+          setDataLibrary(destItems);
         }
         let temp = [...showData];
-        temp[index] = !temp[index]
-        setShowData(temp)
-
-    };
+        temp[index] = !temp[index];
+        setShowData(temp);
+      };
     console.log("hist data selector")
     console.log(availableDatasetNames)
 
@@ -304,30 +282,6 @@ const Hist_DataSelector = ({
         }
     }
 
-    // const onDragEnd = result => {
-    //     // logic to handle the end of a drag event
-    //     if (!result.destination) return;
-    //     const {source, destination} = result;
-    //     if (source.droppableId !== destination.droppableId) {
-    //         const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
-    //         const destinationData = destination.droppableId === "data-library" ? dataLibrary : activeData
-    //         const sourceItems = Array.from(sourceData);
-    //         const destItems = Array.from(destinationData);
-    //         const [removed] = sourceItems.splice(source.index, 1);
-    //         destItems.splice(destination.index, 0, removed)
-    //         sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
-    //         destinationData == activeData ? setActiveData(destItems) : setDataLibrary(destItems);
-    //
-    //     } else {
-    //         const sourceData = source.droppableId === "active-data" ? activeData : dataLibrary
-    //         const sourceItems = Array.from(sourceData);
-    //         const [removed] = sourceItems.splice(result.source.index, 1);
-    //         sourceItems.splice(result.destination.index, 0, removed)
-    //         sourceData == activeData ? setActiveData(sourceItems) : setDataLibrary(sourceItems);
-    //     }
-    //
-    // };
-
     return (
         <div className={styles["data-selector"]}>
             <div className={styles["data-row"]}>
@@ -355,82 +309,6 @@ const Hist_DataSelector = ({
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        {/*<DragDropContext onDragEnd={onDragEnd}>*/}
-                        {/*    <p> Active Data </p>*/}
-                        {/*    <Droppable droppableId="active-data">*/}
-                        {/*        {(provided, snapshot) => (*/}
-                        {/*            <div {...provided.droppableProps}*/}
-                        {/*                 ref={provided.innerRef}>*/}
-                        {/*                <Box sx={{*/}
-                        {/*                    border: 2,*/}
-                        {/*                    display: "flex column",*/}
-                        {/*                    padding: 1,*/}
-                        {/*                    color: "lightgrey",*/}
-                        {/*                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',*/}
-                        {/*                }}>*/}
-                        {/*                    {activeData.map((dataset, index) => (*/}
-                        {/*                        <Draggable key={dataset.name} draggableId={dataset.name} index={index}>*/}
-                        {/*                            {(provided) => (*/}
-                        {/*                                <div {...provided.draggableProps}*/}
-                        {/*                                     ref={provided.innerRef}*/}
-                        {/*                                     {...provided.dragHandleProps}>*/}
-                        {/*                                    <Button*/}
-                        {/*                                        sx={{gap: 1}}*/}
-                        {/*                                        className={styles.datasetButton}*/}
-                        {/*                                        style={{backgroundColor: dataset.color}}*/}
-                        {/*                                        disabled={selectedDatasetNames.includes(dataset.name)}*/}
-                        {/*                                        onMouseOver={mouseover_data}*/}
-                        {/*                                        onMouseLeave={mouseleave_data}*/}
-                        {/*                                        onMouseMove={mousemove_data}*/}
-                        {/*                                    >*/}
-                        {/*                                        {dataset.name}*/}
-                        {/*                                    </Button>*/}
-                        {/*                                </div>*/}
-                        {/*                            )}*/}
-                        {/*                        </Draggable>*/}
-                        {/*                    ))}*/}
-                        {/*                    {provided.placeholder}*/}
-                        {/*                </Box>*/}
-                        {/*            </div>*/}
-                        {/*        )}*/}
-                        {/*    </Droppable>*/}
-                        {/*    <p> Inactive Data Library</p>*/}
-                        {/*    <Droppable droppableId="data-library">*/}
-                        {/*        {(provided, snapshot) => (*/}
-                        {/*            <div {...provided.droppableProps}*/}
-                        {/*                 ref={provided.innerRef}>*/}
-                        {/*                <Box sx={{*/}
-                        {/*                    border: 2,*/}
-                        {/*                    display: "flex column",*/}
-                        {/*                    padding: 1,*/}
-                        {/*                    color: "lightgrey",*/}
-                        {/*                    background: snapshot.isDraggingOver ? 'lightblue' : 'white',*/}
-                        {/*                }}>*/}
-                        {/*                    {dataLibrary.map((dataset, index) => (*/}
-                        {/*                        <Draggable key={dataset.name} draggableId={dataset.name} index={index}>*/}
-                        {/*                            {(provided) => (*/}
-                        {/*                                <div {...provided.draggableProps}*/}
-                        {/*                                     ref={provided.innerRef}*/}
-                        {/*                                     {...provided.dragHandleProps}>*/}
-                        {/*                                    <Button*/}
-                        {/*                                        sx={{gap: 1}}*/}
-                        {/*                                        className={styles.datasetButton}*/}
-                        {/*                                        style={{backgroundColor: dataset.color}}*/}
-                        {/*                                        onClick={() => handleSelectedDatasetNameChange(dataset.name)}*/}
-                        {/*                                        disabled={selectedDatasetNames.includes(dataset.name)}*/}
-                        {/*                                    >*/}
-                        {/*                                        {dataset.name}*/}
-                        {/*                                    </Button>*/}
-                        {/*                                </div>*/}
-                        {/*                            )}*/}
-                        {/*                        </Draggable>*/}
-                        {/*                    ))}*/}
-                        {/*                    {provided.placeholder}*/}
-                        {/*                </Box>*/}
-                        {/*            </div>*/}
-                        {/*        )}*/}
-                        {/*    </Droppable>*/}
-                        {/*</DragDropContext>*/}
                     </div>
                 </FormControl>
             </div>

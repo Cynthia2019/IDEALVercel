@@ -11,7 +11,6 @@ const HEIGHT = SIDE - MARGIN.TOP - MARGIN.BOTTOM;
 
 class Structure {
   constructor(element, data) {
-    console.log(data)
     let height = data.height ? data.height : HEIGHT
     let width = data.width ? data.width : WIDTH
     let marginLeft = data.marginLeft ? data.marginLeft : MARGIN.LEFT

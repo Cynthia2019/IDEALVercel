@@ -62,7 +62,6 @@ export async function getStaticProps() {
             fetchedNames: fetchedNames
         }
     }
-
 }
 
 

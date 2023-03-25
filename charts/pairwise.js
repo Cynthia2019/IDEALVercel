@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import organizeByName from "@/util/organizeByName";
 
 const padding = 20// separation between adjacent cells, in pixels
 const marginTop = 10 // top margin, in pixels
@@ -224,15 +225,13 @@ class Pairwise {
         for (let i = 0; i < max_num_datasets; i++) {
             datasets.push([])
         }
-        data.map((d, i) => {
-            for (let data of d.data) {
-                data.name = d.name;
-                data.color = d.color;
-            }
+        let organizedData = organizeByName(data);
+        organizedData.map((d, i) => {
             colors[d.name] = d.color;
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
+
         let finalData = [].concat(...datasets);
 
         //clean up before updating visuals
@@ -324,7 +323,7 @@ class Pairwise {
 
         let mouseover_non_hist = function (e, d) {
             console.log("non-hist")
-            console.log(this)
+            // console.log(this)
             d3.select(this)
                 // .style("fill", "#EAEAEA")
                 .style("stroke", "black")
@@ -472,8 +471,7 @@ class Pairwise {
 
         this.cell.each(function ([x, y]) {
             if (x != y) {
-                console.log("cell")
-                console.log(this)
+                // console.log(this)
                 d3.select(this)
                     .select(".cell")
                     .attr("class", "non_hist")
@@ -508,8 +506,6 @@ class Pairwise {
 
                     let X0 = d3.map(a, a => d3.map(datasets[i], typeof a === "function" ? a : d => +d[a]));
                     let Y0 = d3.map(b, b => d3.map(datasets[i], typeof b === "function" ? b : d => +d[b]));
-                    console.log("Y0")
-                    console.log(Y0)
                     const Z = d3.map(datasets[i], z);
 
                     // Omit any data not present in the z-domain.

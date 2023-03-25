@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import Header from "../components/header";
+import organizeByName from "../util/organizeByName";
 
 const padding = 10// separation between adjacent cells, in pixels
 const marginTop = 0 // top margin, in pixels
@@ -95,11 +96,10 @@ class Hist {
            setTooltip,
            toggled) {
         console.log("updating...")
-        console.log(data)
+        
         function expo(x, f) {
             if (x < 1000 && x > -1000) return x;
             console.log("number format")
-            console.log(x)
             if (!toggled) {
                 return (x / 1e6) + "e+6"
             } else {
@@ -114,15 +114,13 @@ class Hist {
         for (let i = 0; i < max_num_datasets; i++) {
             datasets.push([])
         }
-        data.map((d, i) => {
-            for (let data of d.data) {
-                data.name = d.name;
-                data.color = d.color;
-            }
+        let organizedData = organizeByName(data);
+        organizedData.map((d, i) => {
             colors[d.name] = d.color;
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
+
         console.log("hist graph colors")
         console.log(colors)
         let finalData = [].concat(...datasets);
@@ -238,7 +236,7 @@ class Hist {
                     all_bins.push(...bins);
                     let temp_tooltip = {}
                     if (data[i]) {
-                        let temp_arr = data[i].data.map((d, i) => d[query1])
+                        let temp_arr = data.map((d, i) => d[query1])
                         // temp_tooltip["max"] = d3.max(temp_arr)
                         // temp_tooltip["min"] = d3.min(temp_arr)
                         temp_tooltip["name"] = data[i].name

@@ -1,7 +1,9 @@
+import Link from "next/link"
+
 export default function Header() {
     return (
         <div className='header'>
-            <p className='headerText'>Northwestern Engineering IDEAL LAB</p>
+            <Link href={'/'} className='headerText'>Northwestern Engineering IDEAL LAB</Link>
         </div>
     )
 }

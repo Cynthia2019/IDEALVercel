@@ -6,7 +6,6 @@ import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
 import Scatter_dataSelector from "../components/scatter_dataSelector";
-//import DataSelector from "../components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
@@ -27,15 +26,13 @@ const merge = (first, second) => {
   return first;
 };
 
-export default function Scatter({}) {
+export default function Scatter({fetchedNames}) {
   const [datasets, setDatasets] = useState([]);
 
-  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames);
+  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames || []);
   const [activeData, setActiveData] = useState(datasets);
   const [dataLibrary, setDataLibrary] = useState([])
-  const [filteredDatasets, setFilteredDatasets] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
-  const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
   const [neighbors, setNeighbors] = useState([]);
   const [reset, setReset] = useState(false);
@@ -58,20 +55,6 @@ export default function Scatter({}) {
     ssr: false,
   });
 
-  const handleSelectedDatasetNameChange = (e) => {
-    const {
-      target: { value },
-    } = e;
-    setSelectedDatasetNames(value);
-    let newDatasets = datasets.filter((s) =>
-        value
-            .map((v) => JSON.parse(v))
-            .map((v) => v.name)
-            .includes(s.name)
-    );
-    setFilteredDatasets(newDatasets);
-  };
-
   const handleQuery1Change = (e) => {
     setQuery1(e.target.value);
   };
@@ -81,60 +64,75 @@ export default function Scatter({}) {
   };
 
   const handleRangeChange = (name, value) => {
-    let filtered_datasets = datasets.map((set, i) => {
-      let filtered = set.data.filter(
-          (d) => d[name] >= value[0] && d[name] <= value[1]
-      );
-      return { name: set.name, data: filtered, color: set.color };
+
+    let filtered_datasets = datasets.filter((d, i) => {
+        let filtered = d[name] >= value[0] && d[name] <= value[1]
+        let names = [...new Set(activeData.map(d => d.name))]
+        return names.includes(d.name) && filtered;
     });
-    filtered_datasets = filtered_datasets.filter((s) => {
-      let names = selectedDatasetNames
-        .map((v) => JSON.parse(v))
-        .map((v) => v.name);
-      return names.includes(s.name);
-    });
-    setFilteredDatasets(filtered_datasets);
     setActiveData(filtered_datasets);
   };
-
   async function getAllData() {
     const env = process.env.NODE_ENV;
     let url = "http://localhost:8000/model/";
     if (env == "production") {
       url = "http://localhost:8000/model/";
-   //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
-
+      //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
     }
     let response = await fetch(`${url}`, {
       method: "POST",
       mode: "cors",
     })
       .then((res) => res.json())
-      .catch((err) => console.log("fetch error", err.message));
+      .catch((err) => console.log(err));
     return response;
   }
 
   useEffect(() => {
-    getAllData().then((res) => {
-      res = JSON.parse(res)
-      const processedData = res.map((dataset, i) => {
-        return processData(dataset, i);
+    async function fetchData(info, index) {
+      const command = new GetObjectCommand({
+        Bucket: info.bucket_name,
+        Key: info.name,
       });
-      const dataset_names = [...new Set(processedData.map(item => item.name))]; 
-      const dataset_color = [...new Set(processedData.map(item => item.color))]; 
-      let dataset_info_json = []
-      for (let i = 0; i < dataset_names.length; i++) {
-        dataset_info_json.push(JSON.stringify({
-          name: dataset_names[i], 
-          color: dataset_color[i]
-        }))
-      }
-      setDatasets(processedData);
-      setFilteredDatasets(processedData);
-      setSelectedDatasetNames(dataset_info_json);
-      setDataPoint(processedData[0]);
-    });
-    console.log(filteredDatasets)
+
+      await s3Client.send(command).then((res) => {
+        let body = res.Body.transformToByteArray();
+        body.then((stream) => {
+          new Response(stream, { headers: { "Content-Type": "text/csv" } })
+            .text()
+            .then((data) => {
+              let parsed = csvParse(data);
+
+              let processedData = parsed.map((dataset, i) => {
+                return processData(dataset, i);
+              });
+              processedData.map((p) => (p.name = availableDatasetNames[index].name));
+              processedData.map((p) => (p.color = colorAssignment[index]));
+              setDatasets(prev => [...prev, ...processedData]);
+              setDataPoint(processedData[0]);
+              setActiveData(prev => [...prev, ...processedData]);
+            });
+        });
+      });
+    }
+
+    try {
+      getAllData().then((res) => {
+        if (!res) {
+          availableDatasetNames.map((info, i) => fetchData(info, i));
+          return;
+        }
+        res = JSON.parse(res);
+        const processedData = res.map((dataset, i) => {
+          return processData(dataset, i);
+        });
+        setDatasets(processedData);
+        setDataPoint(processedData[0]);
+        setActiveData(processedData);
+      });
+    } catch (err) {
+      console.log("unexpected error")
+    }
   }, []);
 
   return (
@@ -152,7 +150,7 @@ export default function Scatter({}) {
                 </p>
               </div>
             <ScatterWrapper
-              data={filteredDatasets}
+              data={activeData}
               setDataPoint={setDataPoint}
               query1={query1}
               query2={query2}
@@ -169,13 +167,10 @@ export default function Scatter({}) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div className={styles.selectors}>
-            /> */}
               <Scatter_dataSelector
                   setDatasets={setDatasets}
                   availableDatasetNames={availableDatasetNames}
                   setAvailableDatasetNames={setAvailableDatasetNames}
-                  selectedDatasetNames={selectedDatasetNames}
-                  handleSelectedDatasetNameChange={handleSelectedDatasetNameChange}
                   query1={query1}
                   handleQuery1Change={handleQuery1Change}
                   query2={query2}
@@ -187,20 +182,46 @@ export default function Scatter({}) {
               />
               <RangeSelector
                   datasets={datasets}
-                  filteredDatasets={activeData}
+                  activeData={activeData}
                   handleChange={handleRangeChange}
               />
             </div>
           </Row>
           <Row>
-            <Col span={16}>
-              <SavePanel selectedData={selectedData} setReset={setReset} />
-            </Col>
-            <Col span={8}>
-              <MaterialInformation dataPoint={dataPoint} />
-            </Col>
-          </Row>
+          <Col span={12}>
+            <NeighborPanel neighbors={neighbors} />
+          </Col>
+          <Col span={12}>
+            <SavePanel selectedData={selectedData} setReset={setReset} />
+          </Col>
+        </Row>
+        <Row>
+          <MaterialInformation dataPoint={dataPoint} />
+        </Row>
         </div>
       </div>
   );
+}
+
+export async function getStaticProps() {
+  let fetchedNames = []
+  const listObjectCommand = new ListObjectsCommand({
+      Bucket: 'ideal-dataset-1'
+  })
+  await s3Client.send(listObjectCommand).then((res) => {
+      const names = res.Contents.map(content => content.Key)
+      for (let i = 0; i < names.length; i++) {
+          fetchedNames.push({
+              bucket_name: 'ideal-dataset-1',
+              name: names[i],
+              color: colorAssignment[i]
+          })
+      }
+  })
+  return {
+      props: {
+          fetchedNames: fetchedNames
+      }
+  }
+
 }
