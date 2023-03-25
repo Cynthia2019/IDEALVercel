@@ -10,6 +10,5 @@ export async function getDiversity(body) {
         method: "POST"
     })
     const jsonData = await response.json()
-    console.log(jsonData)
     return jsonData
 }

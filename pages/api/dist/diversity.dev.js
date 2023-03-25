@@ -30,10 +30,9 @@ function getDiversity(body) {
 
         case 8:
           jsonData = _context.sent;
-          console.log(jsonData);
           return _context.abrupt("return", jsonData);
 
-        case 11:
+        case 10:
         case "end":
           return _context.stop();
       }

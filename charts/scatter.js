@@ -232,20 +232,15 @@ class Scatter {
       if (env == 'production') {
       //    url = 'https://ideal-server-espy0exsw-cynthia2019.vercel.app/model?data='
       }
-      try {
-        let response = await fetch(
-          `${url}[${data}]`,
-          {
-            method: "GET",
-            mode: "cors",
-          }
-        )
-          .then((res) => res.json())
-          .catch((err) => console.log("fetch error", err.message));
-      }
-      catch (err) {
-        console.log("Server not up", err.message);
-      }
+      let response = await fetch(
+        `${url}[${data}]`,
+        {
+          method: "GET",
+          mode: "cors",
+        }
+      )
+        .then((res) => res.json())
+        .catch((err) => console.log("fetch error", err.message));
       return response;
     }
 
