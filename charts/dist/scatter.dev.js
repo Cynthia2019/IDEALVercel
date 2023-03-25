@@ -228,27 +228,35 @@ function () {
 
         if (view == 'neighbor') {
           target.classed("selected", true);
-          getKnnData(inputData).then(function (indices) {
+          getKnnData(inputData).then(function (data) {
+            var indices = data.indices;
+            var distances = data.distances;
             d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
               return indices.includes(datum.index);
             }).classed("masked", function (datum) {
               return !indices.includes(datum.index);
             });
+            var neighborElements = d3.selectAll('.highlighted');
+            var masked = d3.selectAll('.masked');
+            masked.attr('fill', function (d) {
+              return d.color;
+            }).attr('r', circleOriginalSize).classed('selected', false);
+            console.log(indices);
+            var neighbors = [];
+            neighborElements.each(function (d, i) {
+              d['outline_color'] = _constants.nnColorAssignment[i];
+              console.log(d, indices.indexOf(d.index), d.index);
+              d['distance'] = distances[indices.indexOf(d.index)];
+              return neighbors.push(d);
+            });
+            neighbors.sort(function (a, b) {
+              return a.distance - b.distance;
+            });
+            neighborElements.attr('fill', function (d) {
+              return d.outline_color;
+            }).attr('r', circleFocusSize);
+            setNeighbors(neighbors);
           });
-          var neighborElements = d3.selectAll('.highlighted');
-          var masked = d3.selectAll('.masked');
-          masked.attr('fill', function (d) {
-            return d.color;
-          }).attr('r', circleOriginalSize).classed('selected', false);
-          var neighbors = [];
-          neighborElements.each(function (d, i) {
-            d['outline_color'] = _constants.nnColorAssignment[i];
-            return neighbors.push(d);
-          });
-          neighborElements.attr('fill', function (d) {
-            return d.outline_color;
-          }).attr('r', circleFocusSize);
-          setNeighbors(neighbors);
         }
       };
 

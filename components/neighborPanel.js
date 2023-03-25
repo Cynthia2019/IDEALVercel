@@ -18,7 +18,8 @@ const transpose = (data) => {
       C22: data[i]['C22'], 
       C16: data[i]['C16'],
       C26: data[i]['C26'], 
-      C66: data[i]['C66']
+      C66: data[i]['C66'],
+      distance: Math.round(data[i]['distance']*100)/100
     }
   }
   transposed.push(point)
@@ -33,12 +34,13 @@ const NeighborPanel = ({ neighbors }) => {
         csvLink.current.link.click();
     })
   }
+  console.log(neighbors)
   return (
     <div className={styles.saveSection}>
       <div className={styles["save-data-content-line"]}>
         <p className={styles["data-title"]}>Nearest Neighbors Panel</p>
         <div className={styles["save-table-button-group"]}>
-        <Button className={styles["save-table-button"]} variant="contained" endIcon={<DownloadIcon />} onClick={handleDownloadClick}>
+        <Button className={styles["save-table-button"]} endIcon={<DownloadIcon />} onClick={handleDownloadClick}>
           Download
         </Button>
         <CSVLink data={neighbors} filename={"5_nearest_neighbors.csv"} ref={csvLink} target='_blank'></CSVLink>

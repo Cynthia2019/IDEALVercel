@@ -55,7 +55,6 @@ const SavePanel = ({ selectedData, setReset }) => {
         <div className={styles["save-table-button-group"]}>
           <Button
             className={styles["save-table-button"]}
-            variant="contained"
             endIcon={<DownloadIcon />}
             onClick={handleDownloadClick}
           >
@@ -63,7 +62,6 @@ const SavePanel = ({ selectedData, setReset }) => {
           </Button>
           <Button
             className={styles["save-table-button"]}
-            variant="contained"
             endIcon={<RestartAltIcon />}
             onClick={handleResetClick}
             color="error"

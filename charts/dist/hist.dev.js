@@ -160,11 +160,9 @@ function () {
       var max_num_datasets = arguments.length > 6 ? arguments[6] : undefined;
       var setTooltip = arguments.length > 7 ? arguments[7] : undefined;
       var toggled = arguments.length > 8 ? arguments[8] : undefined;
-      console.log("updating...");
 
       function expo(x, f) {
         if (x < 1000 && x > -1000) return x;
-        console.log("number format");
 
         if (!toggled) {
           return x / 1e6 + "e+6";
@@ -189,8 +187,6 @@ function () {
         datasets[i] = d.data ? d.data : [];
         dataset_dic[i] = d.name;
       });
-      console.log("hist graph colors");
-      console.log(colors);
 
       var finalData = (_ref3 = []).concat.apply(_ref3, datasets); //clean up before updating visuals
 
@@ -211,10 +207,9 @@ function () {
       };
 
       var mouseover_hist = function mouseover_hist(e, d) {
-        console.log("hist"); // console.log(e)
+        // console.log(e)
         // console.log(d)
         // index = d3.select(this).attr("class")[5]
-
         d3.select(this).raise().style("stroke", "black").style("stroke-width", 5).style("fill-opacity", 1); // d3.selectAll('.mean-line' + index)
         //     .raise()
         //     .style("stroke-width", 10)
@@ -298,14 +293,14 @@ function () {
             all_bins.push.apply(all_bins, _toConsumableArray(bins));
             var temp_tooltip = {};
 
-            if (data[_i2]) {
-              var temp_arr = data.map(function (d, i) {
+            if (organizedData[_i2]) {
+              var temp_arr = finalData.map(function (d, i) {
                 return d[query1];
               }); // temp_tooltip["max"] = d3.max(temp_arr)
               // temp_tooltip["min"] = d3.min(temp_arr)
 
-              temp_tooltip["name"] = data[_i2].name;
-              temp_tooltip["color"] = data[_i2].color;
+              temp_tooltip["name"] = organizedData[_i2].name;
+              temp_tooltip["color"] = organizedData[_i2].color;
               temp_tooltip["min"] = d3.min(temp_arr);
               temp_tooltip["max"] = d3.max(temp_arr);
               temp_tooltip["mean"] = d3.mean(temp_arr);
@@ -383,6 +378,9 @@ function () {
         // console.log(xScales[index](mean))
 
         d3.select('svg').append('g').append('line').attr('class', 'mean-line' + i).raise().transition(updateTransition).attr("x1", xScales[index](mean) + width / 15).attr("y1", width + padding * 10 + 5).attr("x2", xScales[index](mean) + width / 15).attr("y2", padding * 16 - 5).attr("stroke", colors[dataset_dic[i]]).attr("stroke-width", 6).attr("fill", "None").style("stroke-dasharray", "5, 5");
+      });
+      var tooltipContent = tooltip.map(function (d, i) {
+        return "<b>Dataset: </b>" + d.name + "<br>" + "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" + "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" + "<b>Median: </b>" + expo(d.median, 0) + "<br>";
       }); // let legend = d3.select('svg')
       //     .append('g')
       //     .append("line");
@@ -405,9 +403,7 @@ function () {
       //     .style("text-anchor", "end")
       //     .text("Mean");
 
-      var tooltip_hist = d3.select(container.current).append("div").style("overflow-y", "auto").style("width", '280px').style("height", '200px').attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("stroke", "white").style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)").style("border-width", "2px").style("border-radius", "5px").style("padding", "10px").style("visibility", "visible").html(tooltip.map(function (d, i) {
-        return "<b>Dataset: </b>" + d.name + "<br>" + "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" + "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" + "<b>Median: </b>" + expo(d.median, 0) + "<br><br>";
-      })).style("top", 60 + "px").style("left", 500 + "px");
+      var tooltip_hist = d3.select(container.current).append("div").style("overflow-y", "auto").style("width", '280px').style("height", '200px').attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("stroke", "white").style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)").style("border-width", "2px").style("border-radius", "5px").style("padding", "10px").style("visibility", "visible").html(tooltipContent.join("<br>")).style("top", 60 + "px").style("left", 500 + "px");
     }
   }]);
 

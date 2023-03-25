@@ -2,7 +2,6 @@ import { Table, Col, Row } from "antd";
 import StructureWrapper from "./structureWrapper";
 
 const NeighborTable = ({ data }) => {
-  console.log("neighbor", data);
   let columns = []
   if (data.length != 0 && data[0]) {
     let flatten = Object.entries(data[0]);
@@ -33,6 +32,7 @@ const NeighborTable = ({ data }) => {
               <Row justify={"center"} style={{fontSize:'8px'}}>C16: {row["C16"]}</Row>
               <Row justify={"center"} style={{fontSize:'8px'}}>C26: {row["C26"]}</Row>
               <Row justify={"center"} style={{fontSize:'8px'}}>C66: {row["C66"]}</Row>
+              <Row justify={"center"} style={{fontSize:'8px'}}>distance: {row["distance"]}</Row>
             </Col>
           );
         }
