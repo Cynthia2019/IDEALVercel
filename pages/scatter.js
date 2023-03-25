@@ -16,6 +16,7 @@ import s3Client from "./api/aws";
 import { colorAssignment } from "@/util/constants";
 import processData from "../util/processData";
 import { useRouter } from "next/router";
+import classNames from "classnames";
 
 const merge = (first, second) => {
   for (let i = 0; i < second.length; i++) {
@@ -46,6 +47,10 @@ export default function Scatter({fetchedNames}) {
   const [query2, setQuery2] = useState(
     pairwise_query2 ? pairwise_query2 : "C12"
   );
+
+
+  const [toggleCollapse, setToggleCollapse] = useState(false);
+  const [isCollapsible, setIsCollapsible] = useState(false);
 
   const Youngs = dynamic(() => import("../components/youngs"), {
     ssr: false,
@@ -135,6 +140,14 @@ export default function Scatter({fetchedNames}) {
     }
   }, []);
 
+  const wrapperClasses = classNames(
+    "h-screen px-4 pt-8 pb-4 bg-light flex justify-between flex-col",
+    {
+      ["w-90"]: !toggleCollapse,
+      ["w-20"]: toggleCollapse,
+    }
+);
+
   return (
       <div>
         <Header />
@@ -166,7 +179,33 @@ export default function Scatter({fetchedNames}) {
             <Youngs dataPoint={dataPoint} />
             <Poisson dataPoint={dataPoint} />
           </div>
-          <div className={styles.selectors}>
+                      {/*<div className={styles.selectors}>*/}
+                      <div
+                  className={wrapperClasses}
+                  // onMouseEnter={onMouseOver}
+                  // onMouseLeave={onMouseOver}
+                  style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
+              >
+                <Scatter_dataSelector
+                    setDatasets={setDatasets}
+                    availableDatasetNames={availableDatasetNames}
+                    setAvailableDatasetNames={setAvailableDatasetNames}
+                    query1={query1}
+                    handleQuery1Change={handleQuery1Change}
+                    query2={query2}
+                    handleQuery2Change={handleQuery2Change}
+                    activeData={activeData}
+                    dataLibrary={dataLibrary}
+                    setActiveData={setActiveData}
+                    setDataLibrary={setDataLibrary}
+                />
+                <RangeSelector
+                    datasets={datasets}
+                    activeData={activeData}
+                    handleChange={handleRangeChange}
+                />
+              </div>
+          {/* <div className={styles.selectors}>
               <Scatter_dataSelector
                   setDatasets={setDatasets}
                   availableDatasetNames={availableDatasetNames}
@@ -185,7 +224,7 @@ export default function Scatter({fetchedNames}) {
                   activeData={activeData}
                   handleChange={handleRangeChange}
               />
-            </div>
+            </div> */}
           </Row>
           <Row>
           <Col span={12}>

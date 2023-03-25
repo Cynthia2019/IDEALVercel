@@ -33,7 +33,8 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
     "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.6.2"
+    "react-router-dom": "^6.6.2",
+    "umap-js": "^1.3.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",

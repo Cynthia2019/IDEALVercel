@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import Header from "../components/header";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/home.pairwise.module.css";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
 import Pairwise_DataSelector from "../components/pairwise_dataSelector";
-// import DataSelector from "@/components/dataSelector";
 import RangeSelector from "../components/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import { Row, Col } from "antd";
@@ -16,6 +15,7 @@ import { colorAssignment, s3BucketList } from "@/util/constants";
 import processData from "../util/processData";
 import Link from "next/link";
 import Umap_page from "@/pages/umap";
+import classNames from "classnames";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -32,6 +32,9 @@ export default function Pairwise({ fetchedNames }) {
   const [dataLibrary, setDataLibrary] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedData, setSelectedData] = useState([]);
+
+  const [toggleCollapse, setToggleCollapse] = useState(false);
+  const [isCollapsible, setIsCollapsible] = useState(false);
 
 
   const Youngs = dynamic(() => import("../components/youngs"), {
@@ -114,6 +117,15 @@ export default function Pairwise({ fetchedNames }) {
     }
   }, []);
 
+
+  const wrapperClasses = classNames(
+    "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",
+    {
+        ["w-100"]: !toggleCollapse,
+        ["w-20"]: toggleCollapse,
+    }
+);
+
   return (
     <div>
       <Header />
@@ -144,7 +156,12 @@ export default function Pairwise({ fetchedNames }) {
             <Youngs dataPoint={dataPoint} />
             <Poisson dataPoint={dataPoint} />
           </div>
-          <div className={styles.selectors}>
+          <div
+                        className={wrapperClasses}
+                        // onMouseEnter={onMouseOver}
+                        // onMouseLeave={onMouseOver}
+                        style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
+                    >
             <Pairwise_DataSelector
               setDatasets={setDatasets}
               availableDatasetNames={availableDatasetNames}
