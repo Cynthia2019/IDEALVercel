@@ -56,8 +56,9 @@ export default function Hist({fetchedNames}) {
         const env = process.env.NODE_ENV;
         let url = "http://localhost:8000/model/";
         if (env == "production") {
-          url = "http://localhost:8000/model/";
+          //url = "http://localhost:8000/model/";
           //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
+          return ;
         }
         let response = await fetch(`${url}`, {
           method: "POST",

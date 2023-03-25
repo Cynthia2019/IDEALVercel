@@ -174,7 +174,8 @@ function () {
       };
 
       function getKnnData(data) {
-        var env, url, response;
+        var env, url, _response;
+
         return regeneratorRuntime.async(function getKnnData$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -185,7 +186,8 @@ function () {
                 if (env == 'production') {//    url = 'https://ideal-server-espy0exsw-cynthia2019.vercel.app/model?data='
                 }
 
-                _context.next = 5;
+                _context.prev = 3;
+                _context.next = 6;
                 return regeneratorRuntime.awrap(fetch("".concat(url, "[").concat(data, "]"), {
                   method: "GET",
                   mode: "cors"
@@ -195,16 +197,25 @@ function () {
                   return console.log("fetch error", err.message);
                 }));
 
-              case 5:
-                response = _context.sent;
+              case 6:
+                _response = _context.sent;
+                _context.next = 12;
+                break;
+
+              case 9:
+                _context.prev = 9;
+                _context.t0 = _context["catch"](3);
+                console.log("Server not up", _context.t0.message);
+
+              case 12:
                 return _context.abrupt("return", response);
 
-              case 7:
+              case 13:
               case "end":
                 return _context.stop();
             }
           }
-        });
+        }, null, null, [[3, 9]]);
       }
 
       var mousedown = function mousedown(e, d) {
