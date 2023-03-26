@@ -3,7 +3,7 @@ import Link from "next/link";
 import {useRouter} from "next/router";
 import React, {useState, useMemo} from "react";
 import Header from "./shared/header";
-import styles from "../styles/Home.module.css";
+import styles from "@/styles/Home.module.css";
 import UmapWrapper from "./umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
@@ -12,7 +12,6 @@ import Umap_DataSelector from "./unused/umap_dataSelector";
 //import DataSelector from "../components/dataSelector";
 import RangeSelector from "./shared/rangeSelector";
 import MaterialInformation from "./shared/materialInfo";
-import SavePanel from "../components/savePanel";
 import {Row, Col} from "antd";
 import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import {s3BucketList, colorAssignment} from '@/util/constants'
