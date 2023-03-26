@@ -1,14 +1,14 @@
 import {useState, useEffect, useMemo} from "react";
-import Header from "../components/header";
+import Header from "../components/shared/header";
 import styles from "../styles/hist.Home.module.css";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-import Hist_dataSelector from "../components/hist_dataSelector";
-// import DataSelector from "@/components/dataSelector";
-import Hist_RangeSelector from "../components/hist_rangeSelector";
+// import Hist_dataSelector from "../components/hist_dataSelector";
+import DataSelector from "@/components/shared/dataSelector";
+import Hist_RangeSelector from "../components/histogram/hist_rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import {Row, Col} from "antd";
-import HistWrapper from "../components/histWrapper";
+import HistWrapper from "../components/histogram/histWrapper";
 import { useRouter } from 'next/router';
 import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from "@/pages/api/aws";
@@ -140,7 +140,8 @@ export default function Hist({fetchedNames}) {
                     </div>
 
                     <div className={styles.selectors}>
-                        <Hist_dataSelector
+                        <DataSelector
+                            page={"histogram"}
                             setDatasets={setDatasets}
                             availableDatasetNames={availableDatasetNames}
                             setAvailableDatasetNames={setAvailableDatasetNames}

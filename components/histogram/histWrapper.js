@@ -1,6 +1,6 @@
 import {useRef, useState, useEffect} from "react";
 import * as React from "react";
-import Hist from "../charts/hist";
+import Hist from "@/charts/hist";
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';

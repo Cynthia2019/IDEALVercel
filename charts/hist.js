@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import Header from "../components/header";
+import Header from "../components/shared/header";
 import organizeByName from "../util/organizeByName";
 
 const padding = 10// separation between adjacent cells, in pixels

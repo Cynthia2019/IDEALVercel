@@ -1,21 +1,25 @@
 .data-selector {
     width: 100%;
-    /* border: 3px solid #E4E0EE; */
-    margin: 20px 20px;
-    padding: 20px;
+    margin: -20px 10px;
+    padding: 10px;
     z-index: 10;
+
 }
 .data-content-line {
     display: flex;
     flex-direction: column;
+
 }
 .data-row {
+    margin: 5px 5px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
 }
 .data-title {
     font-size: 20px;
     font-weight: bold;
-    margin: 5px 0; 
+    margin: 0px 0;
+    padding: 5px;
 }

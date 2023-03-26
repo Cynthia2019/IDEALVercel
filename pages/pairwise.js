@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
-import Header from "../components/header";
+import Header from "../components/shared/header";
 import styles from "../styles/home.pairwise.module.css";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
-import Pairwise_DataSelector from "../components/pairwise_dataSelector";
-import RangeSelector from "../components/rangeSelector";
+import DataSelector from "@/components/shared/dataSelector";
+import RangeSelector from "../components/shared/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import { Row, Col } from "antd";
-import PairwiseWrapper from "../components/pairwiseWrapper";
+import PairwiseWrapper from "../components/pairwise/pairwiseWrapper";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
 import { colorAssignment, s3BucketList } from "@/util/constants";
@@ -20,22 +20,22 @@ import classNames from "classnames";
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 export default function Pairwise({ fetchedNames }) {
-    // record all fetched data from the data library
-    // all data stored in one array 
+  // record all fetched data from the data library
+  // all data stored in one array
   const [datasets, setDatasets] = useState([]);
-   // record all available data names in the data library
-  const [availableDatasetNames, setAvailableDatasetNames] =
-    useState(fetchedNames || []);
-    // record all currently selected data
+  // record all available data names in the data library
+  const [availableDatasetNames, setAvailableDatasetNames] = useState(
+    fetchedNames || []
+  );
+  // record all currently selected data
   const [activeData, setActiveData] = useState(datasets);
-  // record all non active data 
+  // record all non active data
   const [dataLibrary, setDataLibrary] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedData, setSelectedData] = useState([]);
 
   const [toggleCollapse, setToggleCollapse] = useState(false);
   const [isCollapsible, setIsCollapsible] = useState(false);
-
 
   const Youngs = dynamic(() => import("../components/youngs"), {
     ssr: false,
@@ -46,11 +46,10 @@ export default function Pairwise({ fetchedNames }) {
   });
 
   const handleRangeChange = (name, value) => {
-
     let filtered_datasets = datasets.filter((d, i) => {
-        let filtered = d[name] >= value[0] && d[name] <= value[1]
-        let names = [...new Set(activeData.map(d => d.name))]
-        return names.includes(d.name) && filtered;
+      let filtered = d[name] >= value[0] && d[name] <= value[1];
+      let names = [...new Set(activeData.map((d) => d.name))];
+      return names.includes(d.name) && filtered;
     });
     setActiveData(filtered_datasets);
   };
@@ -58,7 +57,7 @@ export default function Pairwise({ fetchedNames }) {
     const env = process.env.NODE_ENV;
     let url = "http://localhost:8000/model/";
     if (env == "production") {
-    //   url = "http://localhost:8000/model/";
+      //   url = "http://localhost:8000/model/";
       //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
     }
     let response = await fetch(`${url}`, {
@@ -88,11 +87,13 @@ export default function Pairwise({ fetchedNames }) {
               let processedData = parsed.map((dataset, i) => {
                 return processData(dataset, i);
               });
-              processedData.map((p) => (p.name = availableDatasetNames[index].name));
+              processedData.map(
+                (p) => (p.name = availableDatasetNames[index].name)
+              );
               processedData.map((p) => (p.color = colorAssignment[index]));
-              setDatasets(prev => [...prev, ...processedData]);
+              setDatasets((prev) => [...prev, ...processedData]);
               setDataPoint(processedData[0]);
-              setActiveData(prev => [...prev, ...processedData]);
+              setActiveData((prev) => [...prev, ...processedData]);
             });
         });
       });
@@ -113,18 +114,17 @@ export default function Pairwise({ fetchedNames }) {
         setActiveData(processedData);
       });
     } catch (err) {
-      console.log("unexpected error")
+      console.log("unexpected error");
     }
   }, []);
-
 
   const wrapperClasses = classNames(
     "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",
     {
-        ["w-100"]: !toggleCollapse,
-        ["w-20"]: toggleCollapse,
+      ["w-100"]: !toggleCollapse,
+      ["w-20"]: toggleCollapse,
     }
-);
+  );
 
   return (
     <div>
@@ -157,12 +157,13 @@ export default function Pairwise({ fetchedNames }) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div
-                        className={wrapperClasses}
-                        // onMouseEnter={onMouseOver}
-                        // onMouseLeave={onMouseOver}
-                        style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
-                    >
-            <Pairwise_DataSelector
+            className={wrapperClasses}
+            // onMouseEnter={onMouseOver}
+            // onMouseLeave={onMouseOver}
+            style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
+          >
+            <DataSelector
+              page={"pairwise"}
               setDatasets={setDatasets}
               availableDatasetNames={availableDatasetNames}
               setAvailableDatasetNames={setAvailableDatasetNames}

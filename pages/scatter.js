@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
-import Header from "../components/header";
+import Header from "../components/shared/header";
 import styles from "../styles/Home.module.css";
-import ScatterWrapper from "../components/scatterWrapper";
+import ScatterWrapper from "../components/scatter/scatterWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
-import Scatter_dataSelector from "../components/scatter_dataSelector";
-import RangeSelector from "../components/rangeSelector";
+// import Scatter_dataSelector from "../components/scatter/scatter_dataSelector";
+import DataSelector from "@/components/shared/dataSelector";
+import RangeSelector from "../components/shared/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
 import NeighborPanel from "@/components/neighborPanel";
@@ -27,12 +28,14 @@ const merge = (first, second) => {
   return first;
 };
 
-export default function Scatter({fetchedNames}) {
+export default function Scatter({ fetchedNames }) {
   const [datasets, setDatasets] = useState([]);
 
-  const [availableDatasetNames, setAvailableDatasetNames] = useState(fetchedNames || []);
+  const [availableDatasetNames, setAvailableDatasetNames] = useState(
+    fetchedNames || []
+  );
   const [activeData, setActiveData] = useState(datasets);
-  const [dataLibrary, setDataLibrary] = useState([])
+  const [dataLibrary, setDataLibrary] = useState([]);
   const [dataPoint, setDataPoint] = useState({});
   const [selectedData, setSelectedData] = useState([]);
   const [neighbors, setNeighbors] = useState([]);
@@ -47,7 +50,6 @@ export default function Scatter({fetchedNames}) {
   const [query2, setQuery2] = useState(
     pairwise_query2 ? pairwise_query2 : "C12"
   );
-
 
   const [toggleCollapse, setToggleCollapse] = useState(false);
   const [isCollapsible, setIsCollapsible] = useState(false);
@@ -69,11 +71,10 @@ export default function Scatter({fetchedNames}) {
   };
 
   const handleRangeChange = (name, value) => {
-
     let filtered_datasets = datasets.filter((d, i) => {
-        let filtered = d[name] >= value[0] && d[name] <= value[1]
-        let names = [...new Set(activeData.map(d => d.name))]
-        return names.includes(d.name) && filtered;
+      let filtered = d[name] >= value[0] && d[name] <= value[1];
+      let names = [...new Set(activeData.map((d) => d.name))];
+      return names.includes(d.name) && filtered;
     });
     setActiveData(filtered_datasets);
   };
@@ -81,7 +82,7 @@ export default function Scatter({fetchedNames}) {
     const env = process.env.NODE_ENV;
     let url = "http://localhost:8000/model/";
     if (env == "production") {
-     // url = "http://localhost:8000/model/";
+      // url = "http://localhost:8000/model/";
       //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
     }
     let response = await fetch(`${url}`, {
@@ -111,11 +112,13 @@ export default function Scatter({fetchedNames}) {
               let processedData = parsed.map((dataset, i) => {
                 return processData(dataset, i);
               });
-              processedData.map((p) => (p.name = availableDatasetNames[index].name));
+              processedData.map(
+                (p) => (p.name = availableDatasetNames[index].name)
+              );
               processedData.map((p) => (p.color = colorAssignment[index]));
-              setDatasets(prev => [...prev, ...processedData]);
+              setDatasets((prev) => [...prev, ...processedData]);
               setDataPoint(processedData[0]);
-              setActiveData(prev => [...prev, ...processedData]);
+              setActiveData((prev) => [...prev, ...processedData]);
             });
         });
       });
@@ -136,7 +139,7 @@ export default function Scatter({fetchedNames}) {
         setActiveData(processedData);
       });
     } catch (err) {
-      console.log("unexpected error")
+      console.log("unexpected error");
     }
   }, []);
 
@@ -146,22 +149,24 @@ export default function Scatter({fetchedNames}) {
       ["w-90"]: !toggleCollapse,
       ["w-20"]: toggleCollapse,
     }
-);
+  );
 
   return (
-      <div>
-        <Header />
-        <div className={styles.body}>
-          <Row className={styles.firstScreen}>
-            <div className={styles.mainPlot}>
-              <div className={styles.mainPlotHeader}>
-                <p className={styles.mainPlotTitle}>Material Data Explorer (Individual Scatter Plot)</p>
-                <p className={styles.mainPlotSub}>
-                  Select properties from the dropdown menus to graph on the x and
-                  y axes. Hovering over data points provides additional
-                  information. Scroll to zoom, click and drag to pan.
-                </p>
-              </div>
+    <div>
+      <Header />
+      <div className={styles.body}>
+        <Row className={styles.firstScreen}>
+          <div className={styles.mainPlot}>
+            <div className={styles.mainPlotHeader}>
+              <p className={styles.mainPlotTitle}>
+                Material Data Explorer (Individual Scatter Plot)
+              </p>
+              <p className={styles.mainPlotSub}>
+                Select properties from the dropdown menus to graph on the x and
+                y axes. Hovering over data points provides additional
+                information. Scroll to zoom, click and drag to pan.
+              </p>
+            </div>
             <ScatterWrapper
               data={activeData}
               setDataPoint={setDataPoint}
@@ -179,54 +184,34 @@ export default function Scatter({fetchedNames}) {
             <Youngs dataPoint={dataPoint} />
             <Poisson dataPoint={dataPoint} />
           </div>
-                      {/*<div className={styles.selectors}>*/}
-                      <div
-                  className={wrapperClasses}
-                  // onMouseEnter={onMouseOver}
-                  // onMouseLeave={onMouseOver}
-                  style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
-              >
-                <Scatter_dataSelector
-                    setDatasets={setDatasets}
-                    availableDatasetNames={availableDatasetNames}
-                    setAvailableDatasetNames={setAvailableDatasetNames}
-                    query1={query1}
-                    handleQuery1Change={handleQuery1Change}
-                    query2={query2}
-                    handleQuery2Change={handleQuery2Change}
-                    activeData={activeData}
-                    dataLibrary={dataLibrary}
-                    setActiveData={setActiveData}
-                    setDataLibrary={setDataLibrary}
-                />
-                <RangeSelector
-                    datasets={datasets}
-                    activeData={activeData}
-                    handleChange={handleRangeChange}
-                />
-              </div>
-          {/* <div className={styles.selectors}>
-              <Scatter_dataSelector
-                  setDatasets={setDatasets}
-                  availableDatasetNames={availableDatasetNames}
-                  setAvailableDatasetNames={setAvailableDatasetNames}
-                  query1={query1}
-                  handleQuery1Change={handleQuery1Change}
-                  query2={query2}
-                  handleQuery2Change={handleQuery2Change}
-                  activeData={activeData}
-                  dataLibrary={dataLibrary}
-                  setActiveData={setActiveData}
-                  setDataLibrary={setDataLibrary}
-              />
-              <RangeSelector
-                  datasets={datasets}
-                  activeData={activeData}
-                  handleChange={handleRangeChange}
-              />
-            </div> */}
-          </Row>
-          <Row>
+          <div
+            className={wrapperClasses}
+            // onMouseEnter={onMouseOver}
+            // onMouseLeave={onMouseOver}
+            style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
+          >
+            <DataSelector
+              page={"scatter"}
+              setDatasets={setDatasets}
+              availableDatasetNames={availableDatasetNames}
+              setAvailableDatasetNames={setAvailableDatasetNames}
+              query1={query1}
+              handleQuery1Change={handleQuery1Change}
+              query2={query2}
+              handleQuery2Change={handleQuery2Change}
+              activeData={activeData}
+              dataLibrary={dataLibrary}
+              setActiveData={setActiveData}
+              setDataLibrary={setDataLibrary}
+            />
+            <RangeSelector
+              datasets={datasets}
+              activeData={activeData}
+              handleChange={handleRangeChange}
+            />
+          </div>
+        </Row>
+        <Row>
           <Col span={12}>
             <NeighborPanel neighbors={neighbors} />
           </Col>
@@ -237,30 +222,29 @@ export default function Scatter({fetchedNames}) {
         <Row>
           <MaterialInformation dataPoint={dataPoint} />
         </Row>
-        </div>
       </div>
+    </div>
   );
 }
 
 export async function getStaticProps() {
-  let fetchedNames = []
+  let fetchedNames = [];
   const listObjectCommand = new ListObjectsCommand({
-      Bucket: 'ideal-dataset-1'
-  })
+    Bucket: "ideal-dataset-1",
+  });
   await s3Client.send(listObjectCommand).then((res) => {
-      const names = res.Contents.map(content => content.Key)
-      for (let i = 0; i < names.length; i++) {
-          fetchedNames.push({
-              bucket_name: 'ideal-dataset-1',
-              name: names[i],
-              color: colorAssignment[i]
-          })
-      }
-  })
+    const names = res.Contents.map((content) => content.Key);
+    for (let i = 0; i < names.length; i++) {
+      fetchedNames.push({
+        bucket_name: "ideal-dataset-1",
+        name: names[i],
+        color: colorAssignment[i],
+      });
+    }
+  });
   return {
-      props: {
-          fetchedNames: fetchedNames
-      }
-  }
-
+    props: {
+      fetchedNames: fetchedNames,
+    },
+  };
 }

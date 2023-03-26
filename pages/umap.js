@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
-import Header from "../components/header";
+import Header from "../components/shared/header";
 import styles from "../styles/Home.module.css";
-import UmapWrapper from "../components/umapWrapper";
+import UmapWrapper from "../components/umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
-import Umap_DataSelector from "../components/umap_dataSelector";
-//import DataSelector from "../components/dataSelector";
-import RangeSelector from "../components/rangeSelector";
+// import Umap_DataSelector from "../components/umap_dataSelector";
+import DataSelector from "@/components/shared/dataSelector";
+import RangeSelector from "../components/shared/rangeSelector";
 import MaterialInformation from "../components/materialInfo";
 import SavePanel from "../components/savePanel";
 import { Row, Col } from "antd";
@@ -128,7 +128,8 @@ export default function Umap({fetchedNames}) {
                         />
                     </div>
                     <div className={styles.selectors}>
-                        <Umap_DataSelector
+                        <DataSelector
+                            page={"umap"}
                             setDatasets={setDatasets}
                             availableDatasetNames={availableDatasetNames}
                             setAvailableDatasetNames={setAvailableDatasetNames}

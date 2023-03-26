@@ -9,7 +9,7 @@ exports["default"] = void 0;
 
 var d3 = _interopRequireWildcard(require("d3"));
 
-var _header = _interopRequireDefault(require("../components/header"));
+var _header = _interopRequireDefault(require("../components/shared/header"));
 
 var _organizeByName = _interopRequireDefault(require("../util/organizeByName"));
 

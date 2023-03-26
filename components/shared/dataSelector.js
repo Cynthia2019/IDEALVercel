@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "@/styles/hist.dataSelector.module.css";
+import styles from "@/styles/dataSelector.module.css";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -71,7 +71,56 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Hist_DataSelector = ({
+const XAxisSelector = ({ query1, handleQuery1Change }) => {
+  <div className={styles["data-content-line"]}>
+    <p>X-axis</p>
+    <FormControl variant="standard" fullWidth>
+      <InputLabel id="x-axis-select-label">{query1}</InputLabel>
+      <Select
+        labelId="x-axis-select-label"
+        id="x-axis-select"
+        value={query1}
+        onChange={handleQuery1Change}
+        input={<BootstrapInput />}
+      >
+        {AxisSelections.map((item, index) => {
+          return (
+            <MenuItem value={item} key={index}>
+              {item}
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
+  </div>;
+};
+
+const YAxisSelector = ({ query2, handleQuery2Change }) => {
+  <div className={styles["data-content-line"]}>
+    <p>Y-axis</p>
+    <FormControl variant="standard" fullWidth>
+      <InputLabel id="x-axis-select-label">{query2}</InputLabel>
+      <Select
+        labelId="x-axis-select-label"
+        id="x-axis-select"
+        value={query2}
+        onChange={handleQuery2Change}
+        input={<BootstrapInput />}
+      >
+        {AxisSelections.map((item, index) => {
+          return (
+            <MenuItem value={item} key={index}>
+              {item}
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
+  </div>;
+};
+
+const DataSelector = ({
+  page,
   setDatasets,
   availableDatasetNames,
   setAvailableDatasetNames,
@@ -299,29 +348,19 @@ const Hist_DataSelector = ({
           </div>
         </FormControl>
       </div>
-      <div className={styles["data-content-line"]}>
-        {/*<p>X-axis</p>*/}
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="x-axis-select-label">{query1}</InputLabel>
-          <Select
-            labelId="x-axis-select-label"
-            id="x-axis-select"
-            value={query1}
-            onChange={handleQuery1Change}
-            input={<BootstrapInput />}
-          >
-            {AxisSelections.map((item, index) => {
-              return (
-                <MenuItem value={item} key={index}>
-                  {item}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </div>
+      {page == "scatter" && (
+        <React.Fragment>
+          <XAxisSelector query1={query1} />
+          <YAxisSelector query2={query2} />
+        </React.Fragment>
+      )}
+      {page == "histogram" && (
+        <React.Fragment>
+          <XAxisSelector query1={query1} />
+        </React.Fragment>
+      )}
     </div>
   );
 };
 
-export default Hist_DataSelector;
+export default DataSelector;

@@ -1,12 +1,12 @@
 import { Slider, Row, Col } from "antd";
-import styles from "../styles/rangeSelector.module.css";
+import styles from "@/styles/hist.rangeSelector.module.css";
 
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
 
-const RangeSelector = ({ datasets, activeData, handleChange }) => {
+const Hist_RangeSelector = ({ datasets, filteredDatasets, handleChange }) => {
   const data = datasets;
-  const filtered = activeData;
+  const filtered = filteredDatasets;
   const handleSliderChange = (name, value) => {
     handleChange(name, value);
   };
@@ -40,4 +40,4 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
   );
 };
 
-export default RangeSelector;
+export default Hist_RangeSelector;
