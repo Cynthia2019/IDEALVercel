@@ -1,4 +1,4 @@
-import styles from "../styles/home.pairwise.module.css";
+import styles from "@/styles/home.pairwise.module.css";
 
 
 const MaterialInformation = ({dataPoint}) => {

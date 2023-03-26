@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import styles from "../styles/Home.module.css";
+import styles from "@/styles/Home.module.css";
 import SaveDataTable from "./saveDataTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";

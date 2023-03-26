@@ -8,8 +8,8 @@ import dynamic from "next/dynamic";
 // import Umap_DataSelector from "../components/umap_dataSelector";
 import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "../components/shared/rangeSelector";
-import MaterialInformation from "../components/materialInfo";
-import SavePanel from "../components/savePanel";
+import MaterialInformation from "../components/shared/materialInfo";
+import SavePanel from "@/components/saveData/savePanel";
 import { Row, Col } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from './api/aws'

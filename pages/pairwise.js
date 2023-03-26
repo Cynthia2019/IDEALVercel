@@ -6,7 +6,7 @@ import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
 import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "../components/shared/rangeSelector";
-import MaterialInformation from "../components/materialInfo";
+import MaterialInformation from "../components/shared/materialInfo";
 import { Row, Col } from "antd";
 import PairwiseWrapper from "../components/pairwise/pairwiseWrapper";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";

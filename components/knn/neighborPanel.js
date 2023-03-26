@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import styles from "../styles/Home.module.css";
+import styles from "@/styles/Home.module.css";
 import NeighborTable from "./neighborTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -34,7 +34,7 @@ const NeighborPanel = ({ neighbors }) => {
         csvLink.current.link.click();
     })
   }
-  console.log(neighbors)
+
   return (
     <div className={styles.saveSection}>
       <div className={styles["save-data-content-line"]}>

@@ -1,5 +1,5 @@
 import { Table, Col, Row } from "antd";
-import StructureWrapper from "./structureWrapper";
+import StructureWrapper from "@/components/structureWrapper";
 
 const NeighborTable = ({ data }) => {
   let columns = []

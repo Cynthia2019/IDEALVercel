@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 // import Hist_dataSelector from "../components/hist_dataSelector";
 import DataSelector from "@/components/shared/dataSelector";
 import Hist_RangeSelector from "../components/histogram/hist_rangeSelector";
-import MaterialInformation from "../components/materialInfo";
+import MaterialInformation from "../components/shared/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histogram/histWrapper";
 import { useRouter } from 'next/router';
