@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { UMAP } from 'umap-js';
+import organizeByName from "@/util/organizeByName";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 7;
@@ -127,7 +128,8 @@ class Umap {
         let properties = ['C11', 'C12', 'C22', 'C16', 'C26', 'C66']
         let datasets = [];
         // const embedding = umap.fit(data);
-        data.map((d, i) => {
+        let organizedData = organizeByName(data);
+        organizedData.map((d, i) => {
             const umap = new UMAP();
             let temp_data = []
             for (let data of d.data) {

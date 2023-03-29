@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import Header from "../components/header";
+import Header from "../components/shared/header";
+import organizeByName from "../util/organizeByName";
 
 const padding = 10// separation between adjacent cells, in pixels
 const marginTop = 0 // top margin, in pixels
@@ -94,12 +95,9 @@ class Hist {
            max_num_datasets,
            setTooltip,
            toggled) {
-        console.log("updating...")
-        console.log(data)
+        
         function expo(x, f) {
             if (x < 1000 && x > -1000) return x;
-            console.log("number format")
-            console.log(x)
             if (!toggled) {
                 return (x / 1e6) + "e+6"
             } else {
@@ -114,17 +112,13 @@ class Hist {
         for (let i = 0; i < max_num_datasets; i++) {
             datasets.push([])
         }
-        data.map((d, i) => {
-            for (let data of d.data) {
-                data.name = d.name;
-                data.color = d.color;
-            }
+        let organizedData = organizeByName(data);
+        organizedData.map((d, i) => {
             colors[d.name] = d.color;
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
-        console.log("hist graph colors")
-        console.log(colors)
+
         let finalData = [].concat(...datasets);
         //clean up before updating visuals
         d3.selectAll(".xAxisGroup").remove();
@@ -147,7 +141,6 @@ class Hist {
         };
 
         let mouseover_hist = function (e, d) {
-            console.log("hist");
             // console.log(e)
             // console.log(d)
             // index = d3.select(this).attr("class")[5]
@@ -237,12 +230,12 @@ class Hist {
                     const bins = d3.bin().thresholds(thresholds).value(i => X0[index][i])(I0);
                     all_bins.push(...bins);
                     let temp_tooltip = {}
-                    if (data[i]) {
-                        let temp_arr = data[i].data.map((d, i) => d[query1])
+                    if (organizedData[i]) {
+                        let temp_arr = finalData.map((d, i) => d[query1])
                         // temp_tooltip["max"] = d3.max(temp_arr)
                         // temp_tooltip["min"] = d3.min(temp_arr)
-                        temp_tooltip["name"] = data[i].name
-                        temp_tooltip["color"] = data[i].color
+                        temp_tooltip["name"] = organizedData[i].name
+                        temp_tooltip["color"] = organizedData[i].color
                         temp_tooltip["min"] = d3.min(temp_arr)
                         temp_tooltip["max"] = d3.max(temp_arr)
                         temp_tooltip["mean"] = d3.mean(temp_arr)
@@ -376,6 +369,14 @@ class Hist {
 
         })
 
+        let tooltipContent = tooltip.map((d, i) => (
+            "<b>Dataset: </b>" + d.name + "<br>" +
+            "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" +
+            "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" +
+            "<b>Median: </b>" + expo(d.median, 0) + "<br>"
+        )
+    )
+
         // let legend = d3.select('svg')
         //     .append('g')
         //     .append("line");
@@ -413,14 +414,7 @@ class Hist {
             .style("border-radius", "5px")
             .style("padding", "10px")
             .style("visibility", "visible")
-            .html((tooltip.map((d, i) => (
-                        "<b>Dataset: </b>" + d.name + "<br>" +
-                        "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" +
-                        "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" +
-                        "<b>Median: </b>" + expo(d.median, 0) + "<br><br>"
-                    )
-                ))
-            )
+            .html(tooltipContent.join("<br>"))
             .style("top", 60 + "px")
             .style("left", 500 + "px");
 

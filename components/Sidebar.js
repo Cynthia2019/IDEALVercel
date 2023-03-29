@@ -2,17 +2,16 @@ import classNames from "classnames";
 import Link from "next/link";
 import {useRouter} from "next/router";
 import React, {useState, useMemo} from "react";
-import Header from "../components/header";
-import styles from "../styles/Home.module.css";
-import UmapWrapper from "../components/umapWrapper";
+import Header from "./shared/header";
+import styles from "@/styles/Home.module.css";
+import UmapWrapper from "./umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
-import Umap_DataSelector from "../components/umap_dataSelector";
+import Umap_DataSelector from "./unused/umap_dataSelector";
 //import DataSelector from "../components/dataSelector";
-import RangeSelector from "../components/rangeSelector";
-import MaterialInformation from "../components/materialInfo";
-import SavePanel from "../components/savePanel";
+import RangeSelector from "./shared/rangeSelector";
+import MaterialInformation from "./shared/materialInfo";
 import {Row, Col} from "antd";
 import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import {s3BucketList, colorAssignment} from '@/util/constants'
@@ -111,7 +110,7 @@ const Sidebar = () => {
                     {menuItems.map(({icon: Icon, ...menu}) => {
                         const classes = getNavItemClasses(menu);
                         return (
-                            <div className={classes}>
+                            <div className={classes} key={menu.id}>
                                 <Link legacyBehavior href={menu.link}>
                                     <a className="flex py-4 px-3 items-center w-full h-full">
                                         <div style={{width: "2.5rem"}}>

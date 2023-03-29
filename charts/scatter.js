@@ -1,10 +1,10 @@
 import * as d3 from "d3";
+import { nnColorAssignment } from "@/util/constants";
 
 const circleOriginalSize = 5;
-const circleFocusSize = 7;
+const circleFocusSize = 8;
 
 const legendSpacing = 4;
-
 
 const MARGIN = {
   TOP: 0,
@@ -32,25 +32,22 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 class Scatter {
-  constructor(
-      element,
-      legendElement,
-      data,
-      setDataPoint,
-      selectedData,
-      setSelectedData,
-      view
-  ) {
+  constructor(element, legendElement, data, view) {
     this.svg = d3
-        .select(element)
-        .append("svg")
-        .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-        .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-        .attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM])
-        .attr("style", "max-width: 100%")
-        .append("g")
-        .attr("class", "scatter-plot-plot")
-        .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
+      .select(element)
+      .append("svg")
+      .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+      .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+      .attr("viewBox", [
+        -MARGIN.LEFT,
+        -MARGIN.TOP,
+        WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
+        HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
+      ])
+      .attr("style", "max-width: 100%")
+      .append("g")
+      .attr("class", "scatter-plot-plot")
+      .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
 
     //Legend
     this.legend = d3
@@ -62,21 +59,19 @@ class Scatter {
 
     // Labels
     this.xLabel = this.svg
-        .append("text")
-        .attr("x", WIDTH / 2)
-        .attr("y", HEIGHT + 50)
-        .attr("text-anchor", "middle")
-        .style("fill", "black")
-    ;
+      .append("text")
+      .attr("x", WIDTH / 2)
+      .attr("y", HEIGHT + 50)
+      .attr("text-anchor", "middle")
+      .style("fill", "black");
 
     this.yLabel = this.svg
-        .append("text")
-        .attr("x", -HEIGHT / 2)
-        .attr("y", -80)
-        .attr("text-anchor", "middle")
-        .attr("transform", "rotate(-90)")
-        .style("fill", "black")
-    ;
+      .append("text")
+      .attr("x", -HEIGHT / 2)
+      .attr("y", -80)
+      .attr("text-anchor", "middle")
+      .attr("transform", "rotate(-90)")
+      .style("fill", "black");
 
     // Append group el to display both axes
     this.xAxisGroup = this.svg
@@ -90,46 +85,38 @@ class Scatter {
     this.zoomedXScale;
     this.zoomedYScale;
 
-    this.update(
-        data,
-        element,
-        legendElement,
-        setDataPoint,
-        this.query1,
-        this.query2,
-        selectedData,
-        setSelectedData,
-        view,
-        false
-    );
+
+    this.update({
+      data: data,
+      element: element,
+      legendElement: legendElement,
+      query1: this.query1,
+      query2: this.query2,
+      view: view,
+      reset: false,
+    });
   }
   //query1: x-axis
   //query2: y-axis
-  update(
-      data,
-      element,
-      legendElement,
-      setDataPoint,
-      query1,
-      query2,
-      selectedData,
-      setSelectedData,
-      view,
-      reset,
-      setReset
-  ) {
+  update({
+    data,
+    element,
+    legendElement,
+    setDataPoint,
+    query1,
+    query2,
+    selectedData,
+    setSelectedData,
+    setNeighbors, 
+    view,
+    reset,
+    setReset,
+  }) {
     this.data = data;
     this.query1 = query1;
     this.query2 = query2;
-    let datasets = [];
-
-    data.map((d, i) => {
-      for (let data of d.data) {
-        data.name = d.name;
-        data.color = d.color;
-      }
-      datasets.push(d.data);
-    });
+    let datasets = data;
+    
 
     let finalData = [].concat(...datasets);
 
@@ -137,7 +124,7 @@ class Scatter {
     d3.selectAll(".legend").remove();
     d3.select(".tooltip").remove();
     d3.selectAll(".dataCircle").remove();
-    d3.selectAll("defs").remove()
+    d3.selectAll("defs").remove();
     d3.selectAll(".rectZoom").remove();
     d3.selectAll(".clipPath").remove();
 
@@ -150,23 +137,21 @@ class Scatter {
         .range([HEIGHT, 0]);
 
     let xScale = d3
-        .scaleLinear()
-        .domain([
-          d3.min(finalData, (d) => d[query1]),
-          d3.max(finalData, (d) => d[query1]),
-        ])
-        .range([0, WIDTH]);
-    if(reset || this.zoomedXScale === undefined) {
-      this.xScale = xScale
+      .scaleLinear()
+      .domain([
+        d3.min(finalData, (d) => d[query1]),
+        d3.max(finalData, (d) => d[query1]),
+      ])
+      .range([0, WIDTH]);
+    if (reset || this.zoomedXScale === undefined) {
+      this.xScale = xScale;
+    } else {
+      this.xScale = this.zoomedXScale;
     }
-    else {
-      this.xScale = this.zoomedXScale
-    }
-    if(reset || this.zoomedYScale === undefined) {
-      this.yScale = yScale
-    }
-    else {
-      this.yScale = this.zoomedYScale
+    if (reset || this.zoomedYScale === undefined) {
+      this.yScale = yScale;
+    } else {
+      this.yScale = this.zoomedYScale;
     }
 
     // Add a clipPath: everything out of this area won't be drawn.
@@ -233,14 +218,35 @@ class Scatter {
 
     let mouseleave = function (e, d) {
       tooltip.style("visibility", "hidden").transition().duration(200);
+      const circle = d3.select(this)
       d3.select(this)
-          .attr("r", circleOriginalSize)
-          .style("stroke", "none")
-          .style("stroke-width", 2)
-          .style("fill-opacity", 0.8);
+        .attr("r", circle.classed("highlighted") ? circleFocusSize : circleOriginalSize)
+        .style("stroke", "none")
+        .style("stroke-width", 2)
+        .style("fill-opacity", 0.8);
     };
 
+    async function getKnnData(data) {
+      const env = process.env.NODE_ENV
+      let url= 'http://localhost:8000/model?data='
+      if (env == 'production') {
+      //    url = 'https://ideal-server-espy0exsw-cynthia2019.vercel.app/model?data='
+      }
+      let response = await fetch(
+        `${url}[${data}]`,
+        {
+          method: "GET",
+          mode: "cors",
+        }
+      )
+        .then((res) => res.json())
+        .catch((err) => console.log("fetch error", err.message));
+      return response;
+    }
+
     let mousedown = function (e, d) {
+      let columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
+      let inputData = columns.map((c) => d[c]);
       let target = d3.select(this);
       if (view == "brush-on") {
         target.classed("selected", true);
@@ -251,46 +257,80 @@ class Scatter {
       let selected = [];
       d3.selectAll(".selected").each((d, i) => selected.push(d));
       setSelectedData(selected);
+
+      if (view == 'neighbor') {
+        target.classed("selected", true);
+        getKnnData(inputData).then((data) => {
+          let indices = data.indices
+          let distances = data.distances
+          d3.selectAll(".dataCircle")
+            .data(finalData)
+            .classed("highlighted", function (datum) {
+              return indices.includes(datum.index);
+            })
+            .classed("masked", function (datum) {
+              return !(indices.includes(datum.index));
+            });
+
+            let neighborElements = d3.selectAll('.highlighted')
+            let masked = d3.selectAll('.masked')
+            masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
+      
+            console.log(indices)
+            let neighbors = [];
+            neighborElements.each((d, i) => {
+              d['outline_color'] = nnColorAssignment[i]
+              console.log(d, indices.indexOf(d.index), d.index)
+              d['distance'] = distances[indices.indexOf(d.index)]
+              return neighbors.push(d)
+            });
+            neighbors.sort((a, b) => a.distance - b.distance)
+            neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
+            setNeighbors(neighbors);
+        });
+  
+      }
     };
     let zoomedXScale = this.xScale;
     let zoomedYScale = this.yScale;
 
     // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
     let zoom = d3
-        .zoom()
-        .scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
-        .extent([
-          [0, 0],
-          [WIDTH, HEIGHT],
-        ])
-        .on(
-            "zoom",
-            function (event) {
-              // recover the new scale
-              let newXScale = event.transform.rescaleX(this.xScale);
-              let newYScale = event.transform.rescaleY(this.yScale);
+      .zoom()
+      .scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
+      .extent([
+        [0, 0],
+        [WIDTH, HEIGHT],
+      ])
+      .on(
+        "zoom",
+        function (event) {
+          // recover the new scale
+          let newXScale = event.transform.rescaleX(this.xScale);
+          let newYScale = event.transform.rescaleY(this.yScale);
 
-              // update axes with these new boundaries
-              let xAxisCall = d3
-                  .axisBottom(newXScale)
-                  .tickFormat((x) => `${expo(x, 2)}`);
-              let yAxisCall = d3
-                  .axisLeft(newYScale)
-                  .tickFormat((y) => `${expo(y, 2)}`);
-              this.xAxisGroup.transition().duration(500).call(xAxisCall);
-              this.yAxisGroup.transition().duration(500).call(yAxisCall);
+          // update axes with these new boundaries
+          let xAxisCall = d3
+            .axisBottom(newXScale)
+            .tickFormat((x) => `${expo(x, 2)}`);
+          let yAxisCall = d3
+            .axisLeft(newYScale)
+            .tickFormat((y) => `${expo(y, 2)}`);
+          this.xAxisGroup.transition().duration(500).call(xAxisCall);
+          this.yAxisGroup.transition().duration(500).call(yAxisCall);
 
-              d3.selectAll(".dataCircle")
-                  .data(finalData)
-                  .attr("cy", (d) => newYScale(d[query2]))
-                  .attr("cx", (d) => newXScale(d[query1]));
+          d3.selectAll(".dataCircle")
+            .data(finalData)
+            .attr("cy", (d) => newYScale(d[query2]))
+            .attr("cx", (d) => newXScale(d[query1]));
 
-              zoomedXScale = newXScale;
-              zoomedYScale = newYScale;
-              this.zoomedXScale = newXScale
-              this.zoomedYScale = newYScale
-            }.bind(this)
-        );
+          zoomedXScale = newXScale;
+          zoomedYScale = newYScale;
+          this.zoomedXScale = newXScale;
+          this.zoomedYScale = newYScale;
+        }.bind(this)
+      );
+
 
     this.xScale = zoomedXScale;
     this.yScale = zoomedYScale;
@@ -363,12 +403,11 @@ class Scatter {
 
     legend.exit().remove();
     if (view === "brush-on" || view === "brush-off") {
-      zoom.on("zoom", null)
-      d3.selectAll(".rectZoom").remove()
+      zoom.on("zoom", null);
+      d3.selectAll(".rectZoom").remove();
       this.svg.call(brush);
-    }
-    else if (view === "zoom") {
-      brush.on("start brush end", null)
+    } else if (view === "zoom") {
+      brush.on("start brush end", null);
       this.svg
           .append("rect")
           .attr("class", "rectZoom")
@@ -406,11 +445,11 @@ class Scatter {
         .attr("cy", (d) => this.yScale(d[query2]));
 
     circles.exit().transition().attr("r", 0).remove();
-    if(reset) {
+    if (reset) {
       this.svg.call(zoom.transform, d3.zoomIdentity);
       d3.selectAll(".selected").classed("selected", false);
       setSelectedData([]);
-      setReset(false)
+      setReset(false);
     }
   }
 }
