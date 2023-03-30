@@ -5,6 +5,8 @@ import UmapWrapper from "../components/umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csv, csvParse } from "d3";
 import dynamic from "next/dynamic";
+import ParamSelector from "@/components/umap/paramSelector";
+
 // import Umap_DataSelector from "../components/umap_dataSelector";
 import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "../components/shared/rangeSelector";
@@ -28,6 +30,7 @@ export default function Umap({fetchedNames}) {
     const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
     const [selectedData, setSelectedData] = useState([]);
     const [reset, setReset] = useState(false);
+    const [knn, setKNN] = useState(15);
 
     const router = useRouter();
     const {pairwise_query1, pairwise_query2} = router.query;
@@ -35,6 +38,13 @@ export default function Umap({fetchedNames}) {
     const [query1, setQuery1] = useState(pairwise_query1 ? pairwise_query1 : "C11");
     const [query2, setQuery2] = useState(pairwise_query2 ? pairwise_query2 : "C12");
 
+    const Youngs = dynamic(() => import("../components/youngs"), {
+        ssr: false,
+    });
+
+    const Poisson = dynamic(() => import("../components/poisson"), {
+        ssr: false,
+    });
 
     const handleQuery1Change = (e) => {
         setQuery1(e.target.value);
@@ -42,6 +52,14 @@ export default function Umap({fetchedNames}) {
 
     const handleQuery2Change = (e) => {
         setQuery2(e.target.value);
+    };
+
+    const handleRangeChange = (name, value) => {
+        // console.log('knn')
+        // console.log(value)
+        setKNN(value);
+        // console.log(knn)
+
     };
 
     async function getAllData() {
@@ -114,7 +132,7 @@ export default function Umap({fetchedNames}) {
                 <Row className={styles.firstScreen}>
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
-                            <p className={styles.mainPlotTitle}> UMAP Dimension Reduction (real-time)</p>
+                            <p className={styles.mainPlotTitle}> UMAP Dimension Reduction</p>
                         </div>
                         <UmapWrapper
                             data={activeData}
@@ -125,7 +143,13 @@ export default function Umap({fetchedNames}) {
                             setSelectedData={setSelectedData}
                             reset={reset}
                             setReset={setReset}
+                            knn={knn}
                         />
+                    </div>
+                    <div className={styles.subPlots}>
+                        <StructureWrapper data={dataPoint} />
+                        <Youngs dataPoint={dataPoint} />
+                        <Poisson dataPoint={dataPoint} />
                     </div>
                     <div className={styles.selectors}>
                         <DataSelector
@@ -143,6 +167,11 @@ export default function Umap({fetchedNames}) {
                             setDataLibrary={setDataLibrary}
                         />
                     </div>
+                    <ParamSelector
+                        datasets={datasets}
+                        activeData={activeData}
+                        handleChange={handleRangeChange}
+                    />
                 </Row>
             </div>
         </div>

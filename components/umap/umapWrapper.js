@@ -9,7 +9,8 @@ const UmapWrapper = ({
                             selectedData,
                             setSelectedData,
                             reset,
-                            setReset
+                            setReset,
+                            knn
                         }) => {
     const chartArea = useRef(null);
     const legendArea = useRef(null);
@@ -26,7 +27,8 @@ const UmapWrapper = ({
                     setDataPoint,
                     selectedData,
                     setSelectedData,
-                    view
+                    view,
+                    knn
                 )
             );
         } else {
@@ -41,7 +43,8 @@ const UmapWrapper = ({
                 setSelectedData,
                 view,
                 reset,
-                setReset
+                setReset,
+                knn
             );
         }
     }, [chart, query1, query2, data, view, reset]);

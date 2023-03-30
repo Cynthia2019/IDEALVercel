@@ -41,7 +41,8 @@ class Umap {
         setDataPoint,
         selectedData,
         setSelectedData,
-        view
+        view,
+        knn
     ) {
         this.svg = d3
             .select(element)
@@ -102,7 +103,8 @@ class Umap {
             selectedData,
             setSelectedData,
             view,
-            false
+            false,
+            knn
         );
     }
     //query1: x-axis
@@ -118,8 +120,11 @@ class Umap {
         setSelectedData,
         view,
         reset,
-        setReset
+        setReset,
+        knn
     ) {
+        console.log('knn')
+        console.log(knn)
         this.data = data;
         this.query1 = "X";
         this.query2 = "Y";
@@ -130,7 +135,9 @@ class Umap {
         // const embedding = umap.fit(data);
         let organizedData = organizeByName(data);
         organizedData.map((d, i) => {
-            const umap = new UMAP();
+            const umap = new UMAP({
+                nNeighbors: knn,
+            });
             let temp_data = []
             for (let data of d.data) {
                 let temp_properties = []
@@ -171,8 +178,8 @@ class Umap {
             // console.log(datasets)
         });
         let finalData = [].concat(...datasets);
-        console.log('finalData')
-        console.log(finalData)
+        // console.log('finalData')
+        // console.log(finalData)
 
         //remove elements to avoid repeated append
         d3.selectAll(".legend").remove();
@@ -224,13 +231,13 @@ class Umap {
 
         let xAxisCall = d3
             .axisBottom(this.xScale)
-            .tickFormat((x) => `${expo(x, 2)}`);
+            .tickFormat("")
         this.xAxisGroup.transition().duration(500).call(xAxisCall);
 
-        let yAxisCall = d3.axisLeft(this.yScale).tickFormat((y) => `${expo(y, 2)}`);
+        let yAxisCall = d3.axisLeft(this.yScale).tickFormat("");
         this.yAxisGroup.transition().duration(500).call(yAxisCall);
-        this.xLabel.text(this.query1);
-        this.yLabel.text(this.query2);
+        // this.xLabel.text(this.query1);
+        // this.yLabel.text(this.query2);
 
         let tooltip = d3
             .select(element)
@@ -288,46 +295,6 @@ class Umap {
         };
         let zoomedXScale = this.xScale;
         let zoomedYScale = this.yScale;
-
-        // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
-        let zoom = d3
-            .zoom()
-            .scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
-            .extent([
-                [0, 0],
-                [WIDTH, HEIGHT],
-            ])
-            .on(
-                "zoom",
-                function (event) {
-                    // recover the new scale
-                    let newXScale = event.transform.rescaleX(this.xScale);
-                    let newYScale = event.transform.rescaleY(this.yScale);
-
-                    // update axes with these new boundaries
-                    let xAxisCall = d3
-                        .axisBottom(newXScale)
-                        .tickFormat((x) => `${expo(x, 2)}`);
-                    let yAxisCall = d3
-                        .axisLeft(newYScale)
-                        .tickFormat((y) => `${expo(y, 2)}`);
-                    this.xAxisGroup.transition().duration(500).call(xAxisCall);
-                    this.yAxisGroup.transition().duration(500).call(yAxisCall);
-
-                    d3.selectAll(".dataCircle")
-                        .data(finalData)
-                        .attr("cy", (d) => newYScale(d[query2]))
-                        .attr("cx", (d) => newXScale(d[query1]));
-
-                    zoomedXScale = newXScale;
-                    zoomedYScale = newYScale;
-                    this.zoomedXScale = newXScale
-                    this.zoomedYScale = newYScale
-                }.bind(this)
-            );
-
-        this.xScale = zoomedXScale;
-        this.yScale = zoomedYScale;
 
         let circles = this.svg
             .append("g")
