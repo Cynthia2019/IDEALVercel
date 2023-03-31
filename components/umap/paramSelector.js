@@ -1,5 +1,5 @@
 import { Slider, Row, Col } from "antd";
-import styles from "@/styles/rangeSelector.module.css";
+import styles from "@/styles/umap.paramSelector.module.css";
 
 
 const rangeList = ["KNN"];
@@ -20,7 +20,7 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
                         <Slider
                             range={{ draggableTrack: true }}
                             defaultValue={[
-                                5
+                                15
                             ]}
                             // value={[
                             //     5

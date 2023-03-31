@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import {useState, useEffect, useMemo} from "react";
 import Header from "../components/shared/header";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/umap.module.css";
 import UmapWrapper from "../components/umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
-import { csv, csvParse } from "d3";
+import {csv, csvParse} from "d3";
 import dynamic from "next/dynamic";
 import ParamSelector from "@/components/umap/paramSelector";
 
@@ -12,12 +12,13 @@ import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "../components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
 import SavePanel from "@/components/saveData/savePanel";
-import { Row, Col } from "antd";
-import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
+import {Row, Col} from "antd";
+import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from './api/aws'
-import { s3BucketList, colorAssignment } from '@/util/constants'
+import {s3BucketList, colorAssignment} from '@/util/constants'
 import processData from "../util/processData";
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
+import classNames from "classnames";
 
 
 export default function Umap({fetchedNames}) {
@@ -46,6 +47,9 @@ export default function Umap({fetchedNames}) {
         ssr: false,
     });
 
+    const [toggleCollapse, setToggleCollapse] = useState(false);
+    const [isCollapsible, setIsCollapsible] = useState(false);
+
     const handleQuery1Change = (e) => {
         setQuery1(e.target.value);
     };
@@ -66,68 +70,76 @@ export default function Umap({fetchedNames}) {
         const env = process.env.NODE_ENV;
         let url = "http://localhost:8000/model/";
         if (env == "production") {
-         // url = "http://localhost:8000/model/";
-          //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
+            // url = "http://localhost:8000/model/";
+            //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
         }
         let response = await fetch(`${url}`, {
-          method: "POST",
-          mode: "cors",
+            method: "POST",
+            mode: "cors",
         })
-          .then((res) => res.json())
-          .catch((err) => console.log(err));
+            .then((res) => res.json())
+            .catch((err) => console.log(err));
         return response;
-      }
-    
-      useEffect(() => {
+    }
+
+    useEffect(() => {
         async function fetchData(info, index) {
-          const command = new GetObjectCommand({
-            Bucket: info.bucket_name,
-            Key: info.name,
-          });
-    
-          await s3Client.send(command).then((res) => {
-            let body = res.Body.transformToByteArray();
-            body.then((stream) => {
-              new Response(stream, { headers: { "Content-Type": "text/csv" } })
-                .text()
-                .then((data) => {
-                  let parsed = csvParse(data);
-    
-                  let processedData = parsed.map((dataset, i) => {
-                    return processData(dataset, i);
-                  });
-                  processedData.map((p) => (p.name = availableDatasetNames[index].name));
-                  processedData.map((p) => (p.color = colorAssignment[index]));
-                  setDatasets(prev => [...prev, ...processedData]);
-                  setDataPoint(processedData[0]);
-                  setActiveData(prev => [...prev, ...processedData]);
+            const command = new GetObjectCommand({
+                Bucket: info.bucket_name,
+                Key: info.name,
+            });
+
+            await s3Client.send(command).then((res) => {
+                let body = res.Body.transformToByteArray();
+                body.then((stream) => {
+                    new Response(stream, {headers: {"Content-Type": "text/csv"}})
+                        .text()
+                        .then((data) => {
+                            let parsed = csvParse(data);
+
+                            let processedData = parsed.map((dataset, i) => {
+                                return processData(dataset, i);
+                            });
+                            processedData.map((p) => (p.name = availableDatasetNames[index].name));
+                            processedData.map((p) => (p.color = colorAssignment[index]));
+                            setDatasets(prev => [...prev, ...processedData]);
+                            setDataPoint(processedData[0]);
+                            setActiveData(prev => [...prev, ...processedData]);
+                        });
                 });
             });
-          });
         }
-    
+
         try {
-          getAllData().then((res) => {
-            if (!res) {
-              availableDatasetNames.map((info, i) => fetchData(info, i));
-              return;
-            }
-            res = JSON.parse(res);
-            const processedData = res.map((dataset, i) => {
-              return processData(dataset, i);
+            getAllData().then((res) => {
+                if (!res) {
+                    availableDatasetNames.map((info, i) => fetchData(info, i));
+                    return;
+                }
+                res = JSON.parse(res);
+                const processedData = res.map((dataset, i) => {
+                    return processData(dataset, i);
+                });
+                setDatasets(processedData);
+                setDataPoint(processedData[0]);
+                setActiveData(processedData);
             });
-            setDatasets(processedData);
-            setDataPoint(processedData[0]);
-            setActiveData(processedData);
-          });
         } catch (err) {
-          console.log("unexpected error")
+            console.log("unexpected error")
         }
-      }, []);
+    }, []);
+
+    const wrapperClasses = classNames(
+        "h-screen px-4 pt-8 pb-4 bg-light flex justify-between flex-col",
+        {
+            ["w-90"]: !toggleCollapse,
+            ["w-20"]: toggleCollapse,
+        }
+    );
 
     return (
         <div>
-            <Header />
+            <Header/>
             <div className={styles.body}>
                 <Row className={styles.firstScreen}>
                     <div className={styles.mainPlot}>
@@ -147,11 +159,16 @@ export default function Umap({fetchedNames}) {
                         />
                     </div>
                     <div className={styles.subPlots}>
-                        <StructureWrapper data={dataPoint} />
-                        <Youngs dataPoint={dataPoint} />
-                        <Poisson dataPoint={dataPoint} />
+                        <StructureWrapper data={dataPoint}/>
+                        <Youngs dataPoint={dataPoint}/>
+                        <Poisson dataPoint={dataPoint}/>
                     </div>
-                    <div className={styles.selectors}>
+                    <div
+                        className={wrapperClasses}
+                        // onMouseEnter={onMouseOver}
+                        // onMouseLeave={onMouseOver}
+                        style={{transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s"}}
+                    >
                         <DataSelector
                             page={"umap"}
                             setDatasets={setDatasets}
@@ -166,12 +183,13 @@ export default function Umap({fetchedNames}) {
                             setActiveData={setActiveData}
                             setDataLibrary={setDataLibrary}
                         />
+                        <ParamSelector
+                            datasets={datasets}
+                            activeData={activeData}
+                            handleChange={handleRangeChange}
+                        />
                     </div>
-                    <ParamSelector
-                        datasets={datasets}
-                        activeData={activeData}
-                        handleChange={handleRangeChange}
-                    />
+
                 </Row>
             </div>
         </div>

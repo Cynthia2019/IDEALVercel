@@ -47,7 +47,7 @@ const UmapWrapper = ({
                 knn
             );
         }
-    }, [chart, query1, query2, data, view, reset]);
+    }, [chart, query1, query2, data, view, reset, knn]);
 
     return (
         <div style={{ display: "flex", flexDirection: "row" }}>
