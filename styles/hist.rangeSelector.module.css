@@ -1,9 +1,15 @@
 .property-range {
-    width: 180%;
-    height: 35%;
-    border: 3px solid #E4E0EE;
-    margin: 10px 50px;
-    padding: 20px;
+    /*width: 100%;*/
+    /*height: 35%;*/
+    /*border: 3px solid #E4E0EE;*/
+    /*margin: 10px 20px;*/
+    /*padding: 20px;*/
+
+    width: 100%;
+    margin: 10px 10px;
+    padding: 10px;
+    z-index: 10;
+
 }
 .range-content-line {
     display: flex;

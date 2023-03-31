@@ -29,13 +29,14 @@
   justify-content: flex-start;
   align-items: center;
   width: 18%;
-  height: 90vh;
+  height: 100vh;
   overflow: hidden;
 }
 .selectors {
-  width: 25%;
+  width: 28%;
   display: flex;
   flex-direction: column;
+
 }
 .data-selector {
   border: 3px solid #E4E0EE;

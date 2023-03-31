@@ -183,8 +183,7 @@ export default function Scatter({ fetchedNames }) {
             <Youngs dataPoint={dataPoint} />
             <Poisson dataPoint={dataPoint} />
           </div>
-          <div
-            className={wrapperClasses}
+          <div className={styles.selectors}
             // onMouseEnter={onMouseOver}
             // onMouseLeave={onMouseOver}
             style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
@@ -208,6 +207,8 @@ export default function Scatter({ fetchedNames }) {
               activeData={activeData}
               handleChange={handleRangeChange}
             />
+            <MaterialInformation dataPoint={dataPoint} />
+
           </div>
         </Row>
         <Row>
@@ -217,9 +218,6 @@ export default function Scatter({ fetchedNames }) {
           <Col span={12}>
             <SavePanel selectedData={selectedData} setReset={setReset} />
           </Col>
-        </Row>
-        <Row>
-          <MaterialInformation dataPoint={dataPoint} />
         </Row>
       </div>
     </div>

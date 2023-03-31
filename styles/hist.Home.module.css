@@ -36,8 +36,9 @@
   height: 110vh;
 }
 .selectors {
-  width: 25%;
+  width: 43%;
   display: flex;
+  margin: 0px 50px;
   flex-direction: column;
 }
 .data-selector {

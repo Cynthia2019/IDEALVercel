@@ -157,7 +157,7 @@ export default function Pairwise({ fetchedNames }) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div
-            className={wrapperClasses}
+              className={styles.selectors}
             // onMouseEnter={onMouseOver}
             // onMouseLeave={onMouseOver}
             style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
