@@ -29,8 +29,8 @@ export default function youngs({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        width: 330,
-        height: 330,
+        width: 300,
+        height: 300,
     };
     var config = {
         modeBarButtonsToRemove: ['zoom2d'],
