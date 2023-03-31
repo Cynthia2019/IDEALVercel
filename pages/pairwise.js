@@ -48,8 +48,7 @@ export default function Pairwise({ fetchedNames }) {
   const handleRangeChange = (name, value) => {
     let filtered_datasets = datasets.filter((d, i) => {
       let filtered = d[name] >= value[0] && d[name] <= value[1];
-      let names = [...new Set(activeData.map((d) => d.name))];
-      return names.includes(d.name) && filtered;
+      return filtered;
     });
     setActiveData(filtered_datasets);
   };

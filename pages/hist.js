@@ -2,10 +2,8 @@ import {useState, useEffect, useMemo} from "react";
 import Header from "../components/shared/header";
 import styles from "../styles/hist.Home.module.css";
 import {csv, csvParse} from "d3";
-import dynamic from "next/dynamic";
-// import Hist_dataSelector from "../components/hist_dataSelector";
 import DataSelector from "@/components/shared/dataSelector";
-import Hist_RangeSelector from "../components/histogram/hist_rangeSelector";
+import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
 import {Row, Col} from "antd";
 import HistWrapper from "../components/histogram/histWrapper";
@@ -14,7 +12,8 @@ import {GetObjectCommand, ListObjectsCommand} from "@aws-sdk/client-s3";
 import s3Client from "@/pages/api/aws";
 import {colorAssignment} from "@/util/constants";
 import processData from "@/util/processData";
-import {act} from "react-dom/test-utils";
+import classNames from "classnames";
+
 
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
@@ -27,6 +26,8 @@ export default function Hist({fetchedNames}) {
     const [selectedData, setSelectedData] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
     const [onLoad, setOnLoad] = useState(true);
+    const [toggleCollapse, setToggleCollapse] = useState(false);
+    const [isCollapsible, setIsCollapsible] = useState(false);
 
     const router = useRouter();
     const {pairwise_query1} = router.query;
@@ -47,8 +48,7 @@ export default function Hist({fetchedNames}) {
 
         let filtered_datasets = datasets.filter((d, i) => {
             let filtered = d[name] >= value[0] && d[name] <= value[1]
-            let names = [...new Set(activeData.map(d => d.name))]
-            return names.includes(d.name) && filtered;
+            return filtered;
         });
         setActiveData(filtered_datasets);
       };
@@ -115,6 +115,14 @@ export default function Hist({fetchedNames}) {
         }
       }, []);
 
+      const wrapperClasses = classNames(
+        "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",
+        {
+          ["w-100"]: !toggleCollapse,
+          ["w-20"]: toggleCollapse,
+        }
+      );
+
     return (
         <div>
             <Header/>
@@ -123,12 +131,6 @@ export default function Hist({fetchedNames}) {
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
                             <p className={styles.mainPlotTitle}></p>
-                            {/*<p className={styles.mainPlotSub}>*/}
-                            {/*    Select properties from the dropdown menus below to graph on the*/}
-                            {/*    x and y axes. Hovering over data points provides additional*/}
-                            {/*    information. Scroll to zoom, click and drag to pan, and*/}
-                            {/*    double-click to reset.*/}
-                            {/*</p>*/}
                         </div>
                         <HistWrapper
                             data={activeData}
@@ -139,7 +141,12 @@ export default function Hist({fetchedNames}) {
                         />
                     </div>
 
-                    <div className={styles.selectors}>
+                    <div
+            className={wrapperClasses}
+            // onMouseEnter={onMouseOver}
+            // onMouseLeave={onMouseOver}
+            style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
+          >
                         <DataSelector
                             page={"histogram"}
                             setDatasets={setDatasets}
@@ -154,12 +161,12 @@ export default function Hist({fetchedNames}) {
                             setActiveData={setActiveData}
                             setDataLibrary={setDataLibrary}
                         />
-                        <Hist_RangeSelector
+                        <RangeSelector
                             datasets={datasets}
-                            filteredDatasets={activeData}
+                            activeData={activeData}
                             handleChange={handleRangeChange}
                         />
-                        {/*<MaterialInformation dataPoint={dataPoint}/>*/}
+                        <MaterialInformation dataPoint={dataPoint}/>
 
                     </div>
                 </Row>
