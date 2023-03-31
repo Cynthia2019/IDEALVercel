@@ -77,11 +77,11 @@ export default function Scatter({ fetchedNames }) {
     setActiveData(filtered_datasets);
   };
   async function getAllData() {
-    const env = process.env.NODE_ENV;
-    let url = "http://localhost:8000/model/";
-    if (env == "production") {
-      // url = "http://localhost:8000/model/";
-      //   url = "https://ideal-server-espy0exsw-cynthia2019.vercel.app/model/";
+    const env = process.env.NODE_ENV
+    // let url= 'http://3.142.46.2:8000/model?data='
+    let url= 'http://localhost:8000/model?data='
+    if (env == 'production') {
+        url = 'http://3.142.46.2:8000/model?data='
     }
     let response = await fetch(`${url}`, {
       method: "POST",

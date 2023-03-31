@@ -27,11 +27,11 @@ const SavePanel = ({ selectedData, setReset }) => {
       return { data: arr };
     });
     async function getDiversity(body) {
-      const env = process.env.NODE_ENV;
-      let url = "http://localhost:8000/diversity/";
-      if (env == "production") {
-  //      url =
-//          "https://ideal-server-espy0exsw-cynthia2019.vercel.app/diversity/";
+      const env = process.env.NODE_ENV
+      // let url= 'http://3.142.46.2:8000/model?data='
+      let url= 'http://localhost:8000/model?data='
+      if (env == 'production') {
+          url = 'http://3.142.46.2:8000/model?data='
       }
       try {
         const response = await fetch(`${url}`, {
