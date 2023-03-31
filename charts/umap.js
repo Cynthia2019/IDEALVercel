@@ -218,6 +218,42 @@ class Umap {
             this.yScale = this.zoomedYScale
         }
 
+        let zoom = d3
+            .zoom()
+            .scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
+            .extent([
+                [0, 0],
+                [WIDTH, HEIGHT],
+            ])
+            .on(
+                "zoom",
+                function (event) {
+                    // recover the new scale
+                    let newXScale = event.transform.rescaleX(this.xScale);
+                    let newYScale = event.transform.rescaleY(this.yScale);
+                    //
+                    // // update axes with these new boundaries
+                    // let xAxisCall = d3
+                    //     .axisBottom(newXScale)
+                    //     .tickFormat((x) => `${expo(x, 2)}`);
+                    // let yAxisCall = d3
+                    //     .axisLeft(newYScale)
+                    //     .tickFormat((y) => `${expo(y, 2)}`);
+                    // this.xAxisGroup.transition().duration(500).call(xAxisCall);
+                    // this.yAxisGroup.transition().duration(500).call(yAxisCall);
+
+                    d3.selectAll(".dataCircle")
+                        .data(finalData)
+                        .attr("cy", (d) => newYScale(d[query2]))
+                        .attr("cx", (d) => newXScale(d[query1]));
+
+                    // zoomedXScale = newXScale;
+                    // zoomedYScale = newYScale;
+                    // this.zoomedXScale = newXScale;
+                    // this.zoomedYScale = newYScale;
+                }.bind(this)
+            );
+
         // Add a clipPath: everything out of this area won't be drawn.
         this.svg
             .append("defs")
@@ -295,6 +331,15 @@ class Umap {
         };
         let zoomedXScale = this.xScale;
         let zoomedYScale = this.yScale;
+
+        if (view === "zoom") {
+            this.svg
+                .append("rect")
+                .attr("class", "rectZoom")
+                .attr("width", WIDTH)
+                .attr("height", HEIGHT)
+                .call(zoom);
+        }
 
         let circles = this.svg
             .append("g")
