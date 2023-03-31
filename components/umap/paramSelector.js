@@ -2,7 +2,7 @@ import { Slider, Row, Col } from "antd";
 import styles from "@/styles/umap.paramSelector.module.css";
 
 
-const rangeList = ["Number of nearest neighbors"];
+const rangeList = ["Number of neighbors"];
 
 const RangeSelector = ({ datasets, activeData, handleChange }) => {
     const data = datasets;
@@ -14,10 +14,11 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
         <div className={styles["property-range"]}>
             <p className={styles["range-title"]}>Hyperparameter</p>
             {rangeList.map((name, index) => (
-                <Row key={index} justify="center" align='top'>
-                    <Col span={4}>{name}</Col>
-                    <Col span={20}>
+                <Row key={index} justify="center" align='top' className={styles["range-row"]}>
+                    <Col pull={0} span={24}>{name}: the size of local neighborhood (in terms of number of neighboring sample points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. (Default: 15)</Col>
+                    <Col pull={0} span={24}>
                         <Slider
+                            className={styles["slider"]}
                             range={{ draggableTrack: true }}
                             defaultValue={[
                                 15
