@@ -118,7 +118,7 @@ export default function Pairwise({ fetchedNames }) {
   }, []);
 
   const wrapperClasses = classNames(
-    "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",
+    "h-screen ml-3 px-4 pt-8 flex justify-between flex-col bg-primary",
     {
       ["w-100"]: !toggleCollapse,
       ["w-20"]: toggleCollapse,
@@ -128,7 +128,10 @@ export default function Pairwise({ fetchedNames }) {
   return (
     <div>
       <Header />
-      <div className={styles.body}>
+      <div
+          className={styles.body}
+          // className="bg-primary"
+      >
         <Row>
           <div className={styles.mainPlot}>
             <div className={styles.mainPlotHeader}>
@@ -156,7 +159,8 @@ export default function Pairwise({ fetchedNames }) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div
-              className={styles.selectors}
+              // className={styles.selectors}
+              className="flex-col bg-light w-3/12"
             // onMouseEnter={onMouseOver}
             // onMouseLeave={onMouseOver}
             style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
