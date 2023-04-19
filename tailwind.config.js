@@ -17,7 +17,7 @@ module.exports = {
         light: "#6C7281",
       },
       light: {
-        DEFAULT: "#FAFBFC",
+        DEFAULT: "#F4ECF7",
         lighter: "#F3F4F6",
       },
     },

@@ -117,13 +117,14 @@ export default function Pairwise({ fetchedNames }) {
     }
   }, []);
 
-  const wrapperClasses = classNames(
-    "h-screen ml-3 px-4 pt-8 flex justify-between flex-col bg-primary",
-    {
-      ["w-100"]: !toggleCollapse,
-      ["w-20"]: toggleCollapse,
-    }
-  );
+  // const wrapperClasses = classNames(
+  //   "h-screen ml-3 px-4 pt-8 flex justify-between flex-col bg-primary",
+  //   {
+  //     ["w-100"]: !toggleCollapse,
+  //     ["w-20"]: toggleCollapse,
+  //   }
+  // );
+  const [open, setOpen] = useState(true);
 
   return (
     <div>
@@ -160,11 +161,21 @@ export default function Pairwise({ fetchedNames }) {
           </div>
           <div
               // className={styles.selectors}
-              className="flex-col bg-light w-3/12"
+              // className="flex-col bg-light w-3/12"
+              className={` ${
+                  open ? "w-100" : "-w-10 "
+              } bg-light h-screen p-5  pt-8 relative duration-300`}
             // onMouseEnter={onMouseOver}
             // onMouseLeave={onMouseOver}
             style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
           >
+            <img
+                src="/control.png"
+                className={` cursor-pointer -right-3 top-9 w-7 border-dark-purple
+           border-2 rounded-full  ${!open && "rotate-180"}`}
+                onClick={() => setOpen(!open)}
+             alt='control'/>
+
             <DataSelector
               page={"pairwise"}
               setDatasets={setDatasets}
