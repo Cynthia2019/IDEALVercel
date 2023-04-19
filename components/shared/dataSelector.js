@@ -132,6 +132,7 @@ const DataSelector = ({
   dataLibrary,
   setActiveData,
   setDataLibrary,
+    open,
 }) => {
   const [showData, setShowData] = useState(
     availableDatasetNames.map((dataset, index) => {
@@ -317,13 +318,13 @@ const DataSelector = ({
 
   return (
     <div className={styles["data-selector"]}>
-      <div className={styles["data-row"]}>
+      <div className={`${open ? styles["data-row"] : styles["data-row-closed"]}`}>
         <p className={styles["data-title"]}>Data</p>
         <Upload {...props} accept="text/csv">
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
       </div>
-      <div className={styles["data-content-line"]}>
+      <div className={`${open ? styles["data-content-line"] : styles["data-content-line-closed"]}`}>
         <FormControl sx={{ m: 1, maxWidth: "100%" }}>
           <div>
             <TableContainer

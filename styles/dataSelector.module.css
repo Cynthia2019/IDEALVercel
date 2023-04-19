@@ -3,20 +3,31 @@
     margin: 10px 10px;
     padding: 10px;
     z-index: 10;
-
 }
+
 .data-content-line {
     display: flex;
     flex-direction: column;
-
 }
+
+.data-content-line-closed {
+    display: None;
+}
+
 .data-row {
-    margin: 5px 5px;
+    margin: 0px 6px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
 }
+
+.data-row-closed {
+    margin: 0px 6px;
+    display: flex;
+    flex-direction: column;
+}
+
 .data-title {
     font-size: 20px;
     font-weight: bold;

@@ -5,6 +5,8 @@
     z-index: 10;
 
 }
+
+
 .data-content-line {
     display: flex;
     flex-direction: column;

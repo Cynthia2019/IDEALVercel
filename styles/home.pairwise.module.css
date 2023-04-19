@@ -6,12 +6,15 @@
     max-width: 100vw;
 }
 
+
 .firstScreen {
     min-height: 100vh;
 }
+
 .mainPlot {
     width: 50%;
 }
+
 .mainPlotHeader {
     display: flex;
     flex-direction: column;
@@ -34,12 +37,34 @@
     align-items: center;
     width: 20%;
     height: 100vh;
+    padding: 0;
+    margin: 0;
 
 }
 .selectors {
-    width: 28%;
+    /*pin selectors to the right*/
+    width: 30%;
     display: flex;
     flex-direction: column;
+    background-color: #F4ECF7;
+    transition: width 200ms ease;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    top: 10;
+    right: 0;
+}
+
+.selectorsClosed {
+    width: 10%;
+    position: fixed;
+    top: 10;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #F4ECF7;
+    transition: width 200ms ease;
+
 }
 .data-selector {
     border: 3px solid #E4E0EE;
