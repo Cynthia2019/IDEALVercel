@@ -179,7 +179,9 @@ export default function Pairwise({ fetchedNames }) {
               handleChange={handleRangeChange}
               open={open}
             />
-            <MaterialInformation dataPoint={dataPoint} />
+            <MaterialInformation
+                dataPoint={dataPoint}
+                open={open}/>
           </div>
         </Row>
       </div>

@@ -4,7 +4,7 @@ import styles from "@/styles/rangeSelector.module.css";
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
 
-const RangeSelector = ({ datasets, activeData, handleChange }) => {
+const RangeSelector = ({ datasets, activeData, handleChange, open }) => {
   const data = datasets;
   const filtered = activeData;
   const handleSliderChange = (name, value) => {
@@ -14,7 +14,9 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
     <div className={styles["property-range"]}>
       <p className={styles["range-title"]}>Property Range</p>
       {rangeList.map((name, index) => (
-        <Row key={index} justify="center" align='top'>
+        <Row key={index} justify="center" align='top'
+             className={`${open ? '' : styles["slider-closed"]}`}
+        >
           <Col span={4}>{name}</Col>
           <Col span={20}>
             <Slider

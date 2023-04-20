@@ -53,6 +53,7 @@
     position: fixed;
     top: 10;
     right: 0;
+    height: 100%;
 }
 
 .selectorsClosed {
@@ -64,7 +65,7 @@
     flex-direction: column;
     background-color: #F4ECF7;
     transition: width 200ms ease;
-
+    height: 100%;
 }
 .data-selector {
     border: 3px solid #E4E0EE;
@@ -109,6 +110,7 @@
     padding: 20px;
 }
 
+
 .mat-subtitle-line {
     display: flex;
     flex-direction: row;
@@ -119,6 +121,15 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+
+.mat-content {
+    display: block;
+}
+
+.mat-content-closed {
+    display: none;
 }
 
 .save-data-content-line {

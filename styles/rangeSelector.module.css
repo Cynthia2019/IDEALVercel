@@ -3,6 +3,7 @@
     /* border: 3px solid #E4E0EE; */
     margin: 0 10px;
     padding: 20px;
+
 }
 .range-content-line {
     display: flex;
@@ -17,4 +18,9 @@
     font-size: 20px;
     font-weight: bold;
     margin: 5px 0;
+
+}
+
+.slider-closed {
+    display: none;
 }
