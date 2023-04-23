@@ -148,6 +148,7 @@ export default function Scatter({ fetchedNames }) {
       ["w-20"]: toggleCollapse,
     }
   );
+  const [open, setOpen] = useState(true);
 
   return (
     <div>
@@ -183,11 +184,19 @@ export default function Scatter({ fetchedNames }) {
             <Poisson dataPoint={dataPoint} />
           </div>
           <div
-              className={styles.selectors}
+              className={`${open ? styles.selectors : styles.selectorsClosed}`}
             // onMouseEnter={onMouseOver}
             // onMouseLeave={onMouseOver}
-            style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
+            // style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
           >
+            <img
+                src="/control.png"
+                className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple
+                m-4
+           border-2 rounded-full  ${!open && "rotate-180"}`}
+                onClick={() => setOpen(!open)}
+                alt='control'/>
+
             <DataSelector
               page={"scatter"}
               setDatasets={setDatasets}
@@ -201,13 +210,17 @@ export default function Scatter({ fetchedNames }) {
               dataLibrary={dataLibrary}
               setActiveData={setActiveData}
               setDataLibrary={setDataLibrary}
+              open={open}
             />
             <RangeSelector
               datasets={datasets}
               activeData={activeData}
               handleChange={handleRangeChange}
+              open={open}
             />
-            <MaterialInformation dataPoint={dataPoint} />
+            <MaterialInformation
+                dataPoint={dataPoint}
+                open={open}/>
           </div>
         </Row>
         <Row>

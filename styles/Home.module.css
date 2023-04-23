@@ -32,11 +32,33 @@
   height: 90vh;
   overflow: hidden;
 }
+
 .selectors {
-  width: 28%;
+  width: 30%;
   display: flex;
   flex-direction: column;
+  background-color: #F4ECF7;
+  transition: width 200ms ease;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 10;
+  right: 0;
+  height: 91%;
 }
+
+.selectorsClosed {
+  width: 10%;
+  position: absolute;
+  top: 10;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #F4ECF7;
+  transition: width 200ms ease;
+  height: 91%;
+}
+
 .data-selector {
   border: 3px solid #E4E0EE;
   margin: 10px 10px;
