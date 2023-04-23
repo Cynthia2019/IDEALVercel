@@ -20,7 +20,8 @@ const RangeSelector = ({ datasets, activeData, handleChange, open }) => {
           <Col span={4}>{name}</Col>
           <Col span={20}>
             <Slider
-              range={{ draggableTrack: true }}
+              range={{ draggableTrack: true
+                }}
               defaultValue={[
                 Math.min(...data.map((d) => d[name])),
                 Math.max(...data.map((d) => d[name])),

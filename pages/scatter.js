@@ -70,7 +70,8 @@ export default function Scatter({ fetchedNames }) {
   };
 
   const handleRangeChange = (name, value) => {
-    let filtered_datasets = datasets.filter((d, i) => {
+    let filtered_datasets = activeData.filter((d, i) => {
+      console.log(`name: ${name}, value: ${value}`);
       let filtered = d[name] >= value[0] && d[name] <= value[1];
       return filtered;
     });
@@ -225,7 +226,7 @@ export default function Scatter({ fetchedNames }) {
         </Row>
         <Row>
           <Col span={12}>
-            <NeighborPanel neighbors={neighbors} />
+            {/*<NeighborPanel neighbors={neighbors} />*/}
           </Col>
           <Col span={12}>
             <SavePanel selectedData={selectedData} setReset={setReset} />

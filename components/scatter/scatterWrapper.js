@@ -88,10 +88,10 @@ const ScatterWrapper = ({
               <CancelOutlinedIcon style={{ fontSize: "15px", color: "red" }} />
               <span style={{ fontSize: "10px" }}>Deselect Data</span>
           </ToggleButton>
-          <ToggleButton value='neighbor' aria-label="find nearest neighbors">
-            <FcMindMap style={{fontSize: '25px'}}/>
-            <span style={{ fontSize: "10px" }}>Find Nearest Neighbors</span>
-          </ToggleButton>
+          {/*<ToggleButton value='neighbor' aria-label="find nearest neighbors">*/}
+          {/*  <FcMindMap style={{fontSize: '25px'}}/>*/}
+          {/*  <span style={{ fontSize: "10px" }}>Find Nearest Neighbors</span>*/}
+          {/*</ToggleButton>*/}
 
         </ToggleButtonGroup>
 
