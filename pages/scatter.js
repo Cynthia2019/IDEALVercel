@@ -194,7 +194,7 @@ export default function Scatter({ fetchedNames }) {
                 src="/control.png"
                 className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple
                 m-4
-           border-2 rounded-full  ${!open && "rotate-180"}`}
+           border-2 rounded-full  ${open && "rotate-180"}`}
                 onClick={() => setOpen(!open)}
                 alt='control'/>
 

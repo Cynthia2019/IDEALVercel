@@ -134,6 +134,7 @@ class Umap {
         let datasets = [];
         // const embedding = umap.fit(data);
         let organizedData = organizeByName(data);
+        console.log(organizedData)
         organizedData.map((d, i) => {
             const umap = new UMAP({
                 nNeighbors: knn,
