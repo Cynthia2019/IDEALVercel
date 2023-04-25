@@ -135,7 +135,7 @@ class Umap {
         // const embedding = umap.fit(data);
         let organizedData = organizeByName(data);
         const umap = new UMAP({
-            nNeighbors: knn,
+            nNeighbors: knn ? knn : 15,
         });
         console.log(organizedData)
         let temp_data = []
@@ -149,6 +149,7 @@ class Umap {
 
             }});
 
+        console.log('length', temp_data.length);
         temp_data.length ? umap.fit(temp_data) : null;
 
         organizedData.map((d, i) => {
