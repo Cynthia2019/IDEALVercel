@@ -134,12 +134,25 @@ class Umap {
         let datasets = [];
         // const embedding = umap.fit(data);
         let organizedData = organizeByName(data);
+        const umap = new UMAP({
+            nNeighbors: knn,
+        });
         console.log(organizedData)
+        let temp_data = []
         organizedData.map((d, i) => {
-            const umap = new UMAP({
-                nNeighbors: knn,
-            });
-            let temp_data = []
+            for (let data of d.data) {
+                let temp_properties = []
+                for (let p of properties) {
+                    temp_properties.push(data[p])
+                }
+                temp_data.push(temp_properties)
+
+            }});
+
+        temp_data.length ? umap.fit(temp_data) : null;
+
+        organizedData.map((d, i) => {
+            let temp_data2 = []
             for (let data of d.data) {
                 let temp_properties = []
                 for (let p of properties) {
@@ -147,41 +160,47 @@ class Umap {
                 }
                 data.name = d.name;
                 data.color = d.color;
-                temp_data.push(temp_properties)
+                temp_data2.push(temp_properties)
             }
 
-            // console.log("temp")
-            // console.log(d.data)
-            // console.log(temp_data)
-            // console.log(umap.fit(temp_data))
-            // console.log("data")
-            // console.log(d.data[0])
-            // console.log("Umap")
-            // console.log(umap.fit(d.data)[0])
-            // let temp = []
-            // properties.map((p) => {
-            //
-            // }
-            let res = umap.fit(temp_data)
+            let res = umap.transform(temp_data2)
             res.map((p, i) => {
                 d.data[i]['X'] = p[0]
                 d.data[i]['Y'] = p[1]
             })
-            //
-            // console.log("new_data")
-            // console.log(d.data)
-            //
-            // console.log(temp_data)
-            // console.log(res)
-            // console.log(new_data)
             datasets.push(d.data);
-            // console.log("datasets")
-            // console.log(datasets)
         });
-        let finalData = [].concat(...datasets);
-        // console.log('finalData')
-        // console.log(finalData)
 
+        let finalData = [].concat(...datasets);
+
+        // Split by single data set
+        // organizedData.map((d, i) => {
+        //     const umap = new UMAP({
+        //         nNeighbors: knn,
+        //     });
+        //     let temp_data = []
+        //     for (let data of d.data) {
+        //         let temp_properties = []
+        //         for (let p of properties) {
+        //             temp_properties.push(data[p])
+        //         }
+        //         data.name = d.name;
+        //         data.color = d.color;
+        //         temp_data.push(temp_properties)
+        //     }
+        //     console.log("temp")
+        //     console.log(temp_data)
+        //     let res = umap.fit(temp_data)
+        //     res.map((p, i) => {
+        //         d.data[i]['X'] = p[0]
+        //         d.data[i]['Y'] = p[1]
+        //     })
+        //     datasets.push(d.data);
+        // });
+        //
+        // let finalData = [].concat(...datasets);
+        //
+        // console.log(`final data`, finalData)
         //remove elements to avoid repeated append
         d3.selectAll(".legend").remove();
         d3.select(".tooltip").remove();
