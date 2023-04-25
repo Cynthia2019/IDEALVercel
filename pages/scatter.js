@@ -70,7 +70,7 @@ export default function Scatter({ fetchedNames }) {
   };
 
   const handleRangeChange = (name, value) => {
-    let filtered_datasets = activeData.filter((d, i) => {
+    let filtered_datasets = datasets.filter((d, i) => {
       console.log(`name: ${name}, value: ${value}`);
       let filtered = d[name] >= value[0] && d[name] <= value[1];
       return filtered;

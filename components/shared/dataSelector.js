@@ -329,7 +329,7 @@ const DataSelector = ({
           <div>
             <TableContainer
               component={Paper}
-              sx={{ maxHeight: 300, minWidth: 200 }}
+              sx={{ maxHeight: 235, minWidth: 200 }}
             >
               <Table stickyHeader aria-label="simple table">
                 <TableHead>
