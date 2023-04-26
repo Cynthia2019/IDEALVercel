@@ -1,6 +1,7 @@
 import * as d3 from "d3";
-import { UMAP } from 'umap-js';
+import {UMAP} from 'umap-js';
 import organizeByName from "@/util/organizeByName";
+import {StandardScaler} from "@/components/shared/standardScaler";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 7;
@@ -17,8 +18,8 @@ const MARGIN = {
 
 const SIDE_BAR_SIZE = 100;
 
-const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT ;
-const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM ;
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM;
 
 function expo(x, f) {
     if (x < 1000 && x > -1000) return x.toFixed();
@@ -107,6 +108,7 @@ class Umap {
             knn
         );
     }
+
     //query1: x-axis
     //query2: y-axis
     update(
@@ -132,6 +134,9 @@ class Umap {
         query2 = "Y"
         let properties = ['C11', 'C12', 'C22', 'C16', 'C26', 'C66']
         let datasets = [];
+
+        let scaler = new StandardScaler()
+
         // const embedding = umap.fit(data);
         let organizedData = organizeByName(data);
         const umap = new UMAP({
@@ -143,13 +148,14 @@ class Umap {
             for (let data of d.data) {
                 let temp_properties = []
                 for (let p of properties) {
-                    temp_properties.push(data[p])
+                    temp_properties.push(+data[p])
                 }
                 temp_data.push(temp_properties)
+            }
+        });
 
-            }});
-
-        console.log('length', temp_data.length);
+        temp_data.length ? temp_data = scaler.fit_transform(temp_data) : null;
+        console.log('temp_data', temp_data);
         temp_data.length ? umap.fit(temp_data) : null;
 
         organizedData.map((d, i) => {
@@ -164,11 +170,14 @@ class Umap {
                 temp_data2.push(temp_properties)
             }
 
-            let res = umap.transform(temp_data2)
-            res.map((p, i) => {
+            temp_data2 = scaler.transform(temp_data2)
+            // df2 = dfd.toJSON(df2, {format: 'row'})
+            let res = temp_data2.length ? umap.transform(temp_data2) : null
+
+            res ? res.map((p, i) => {
                 d.data[i]['X'] = p[0]
                 d.data[i]['Y'] = p[1]
-            })
+            }) : null
             datasets.push(d.data);
         });
 
@@ -226,16 +235,14 @@ class Umap {
             ])
             .range([0, WIDTH]);
 
-        if(reset || this.zoomedXScale === undefined) {
+        if (reset || this.zoomedXScale === undefined) {
             this.xScale = xScale
-        }
-        else {
+        } else {
             this.xScale = this.zoomedXScale
         }
-        if(reset || this.zoomedYScale === undefined) {
+        if (reset || this.zoomedYScale === undefined) {
             this.yScale = yScale
-        }
-        else {
+        } else {
             this.yScale = this.zoomedYScale
         }
 
@@ -391,7 +398,7 @@ class Umap {
             .attr("cy", (d) => this.yScale(d[query2]));
 
         circles.exit().transition().attr("r", 0).remove();
-        if(reset) {
+        if (reset) {
             this.svg.call(zoom.transform, d3.zoomIdentity);
             d3.selectAll(".selected").classed("selected", false);
             setSelectedData([]);
