@@ -163,6 +163,7 @@ class Umap {
             for (let data of d.data) {
                 let temp_properties = []
                 for (let p of properties) {
+                    // data[p] === 0 ? console.log("zero") : null;
                     temp_properties.push(data[p])
                 }
                 data.name = d.name;
