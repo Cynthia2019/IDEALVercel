@@ -269,6 +269,8 @@ class Pairwise {
             .style("border-radius", "5px")
             .style("padding", "10px")
             .style("visibility", "hidden")
+            .raise();
+
 
         let tooltip_circ = d3
             .select(container.current)
@@ -281,6 +283,8 @@ class Pairwise {
             .style("border-radius", "5px")
             .style("padding", "10px")
             .style("visibility", "hidden")
+            .raise();
+
 
         let mouseover_circ = function (e, d) {
             d3.select(this)
@@ -309,6 +313,7 @@ class Pairwise {
                 .style("stroke", "grey")
                 .style("stroke-width", 2)
                 .style("fill-opacity", 0.8);
+
         };
 
         let mouseover_hist = function (e, d) {
@@ -408,7 +413,7 @@ class Pairwise {
                     // d[query2]
                 )
                 .style("top", e.pageY - 110 + "px")
-                .style("left", e.pageX + 10 + "px");
+                .style("left", e.pageX + 10 + "px")
         };
 
         d3.select(legendContainer).selectAll(".legend").remove();

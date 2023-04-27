@@ -28,8 +28,15 @@ export default function poisson({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        width: 300,
-        height: 300
+        width: 325,
+        height: 330,
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [0, 2]
+            }
+        },
+
     };
     var config = {
         modeBarButtonsToRemove: ['zoom2d'],
