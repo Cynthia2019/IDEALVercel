@@ -3,8 +3,11 @@
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 const processData = (d, i) => {
-        let youngs = d.youngs?.match(regex).map(parseFloat);
-        let poisson = d.poisson?.match(regex).map(parseFloat);
+        console.log('process dataset name', d.dataset_name)
+        console.log('dataset', d)
+        console.log('youngs', d.youngs)
+        let youngs = d.youngs?.match(regex)?.map(parseFloat);
+        let poisson = d.poisson?.match(regex)?.map(parseFloat);
         let processed = {
           index: i, 
           name: d.dataset_name, 

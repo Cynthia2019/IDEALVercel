@@ -353,7 +353,7 @@ const DataSelector = ({
   }
   FileSaver.saveAs(
       new Blob(byteArrays, { type: "application/json;charset=utf-8" }),
-      "template.xls"
+      "template.csv"
   );
 };
   return (
