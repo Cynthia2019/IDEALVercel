@@ -93,6 +93,7 @@ class Pairwise {
             .attr("width", width)
             .attr("height", height)
             .attr("viewBox", [-marginLeft, -marginTop, width, height])
+            .attr("style", "outline: thin solid red;")
             .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
         this.cell = this.svg.append("g")
@@ -111,7 +112,6 @@ class Pairwise {
             .attr("width", cellWidth)
             .attr("height", cellHeight)
             .attr("class", "cell");
-
 
 
         if (x === y) this.svg.append("g")
@@ -138,6 +138,7 @@ class Pairwise {
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .text(d => d);
+
 
     }
 
@@ -182,6 +183,7 @@ class Pairwise {
             .join("g")
             .attr("transform", (d, i) => `translate(0,${i * (cellHeight + padding)})`)
             .attr("class", "yAxisGroup")
+            .style("font-size","12px")
             .each(function (yScale) {
                 d3.select(this).call(yAxis.scale(yScale));
             })
@@ -193,6 +195,7 @@ class Pairwise {
             .join("g")
             .attr("transform", (d, i) => `translate(${i * (cellWidth + padding)}, ${height - marginBottom - marginTop})`)
             .attr("class", "xAxisGroup")
+            .style("font-size","12px")
             .each(function (xScale, columns) {
                 d3.select(this).call(xAxis.scale(xScale))
             })

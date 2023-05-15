@@ -28,7 +28,7 @@ export default function poisson({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        width: 325,
+        width: 300,
         height: 330,
         polar: {
             radialaxis: {
@@ -36,6 +36,9 @@ export default function poisson({dataPoint}) {
                 range: [0, 2]
             }
         },
+        // margin: {
+        //     pad: 100,
+        // }
 
     };
     var config = {

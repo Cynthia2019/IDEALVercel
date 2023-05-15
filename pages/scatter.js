@@ -77,7 +77,7 @@ export default function Scatter({ fetchedNames }) {
     });
     setActiveData(filtered_datasets);
   };
-  async function getAllData() {
+   async function getAllData() {
     const env = process.env.NODE_ENV
     // let url= 'http://3.142.46.2:8000/model?data='
     let url= 'http://localhost:8000/model?data='
@@ -103,6 +103,7 @@ export default function Scatter({ fetchedNames }) {
       await s3Client.send(command).then((res) => {
         let body = res.Body.transformToByteArray();
         body.then((stream) => {
+          console.log('fetching data scatter')
           new Response(stream, { headers: { "Content-Type": "text/csv" } })
             .text()
             .then((data) => {
@@ -238,6 +239,7 @@ export default function Scatter({ fetchedNames }) {
 }
 
 export async function getStaticProps() {
+  console.log('fetching data staticProps')
   let fetchedNames = [];
   const listObjectCommand = new ListObjectsCommand({
     Bucket: "ideal-dataset-1",

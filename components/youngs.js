@@ -29,7 +29,7 @@ export default function youngs({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        width: 325,
+        width: 300,
         height: 330,
         polar: {
             radialaxis: {

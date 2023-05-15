@@ -12,10 +12,11 @@ import Box from "@mui/material/Box";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Upload } from "antd";
 import s3Client from "@/pages/api/aws";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import {GetObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3";
 import processData from "@/util/processData";
 import Papa, { parse } from "papaparse";
 import { colorAssignment, requiredColumns } from "@/util/constants";
+import {getAllData} from "@/pages/scatter";
 import {
   DragDropContext,
   Droppable,
@@ -35,6 +36,7 @@ import Typography from "@mui/material/Typography";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
+import {csvParse} from "d3";
 
 resetServerContext();
 const AxisSelections = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -134,6 +136,21 @@ const DataSelector = ({
   setDataLibrary,
     open,
 }) => {
+  async function getAllData() {
+    const env = process.env.NODE_ENV
+    // let url= 'http://3.142.46.2:8000/model?data='
+    let url= 'http://localhost:8000/model?data='
+    if (env == 'production') {
+      url = 'http://3.142.46.2:8000/model?data='
+    }
+    let response = await fetch(`${url}`, {
+      method: "POST",
+      mode: "cors",
+    })
+        .then((res) => res.json())
+        .catch((err) => console.log(err));
+    return response;
+  }
   const [showData, setShowData] = useState(
     availableDatasetNames.map((dataset, index) => {
       return true;
@@ -276,6 +293,7 @@ const DataSelector = ({
         },
       });
       await s3Client.send(command).then((res) => {
+        console.log('fetching data selector')
         if (res.$metadata.httpStatusCode == 200) {
           onSuccess(res, file);
           //if success, process the file data, then add the dataset to the dataset state.
@@ -323,6 +341,7 @@ const DataSelector = ({
         <Upload {...props} accept="text/csv">
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
+        <button id="downloadBtn" value="download">Download Template</button>
       </div>
       <div className={`${open ? styles["data-content-line"] : styles["data-content-line-closed"]}`}>
         <FormControl sx={{ m: 1, maxWidth: "100%" }}>

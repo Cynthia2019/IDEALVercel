@@ -7,12 +7,15 @@
 
 .mainPlot {
   width: 50%;
+  /*border: 3px solid #E4E0EE;*/
 }
+
 .mainPlotHeader {
   display: flex;
   flex-direction: column;
   padding: 0 30px;
 }
+
 .mainPlotTitle {
   font-size: 30px;
   font-weight: bold;

@@ -24,8 +24,8 @@ class Structure {
       .style("z-index", 10)
       .style("margin-top", "30px")
       .append("g")
-      .attr("transform", `translate(${marginLeft}, ${marginTop})`);
-    
+        .attr("transform", `translate(${marginLeft}, ${marginTop})`);
+
     this.svg.append("text")
       .attr("x", (width / 2))             
       .attr("y", 0 - (marginTop / 2))
@@ -37,7 +37,7 @@ class Structure {
     this.svg.append("text")
       .attr("x", (width / 2))             
       .attr("y", height + marginTop )
-      .attr("class", "volumn-ratio")
+      .attr("class", "volume-fraction")
       .attr("text-anchor", "middle")  
       .style("font-size", data.fontSize ? data.fontSize : "16px") 
       .style("font-family", 'Arial, sans-serif')
@@ -61,7 +61,7 @@ class Structure {
 
 
     let ratio = this.calculateRatio(this.data)
-    this.svg.select(".volumn-ratio").text(`Volumn Ratio: ${ratio}`);
+    this.svg.select(".volume-fraction").text(`Volume Fraction: ${ratio}`);
 
     const pixels = this.svg.selectAll("rect").data(res);
     pixels

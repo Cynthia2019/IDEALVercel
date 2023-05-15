@@ -22,6 +22,7 @@ const SavePanel = ({ selectedData, setReset }) => {
   };
   const [diversity, setDiversity] = useState({});
   useEffect(() => {
+    console.log('selectedData', selectedData)
     let formated = selectedData.map((data) => {
       let arr = C_list.map((col) => data[col]);
       return { data: arr };

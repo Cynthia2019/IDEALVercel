@@ -47,7 +47,8 @@ class Scatter {
       .attr("style", "max-width: 100%")
       .append("g")
       .attr("class", "scatter-plot-plot")
-      .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
 
     //Legend
     this.legend = d3
@@ -61,7 +62,7 @@ class Scatter {
     this.xLabel = this.svg
       .append("text")
       .attr("x", WIDTH / 2)
-      .attr("y", HEIGHT + 50)
+      .attr("y", HEIGHT + 40)
       .attr("text-anchor", "middle")
       .style("fill", "black");
 
