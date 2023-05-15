@@ -37,6 +37,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
 import {csvParse} from "d3";
+import {data_template} from "@/data/constants";
+import FileSaver from 'file-saver';
 
 resetServerContext();
 const AxisSelections = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -334,6 +336,26 @@ const DataSelector = ({
     },
   };
 
+  const downloadTemplate = () => {
+    let sliceSize = 1024;
+    let byteCharacters = atob(data_template);
+    let bytesLength = byteCharacters.length;
+    let slicesCount = Math.ceil(bytesLength / sliceSize);
+    let byteArrays = new Array(slicesCount);
+    for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    let begin = sliceIndex * sliceSize;
+    let end = Math.min(begin + sliceSize, bytesLength);
+    let bytes = new Array(end - begin);
+    for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+      bytes[i] = byteCharacters[offset].charCodeAt(0);
+    }
+    byteArrays[sliceIndex] = new Uint8Array(bytes);
+  }
+  FileSaver.saveAs(
+      new Blob(byteArrays, { type: "application/json;charset=utf-8" }),
+      "template.xls"
+  );
+};
   return (
     <div className={styles["data-selector"]}>
       <div className={`${open ? styles["data-row"] : styles["data-row-closed"]}`}>
@@ -341,7 +363,7 @@ const DataSelector = ({
         <Upload {...props} accept="text/csv">
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
-        <button id="downloadBtn" value="download">Download Template</button>
+        <button onClick={downloadTemplate} id="downloadBtn" value="download">Download Template</button>
       </div>
       <div className={`${open ? styles["data-content-line"] : styles["data-content-line-closed"]}`}>
         <FormControl sx={{ m: 1, maxWidth: "100%" }}>
