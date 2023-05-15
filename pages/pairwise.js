@@ -14,8 +14,10 @@ import s3Client from "./api/aws";
 import { colorAssignment, s3BucketList } from "@/util/constants";
 import processData from "../util/processData";
 import Link from "next/link";
+import Button from '@mui/material/Button';
 import Umap_page from "@/pages/umap";
 import classNames from "classnames";
+import * as React from "react";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -132,7 +134,12 @@ export default function Pairwise({ fetchedNames }) {
               <p className={styles.mainPlotTitle}>
                 Material Data Explorer (Pairwise)
               </p>
-              <Link href="/umap">UMAP Dimension Reduction</Link>
+              {/*<Link href="/umap">*/}
+              <div>
+                <Button href="/umap" variant="contained">UMAP Dimension Reduction</Button>
+              </div>
+
+              {/*</Link>*/}
               {/*<p className={styles.mainPlotSub}>*/}
               {/*    Select properties from the dropdown menus below to graph on the*/}
               {/*    x and y axes. Hovering over data points provides additional*/}

@@ -363,7 +363,7 @@ const DataSelector = ({
         <Upload {...props} accept="text/csv">
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
-        <button onClick={downloadTemplate} id="downloadBtn" value="download">Download Template</button>
+        <Button variant="contained" onClick={downloadTemplate} id="downloadBtn" value="download">Download Template</Button>
       </div>
       <div className={`${open ? styles["data-content-line"] : styles["data-content-line-closed"]}`}>
         <FormControl sx={{ m: 1, maxWidth: "100%" }}>
