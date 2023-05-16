@@ -28,9 +28,10 @@ export default function youngs({dataPoint}) {
             size: 12,
             color: '#000'
         },
+        automargin: true,
         orientation: -90,
-        width: 300,
-        height: 330,
+        // width: 300,
+        // height: 330,
         polar: {
             radialaxis: {
                 visible: true,
@@ -43,7 +44,10 @@ export default function youngs({dataPoint}) {
         responsive: true
     }
     var style = {
-        marginTop: '0px'
+        marginTop: '0px',
+        width: "100%",
+        height: "100%",
+
     }
     return (
         <Plot
@@ -51,7 +55,13 @@ export default function youngs({dataPoint}) {
             layout={layout}
             config={config}
             style={style}
+            useResizeHandler={true}
+
         />
     );
 }
 
+// window.onresize = function() {
+//     Plotly.Plots.resize(youngs);
+// };
+//
