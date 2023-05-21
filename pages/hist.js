@@ -111,14 +111,25 @@ export default function Hist({ fetchedNames }) {
         setDatasets(processedData);
         setDataPoint(processedData[0]);
         setActiveData(processedData);
-        setAvailableDatasetNames(processedData.map((d, i) => {
+				const newAvailableDatasetNames = processedData
+					.map((item) => item.name)
+					.filter(
+						(name, index, currentVal) =>
+							currentVal.indexOf(name) === index
+					);
+        const colors = processedData
+					.map((item) => item.color)
+					.filter(
+						(color, index, currentVal) =>
+							currentVal.indexOf(color) === index
+					);
+				setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
           return {
-              bucket_name: 'ideal-dataset-1',
-              name: d.name,
-              color: colorAssignment[i]
-          }
-      }
-      ));
+            bucket_name: "ideal-dataset-1",
+            name: name,
+            color: colors[i]
+            }
+            }));
       });
     } catch (err) {
       console.log("unexpected error");
