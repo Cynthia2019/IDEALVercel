@@ -47,7 +47,7 @@
   position: absolute;
   top: 10;
   right: 0;
-  height: 91%;
+  height: fit-content;
 }
 
 .selectorsClosed {

@@ -76,8 +76,8 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 }));
 
 const XAxisSelector = ({ query1, handleQuery1Change }) => {
+  return (
 	<div className={styles["data-content-line"]}>
-		<p>X-axis</p>
 		<FormControl variant="standard" fullWidth>
 			<InputLabel id="x-axis-select-label">{query1}</InputLabel>
 			<Select
@@ -96,12 +96,12 @@ const XAxisSelector = ({ query1, handleQuery1Change }) => {
 				})}
 			</Select>
 		</FormControl>
-	</div>;
-};
+	</div>
+)};
 
 const YAxisSelector = ({ query2, handleQuery2Change }) => {
+  return (
 	<div className={styles["data-content-line"]}>
-		<p>Y-axis</p>
 		<FormControl variant="standard" fullWidth>
 			<InputLabel id="x-axis-select-label">{query2}</InputLabel>
 			<Select
@@ -120,8 +120,8 @@ const YAxisSelector = ({ query2, handleQuery2Change }) => {
 				})}
 			</Select>
 		</FormControl>
-	</div>;
-};
+	</div>
+)};
 
 const DataSelector = ({
 	page,
@@ -141,6 +141,7 @@ const DataSelector = ({
 	const [showData, setShowData] = useState([]);
 
 	useEffect(() => {
+    console.log(page)
 		setShowData(
 			availableDatasetNames.map((item) => {
         return activeData.map((data) => data.name).includes(item.name);
@@ -421,16 +422,14 @@ const DataSelector = ({
 					</div>
 				</FormControl>
 			</div>
-			{page == "scatter" && (
-				<React.Fragment>
-					<XAxisSelector query1={query1} />
-					<YAxisSelector query2={query2} />
-				</React.Fragment>
+			{page === "scatter" && (
+				<div>
+					<XAxisSelector query1={query1} handleQuery1Change={handleQuery1Change}/>
+					<YAxisSelector query2={query2} handleQuery2Change={handleQuery2Change}/>
+				</div>
 			)}
-			{page == "histogram" && (
-				<React.Fragment>
-					<XAxisSelector query1={query1} />
-				</React.Fragment>
+			{page === "histogram" && (
+					<XAxisSelector query1={query1} handleQuery1Change={handleQuery1Change}/>
 			)}
 		</div>
 	);

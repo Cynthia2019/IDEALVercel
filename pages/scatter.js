@@ -250,17 +250,15 @@ export default function Scatter({ fetchedNames }) {
 						/>
 					</div>
 				</Row>
-				<Row>
-					<Col span={12}>
+				<Row style={{width: '60%'}}>
 						<NeighborPanel neighbors={neighbors} />
-					</Col>
-					<Col span={12}>
-						<SavePanel
+				</Row>
+        <Row style={{width: '60%'}}>
+        <SavePanel
 							selectedData={selectedData}
 							setReset={setReset}
 						/>
-					</Col>
-				</Row>
+        </Row>
 			</div>
 		</div>
 	);
