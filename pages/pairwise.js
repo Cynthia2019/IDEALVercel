@@ -41,14 +41,21 @@ export default function Pairwise({fetchedNames}) {
     });
 
 
-
     const handleRangeChange = (name, value) => {
+        const activeDatasetNames = activeData.map((d) => d.name);
         let filtered_datasets = datasets.filter((d, i) => {
-            const activeDatasetNames = activeData.map((d) => d.name);
             let filtered = d[name] >= value[0] && d[name] <= value[1] && activeDatasetNames.includes(d.name);
             return filtered;
         });
-        setActiveData(filtered_datasets);
+        // remove filtered out data from active data and add to data library
+        let sourceItems = dataLibrary;
+        let destItems = filtered_datasets;
+        const unselected = activeData.filter((d) => !filtered_datasets.includes(d));
+  
+        sourceItems = sourceItems.concat(unselected);
+        setActiveData(destItems);
+        setDataLibrary(sourceItems);
+
     };
 
     async function getAllData() {
