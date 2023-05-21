@@ -137,6 +137,15 @@ export default function Scatter({ fetchedNames }) {
         setDatasets(processedData);
         setDataPoint(processedData[0]);
         setActiveData(processedData);
+        setAvailableDatasetNames(processedData.map((d, i) => {
+          console.log(d)
+          return {
+              bucket_name: 'ideal-dataset-1',
+              name: d.name,
+              color: colorAssignment[i]
+          }
+      }
+      ));
       });
     } catch (err) {
       console.log("unexpected error");

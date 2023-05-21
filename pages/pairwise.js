@@ -31,10 +31,6 @@ export default function Pairwise({fetchedNames}) {
     // record all non active data
     const [dataLibrary, setDataLibrary] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
-    const [selectedData, setSelectedData] = useState([]);
-
-    const [toggleCollapse, setToggleCollapse] = useState(false);
-    const [isCollapsible, setIsCollapsible] = useState(false);
 
     const Youngs = dynamic(() => import("../components/youngs"), {
         ssr: false,
@@ -114,6 +110,14 @@ export default function Pairwise({fetchedNames}) {
                 setDatasets(processedData);
                 setDataPoint(processedData[0]);
                 setActiveData(processedData);
+                setAvailableDatasetNames(processedData.map((d, i) => {
+                    return {
+                        bucket_name: 'ideal-dataset-1',
+                        name: d.name,
+                        color: colorAssignment[i]
+                    }
+                }
+                ));
             });
         } catch (err) {
             console.log("unexpected error");
@@ -150,7 +154,6 @@ export default function Pairwise({fetchedNames}) {
                         <PairwiseWrapper
                             data={activeData}
                             setDataPoint={setDataPoint}
-                            setSelectedData={setSelectedData}
                             max_num_datasets={availableDatasetNames.length}
                         />
                     </div>
