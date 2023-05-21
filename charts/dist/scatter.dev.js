@@ -61,11 +61,11 @@ function () {
   function Scatter(element, legendElement, data, view) {
     _classCallCheck(this, Scatter);
 
-    this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "scatter-plot-plot").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
+    this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "scatter-plot-plot").attr("preserveAspectRatio", "xMidYMid meet").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
 
     this.legend = d3.select(legendElement).append("svg").attr("width", 120).append("g").attr("class", "scatter-plot-legend"); // Labels
 
-    this.xLabel = this.svg.append("text").attr("x", WIDTH / 2).attr("y", HEIGHT + 50).attr("text-anchor", "middle").style("fill", "black");
+    this.xLabel = this.svg.append("text").attr("x", WIDTH / 2).attr("y", HEIGHT + 40).attr("text-anchor", "middle").style("fill", "black");
     this.yLabel = this.svg.append("text").attr("x", -HEIGHT / 2).attr("y", -80).attr("text-anchor", "middle").attr("transform", "rotate(-90)").style("fill", "black"); // Append group el to display both axes
 
     this.xAxisGroup = this.svg.append("g").attr("transform", "translate(0, ".concat(HEIGHT, ")")); // Append group el to display both axes
@@ -158,6 +158,7 @@ function () {
       var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
 
       var mouseover = function mouseover(e, d) {
+        console.log("mouseover");
         d3.select(this).attr("r", circleFocusSize).style("stroke", "black").style("stroke-width", 2).style("fill-opacity", 1);
         setDataPoint(d);
         tooltip.style("visibility", "visible").transition().duration(200);
@@ -179,12 +180,12 @@ function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                env = process.env.NODE_ENV; // let url= 'http://3.142.46.2:8000/model?data='
+                env = process.env.NODE_ENV; //   let url= 'http://localhost:8000/model?data='
 
-                url = 'http://localhost:8000/model?data=';
+                url = 'https://metamaterials-srv.northwestern.edu/model?data=';
 
                 if (env == 'production') {
-                  url = 'http://3.142.46.2:8000/model?data=';
+                  url = 'https://metamaterials-srv.northwestern.edu/model?data=';
                 }
 
                 _context.next = 5;
@@ -231,6 +232,7 @@ function () {
         if (view == 'neighbor') {
           target.classed("selected", true);
           getKnnData(inputData).then(function (data) {
+            console.log("get knn data");
             var indices = data.indices;
             var distances = data.distances;
             d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
@@ -243,7 +245,6 @@ function () {
             masked.attr('fill', function (d) {
               return d.color;
             }).attr('r', circleOriginalSize).classed('selected', false);
-            console.log(indices);
             var neighbors = [];
             neighborElements.each(function (d, i) {
               d['outline_color'] = _constants.nnColorAssignment[i];

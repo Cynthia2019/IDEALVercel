@@ -6,13 +6,13 @@ const NeighborTable = ({ data }) => {
   if (data.length != 0 && data[0]) {
     let flatten = Object.entries(data[0]);
     columns = flatten.map(([key, value], i) => ({
-      key: key,
+      key: `neighbor-col-${i}`,
       dataIndex: key,
-      render: (_, record) => {
+      render: (i, record) => {
         if (record) {
           const row = value;
           return (
-            <Col>
+            <Col key={`neighbor-col-${i}`}>
               <Row justify={"start"} align={"center"}>
                 <StructureWrapper
                   data={{

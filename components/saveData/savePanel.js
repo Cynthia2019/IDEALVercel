@@ -22,17 +22,16 @@ const SavePanel = ({ selectedData, setReset }) => {
   };
   const [diversity, setDiversity] = useState({});
   useEffect(() => {
-    console.log('selectedData', selectedData)
     let formated = selectedData.map((data) => {
       let arr = C_list.map((col) => data[col]);
       return { data: arr };
     });
     async function getDiversity(body) {
       const env = process.env.NODE_ENV
-      // let url= 'http://3.142.46.2:8000/model?data='
-      let url= 'http://localhost:8000/model?data='
+      let url= 'https://metamaterials-srv.northwestern.edu/diversity/'
+      // let url= 'http://localhost:8000/model?data='
       if (env == 'production') {
-          url = 'http://3.142.46.2:8000/model?data='
+          url = 'https://metamaterials-srv.northwestern.edu/diversity/'
       }
       try {
         const response = await fetch(`${url}`, {
@@ -43,7 +42,7 @@ const SavePanel = ({ selectedData, setReset }) => {
         setDiversity(jsonData[0]);
       }
       catch (err) {
-        console.log("Server not up");
+        console.log(err.message);
         setDiversity({})
       }
     }

@@ -188,6 +188,7 @@ class Scatter {
         .style("visibility", "hidden");
 
     let mouseover = function (e, d) {
+      console.log("mouseover")
       d3.select(this)
           .attr("r", circleFocusSize)
           .style("stroke", "black")
@@ -229,10 +230,10 @@ class Scatter {
 
     async function getKnnData(data) {
       const env = process.env.NODE_ENV
-      // let url= 'http://3.142.46.2:8000/model?data='
-      let url= 'http://localhost:8000/model?data='
+   //   let url= 'http://localhost:8000/model?data='
+      let url = 'https://metamaterials-srv.northwestern.edu/model?data='
       if (env == 'production') {
-          url = 'http://3.142.46.2:8000/model?data='
+        url = 'https://metamaterials-srv.northwestern.edu/model?data='
       }
       let response = await fetch(
         `${url}[${data}]`,
@@ -260,9 +261,11 @@ class Scatter {
       d3.selectAll(".selected").each((d, i) => selected.push(d));
       setSelectedData(selected);
 
+
       if (view == 'neighbor') {
         target.classed("selected", true);
         getKnnData(inputData).then((data) => {
+          console.log("get knn data")
           let indices = data.indices
           let distances = data.distances
           d3.selectAll(".dataCircle")
@@ -278,7 +281,6 @@ class Scatter {
             let masked = d3.selectAll('.masked')
             masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
       
-            console.log(indices)
             let neighbors = [];
             neighborElements.each((d, i) => {
               d['outline_color'] = nnColorAssignment[i]

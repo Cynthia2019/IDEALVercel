@@ -138,21 +138,6 @@ const DataSelector = ({
   setDataLibrary,
     open,
 }) => {
-  async function getAllData() {
-    const env = process.env.NODE_ENV
-    // let url= 'http://3.142.46.2:8000/model?data='
-    let url= 'http://localhost:8000/model?data='
-    if (env == 'production') {
-      url = 'http://3.142.46.2:8000/model?data='
-    }
-    let response = await fetch(`${url}`, {
-      method: "POST",
-      mode: "cors",
-    })
-        .then((res) => res.json())
-        .catch((err) => console.log(err));
-    return response;
-  }
   const [showData, setShowData] = useState(
     availableDatasetNames.map((dataset, index) => {
       return true;

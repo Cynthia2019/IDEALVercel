@@ -68,10 +68,10 @@ export default function Umap({fetchedNames}) {
 
     async function getAllData() {
         const env = process.env.NODE_ENV
-        // let url= 'http://3.142.46.2:8000/model?data='
-        let url= 'http://localhost:8000/model?data='
+        let url= 'https://metamaterials-srv.northwestern.edu/model'
+        // let url= 'http://localhost:8000/model?data='
         if (env == 'production') {
-            url = 'http://3.142.46.2:8000/model?data='
+            url = 'https://metamaterials-srv.northwestern.edu/model'
         }
         let response = await fetch(`${url}`, {
             method: "POST",
