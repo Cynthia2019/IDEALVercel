@@ -78,7 +78,8 @@ export default function Pairwise({fetchedNames}) {
         async function fetchData(info, index) {
             console.log('info', info)
             const command = new GetObjectCommand({
-                Bucket: info.bucket_name,
+                // Bucket: info.bucket_name,
+                Bucket: 'ideal-dataset-1',
                 Key: info.name,
             });
             console.log('pairwise fetching data', command)
@@ -141,7 +142,7 @@ export default function Pairwise({fetchedNames}) {
         } catch (err) {
             console.log("unexpected error");
         }
-    }, []);
+    }, [availableDatasetNames]);
 
     const [open, setOpen] = useState(true);
 
