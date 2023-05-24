@@ -80,7 +80,7 @@ export default function Pairwise({fetchedNames}) {
                 Bucket: info.bucket_name,
                 Key: info.name,
             });
-
+            console.log('pairwise fetching data', command)
             await s3Client.send(command).then((res) => {
                 let body = res.Body.transformToByteArray();
                 body.then((stream) => {
