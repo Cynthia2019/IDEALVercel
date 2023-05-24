@@ -76,6 +76,7 @@ export default function Pairwise({fetchedNames}) {
 
     useEffect(() => {
         async function fetchData(info, index) {
+            console.log('info', info)
             const command = new GetObjectCommand({
                 Bucket: info.bucket_name,
                 Key: info.name,
