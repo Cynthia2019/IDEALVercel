@@ -27,7 +27,7 @@ export default function Pairwise({fetchedNames}) {
         fetchedNames || []
     );
     // record all currently selected data
-    const [activeData, setActiveData] = useState(datasets);
+    const [activeData, setActiveData] = useState([]);
     // record all non active data
     const [dataLibrary, setDataLibrary] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
@@ -55,10 +55,10 @@ export default function Pairwise({fetchedNames}) {
         sourceItems = sourceItems.concat(unselected);
         setActiveData(destItems);
         setDataLibrary(sourceItems);
-
     };
 
     async function getAllData() {
+        console.log('pairwise get all data')
         const env = process.env.NODE_ENV
         let url= 'https://metamaterials-srv.northwestern.edu/model'
         // let url = 'http://localhost:8000/model?data='
@@ -76,34 +76,40 @@ export default function Pairwise({fetchedNames}) {
 
     useEffect(() => {
         async function fetchData(info, index) {
-            console.log('info', info)
-            const command = new GetObjectCommand({
-                // Bucket: info.bucket_name,
-                Bucket: 'ideal-dataset-1',
-                Key: info.name,
-            });
-            console.log('pairwise fetching data', command)
-            await s3Client.send(command).then((res) => {
-                let body = res.Body.transformToByteArray();
-                body.then((stream) => {
-                    new Response(stream, {headers: {"Content-Type": "text/csv"}})
-                        .text()
-                        .then((data) => {
-                            let parsed = csvParse(data);
-
-                            let processedData = parsed.map((dataset, i) => {
-                                return processData(dataset, i);
-                            });
-                            processedData.map(
-                                (p) => (p.name = availableDatasetNames[index].name)
-                            );
-                            processedData.map((p) => (p.color = colorAssignment[index]));
-                            setDatasets((prev) => [...prev, ...processedData]);
-                            setDataPoint(processedData[0]);
-                            setActiveData((prev) => [...prev, ...processedData]);
-                        });
+            try {
+                const command = new GetObjectCommand({
+                    // Bucket: info.bucket_name,
+                    Bucket: 'ideal-dataset-1',
+                    Key: info.name,
                 });
-            });
+                console.log('pairwise fetching data', command)
+                // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+                await s3Client.send(command).then((res) => {
+                    let body = res.Body.transformToByteArray();
+                    body.then((stream) => {
+                        new Response(stream, {headers: {"Content-Type": "text/csv"}})
+                            .text()
+                            .then((data) => {
+                                let parsed = csvParse(data);
+
+                                let processedData = parsed.map((dataset, i) => {
+                                    return processData(dataset, i);
+                                });
+                                processedData.map(
+                                    (p) => (p.name = availableDatasetNames[index].name)
+                                );
+                                processedData.map((p) => (p.color = colorAssignment[index]));
+                                setDatasets((prev) => [...prev, ...processedData]);
+                                setDataPoint(processedData[0]);
+                                setActiveData((prev) => [...prev, ...processedData]);
+                            });
+                    });
+                });
+            } catch (error) {
+                console.log("Error in fetchData:", error);
+            }
+
         }
 
         try {
@@ -113,6 +119,7 @@ export default function Pairwise({fetchedNames}) {
                     return;
                 }
                 res = JSON.parse(res);
+
                 const processedData = res.map((dataset, i) => {
                     return processData(dataset, i);
                 });

@@ -310,14 +310,14 @@ const DataSelector = ({
 						header: true,
 						skipEmptyLines: true,
 						complete: (res) => {
-							setDatasets((prevState) => [
-								...prevState,
-								{
-									name: file.name,
-									data: processData(res.data),
-									color: colorAssignment[prevState.length],
-								},
-							]);
+							// setDatasets((prevState) => [
+							// 	...prevState,
+							// 	{
+							// 		name: file.name,
+							// 		data: processData(res.data),
+							// 		color: colorAssignment[prevState.length],
+							// 	},
+							// ]);
 							setAvailableDatasetNames((prevState) => [
 								...prevState,
 								{
@@ -325,16 +325,16 @@ const DataSelector = ({
 									color: colorAssignment[prevState.length],
 								},
 							]);
-							setDataLibrary((prevState) => [
-								...prevState,
-								{
-									name: file.name,
-									data: processData(res.data),
-									color: colorAssignment[
-										availableDatasetNames.length
-									],
-								},
-							]);
+							// setDataLibrary((prevState) => [
+							// 	...prevState,
+							// 	{
+							// 		name: file.name,
+							// 		data: processData(res.data),
+							// 		color: colorAssignment[
+							// 			availableDatasetNames.length
+							// 		],
+							// 	},
+							// ]);
 						},
 					});
 				} else {

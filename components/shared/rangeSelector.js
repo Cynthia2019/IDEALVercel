@@ -1,5 +1,6 @@
 import { Slider, Row, Col } from "antd";
 import styles from "@/styles/rangeSelector.module.css";
+import {useState, useEffect} from "react";
 
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -7,9 +8,12 @@ const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
 const RangeSelector = ({ datasets, activeData, handleChange, open }) => {
   const data = datasets;
   const filtered = activeData;
+  console.log('data', data)
+  // console.log('filtered', filtered)
   const handleSliderChange = (name, value) => {
     handleChange(name, value);
   };
+
   return (
     <div className={styles["property-range"]}>
       <p className={styles["range-title"]}>Property Range</p>
