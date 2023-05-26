@@ -98,6 +98,7 @@ export default function Scatter({ fetchedNames }) {
 			const command = new GetObjectCommand({
 				Bucket: info.bucket_name,
 				Key: info.name,
+				cacheControl: "no-cache",
 			});
 
 			await s3Client.send(command).then((res) => {
@@ -168,7 +169,7 @@ export default function Scatter({ fetchedNames }) {
 		} catch (err) {
 			console.log("unexpected error");
 		}
-	}, []);
+	}, [availableDatasetNames]);
 
 	const [open, setOpen] = useState(true);
 
@@ -264,25 +265,3 @@ export default function Scatter({ fetchedNames }) {
 	);
 }
 
-// export async function getStaticProps() {
-//   console.log('fetching data staticProps')
-//   let fetchedNames = [];
-//   const listObjectCommand = new ListObjectsCommand({
-//     Bucket: "ideal-dataset-1",
-//   });
-//   await s3Client.send(listObjectCommand).then((res) => {
-//     const names = res.Contents.map((content) => content.Key);
-//     for (let i = 0; i < names.length; i++) {
-//       fetchedNames.push({
-//         bucket_name: "ideal-dataset-1",
-//         name: names[i],
-//         color: colorAssignment[i],
-//       });
-//     }
-//   });
-//   return {
-//     props: {
-//       fetchedNames: fetchedNames,
-//     },
-//   };
-// }

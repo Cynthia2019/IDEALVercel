@@ -87,6 +87,7 @@ export default function Umap({fetchedNames}) {
             const command = new GetObjectCommand({
                 Bucket: info.bucket_name,
                 Key: info.name,
+                cacheControl: "no-cache",
             });
 
             await s3Client.send(command).then((res) => {
@@ -127,7 +128,7 @@ export default function Umap({fetchedNames}) {
         } catch (err) {
             console.log("unexpected error")
         }
-    }, []);
+    }, [availableDatasetNames]);
 
     const wrapperClasses = classNames(
         "h-screen px-4 pt-8 pb-4 bg-light flex justify-between flex-col",

@@ -45,7 +45,8 @@ export default function Home({fetchedNames}) {
 export async function getStaticProps() {
     let fetchedNames = []
     const listObjectCommand = new ListObjectsCommand({
-        Bucket: 'ideal-dataset-1'
+        Bucket: 'ideal-dataset-1',
+        cacheControl: "no-cache",
     })
     await s3Client.send(listObjectCommand).then((res) => {
         const names = res.Contents.map(content => content.Key)
