@@ -67,7 +67,7 @@ export default function Pairwise({fetchedNames}) {
         // }
         let response = await fetch(`${url}`, {
             method: "POST",
-            mode: "cors",
+            // mode: "cors",
         })
             .then((res) => {
                 console.log('pairwise get all data response', res)
