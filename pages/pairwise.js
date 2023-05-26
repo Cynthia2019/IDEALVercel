@@ -81,6 +81,7 @@ export default function Pairwise({fetchedNames}) {
                     // Bucket: info.bucket_name,
                     Bucket: 'ideal-dataset-1',
                     Key: info.name,
+                    cacheControl: "no-cache",
                 });
                 console.log('pairwise fetching data', command)
                 // await new Promise((resolve) => setTimeout(resolve, 5000));
