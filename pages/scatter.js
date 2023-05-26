@@ -159,6 +159,7 @@ export default function Scatter({ fetchedNames }) {
 							currentVal.indexOf(color) === index
 					);
 				setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
+
           return {
             bucket_name: "ideal-dataset-1",
             name: name,
@@ -169,7 +170,7 @@ export default function Scatter({ fetchedNames }) {
 		} catch (err) {
 			console.log("unexpected error");
 		}
-	}, [availableDatasetNames]);
+	}, [availableDatasetNames.length]);
 
 	const [open, setOpen] = useState(true);
 
