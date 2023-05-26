@@ -69,8 +69,11 @@ export default function Pairwise({fetchedNames}) {
             method: "POST",
             mode: "cors",
         })
-            .then((res) => res.json())
-            .catch((err) => console.log(err));
+            .then((res) => {
+                console.log('pairwise get all data response', res)
+                return res.json()
+            })
+            .catch((err) => console.log('pairwise get all data error', err));
         return response;
     }
 

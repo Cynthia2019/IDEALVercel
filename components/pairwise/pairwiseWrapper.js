@@ -12,8 +12,8 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_
     useEffect(() => {
         if (!chart) {
             setChart(new Pairwise(data,
-                                    pairwiseContainer,
-                                    legendContainer.current));
+                pairwiseContainer,
+                legendContainer.current));
         } else {
             chart.update(data, {
                     columns: [
