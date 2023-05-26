@@ -101,11 +101,10 @@ export default function Scatter({fetchedNames}) {
                 Key: info.name,
                 cacheControl: "no-cache",
             });
-
+            console.log("scatter fetching data s3 response", command);
             await s3Client.send(command).then((res) => {
                 let body = res.Body.transformToByteArray();
                 body.then((stream) => {
-                    console.log("s3 fetching data scatter");
                     new Response(stream, {
                         headers: {"Content-Type": "text/csv"},
                     })

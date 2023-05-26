@@ -51,7 +51,7 @@ export default function Pairwise({fetchedNames}) {
         let sourceItems = dataLibrary;
         let destItems = filtered_datasets;
         const unselected = activeData.filter((d) => !filtered_datasets.includes(d));
-  
+
         sourceItems = sourceItems.concat(unselected);
         setActiveData(destItems);
         setDataLibrary(sourceItems);
@@ -60,11 +60,11 @@ export default function Pairwise({fetchedNames}) {
     async function getAllData() {
         console.log('pairwise get all data')
         const env = process.env.NODE_ENV
-        let url= '/model'
+        let url = 'https://metamaterials-srv.northwestern.edu/model'
         // let url = 'http://localhost:8000/model?data='
-        // if (env == 'production') {
-        //     url = 'https://metamaterials-srv.northwestern.edu/model'
-        // }
+        if (env == 'production') {
+            url = 'https://metamaterials-srv.northwestern.edu/model'
+        }
         let response = await fetch(`${url}`, {
             method: "POST",
             mode: "cors",
@@ -79,40 +79,37 @@ export default function Pairwise({fetchedNames}) {
 
     useEffect(() => {
         async function fetchData(info, index) {
-            try {
-                const command = new GetObjectCommand({
-                    // Bucket: info.bucket_name,
-                    Bucket: 'ideal-dataset-1',
-                    Key: info.name,
-                    cacheControl: "no-cache",
-                });
-                console.log('pairwise fetching data', command)
-                // await new Promise((resolve) => setTimeout(resolve, 5000));
+            const command = new GetObjectCommand({
+                // Bucket: info.bucket_name,
+                Bucket: 'ideal-dataset-1',
+                Key: info.name,
+                cacheControl: "no-cache",
+            });
+            console.log('pairwise fetching data', command)
+            // await new Promise((resolve) => setTimeout(resolve, 5000));
 
-                await s3Client.send(command).then((res) => {
-                    let body = res.Body.transformToByteArray();
-                    body.then((stream) => {
-                        new Response(stream, {headers: {"Content-Type": "text/csv"}})
-                            .text()
-                            .then((data) => {
-                                let parsed = csvParse(data);
+            await s3Client.send(command).then((res) => {
+                let body = res.Body.transformToByteArray();
+                body.then((stream) => {
+                    new Response(stream, {headers: {"Content-Type": "text/csv"}})
+                        .text()
+                        .then((data) => {
+                            let parsed = csvParse(data);
 
-                                let processedData = parsed.map((dataset, i) => {
-                                    return processData(dataset, i);
-                                });
-                                processedData.map(
-                                    (p) => (p.name = availableDatasetNames[index].name)
-                                );
-                                processedData.map((p) => (p.color = colorAssignment[index]));
-                                setDatasets((prev) => [...prev, ...processedData]);
-                                setDataPoint(processedData[0]);
-                                setActiveData((prev) => [...prev, ...processedData]);
+                            let processedData = parsed.map((dataset, i) => {
+                                return processData(dataset, i);
                             });
-                    });
+                            processedData.map(
+                                (p) => (p.name = availableDatasetNames[index].name)
+                            );
+                            processedData.map((p) => (p.color = colorAssignment[index]));
+                            setDatasets((prev) => [...prev, ...processedData]);
+                            setDataPoint(processedData[0]);
+                            setActiveData((prev) => [...prev, ...processedData]);
+                        });
                 });
-            } catch (error) {
-                console.log("Error in fetchData:", error);
-            }
+            });
+
 
         }
 
@@ -131,24 +128,24 @@ export default function Pairwise({fetchedNames}) {
                 setDataPoint(processedData[0]);
                 setActiveData(processedData);
                 const newAvailableDatasetNames = processedData
-                .map((item) => item.name)
-                .filter(
-                  (name, index, currentVal) =>
-                    currentVal.indexOf(name) === index
-                );
-              const colors = processedData
-                .map((item) => item.color)
-                .filter(
-                  (color, index, currentVal) =>
-                    currentVal.indexOf(color) === index
-                );
-              setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
-                return {
-                  bucket_name: "ideal-dataset-1",
-                  name: name,
-                  color: colors[i]
-                  }
-                  }));
+                    .map((item) => item.name)
+                    .filter(
+                        (name, index, currentVal) =>
+                            currentVal.indexOf(name) === index
+                    );
+                const colors = processedData
+                    .map((item) => item.color)
+                    .filter(
+                        (color, index, currentVal) =>
+                            currentVal.indexOf(color) === index
+                    );
+                setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
+                    return {
+                        bucket_name: "ideal-dataset-1",
+                        name: name,
+                        color: colors[i]
+                    }
+                }));
             });
         } catch (err) {
             console.log("unexpected error");
