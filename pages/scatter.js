@@ -96,7 +96,7 @@ export default function Scatter({ fetchedNames }) {
 	useEffect(() => {
 		async function fetchData(info, index) {
 			const command = new GetObjectCommand({
-				Bucket: info.bucket_name,
+				Bucket: 'ideal-dataset-1',
 				Key: info.name,
 				cacheControl: "no-cache",
 			});
