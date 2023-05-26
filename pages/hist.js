@@ -135,7 +135,7 @@ export default function Hist({ fetchedNames }) {
     } catch (err) {
       console.log("unexpected error");
     }
-  }, [availableDatasetNames]);
+  }, [availableDatasetNames.length]);
 
   const wrapperClasses = classNames(
     "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",

@@ -128,7 +128,7 @@ export default function Umap({fetchedNames}) {
         } catch (err) {
             console.log("unexpected error")
         }
-    }, [availableDatasetNames]);
+    }, [availableDatasetNames.length]);
 
     const wrapperClasses = classNames(
         "h-screen px-4 pt-8 pb-4 bg-light flex justify-between flex-col",

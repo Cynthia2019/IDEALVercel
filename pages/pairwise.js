@@ -150,7 +150,7 @@ export default function Pairwise({fetchedNames}) {
         } catch (err) {
             console.log("unexpected error");
         }
-    }, [availableDatasetNames]);
+    }, [availableDatasetNames.length]);
 
     const [open, setOpen] = useState(true);
 
