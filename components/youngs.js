@@ -41,7 +41,7 @@ export default function youngs({dataPoint}) {
         },
         orientation: -90,
         width: 300,
-        height: 290,
+        height: 270,
         polar: {
             radialaxis: {
                 visible: true,

@@ -280,3 +280,7 @@
         flex-direction: column;
     }
 }
+
+.materialInformation-black {
+    margin-top: 6px;
+}

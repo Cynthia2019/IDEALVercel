@@ -162,23 +162,24 @@ export default function Pairwise({fetchedNames}) {
             >
                 <Row>
                     <div className={styles.mainPlot}>
-                        <div className={styles.mainPlotHeader}>
-                            <p className={styles.mainPlotTitle}>
-                                Material Data Explorer (Pairwise)
-                            </p>
-                            {/*<Link href="/umap">*/}
-                            <div>
-                                <Button href="/umap" variant="contained">UMAP Dimension Reduction</Button>
-                            </div>
-
-                            {/*</Link>*/}
-                            {/*<p className={styles.mainPlotSub}>*/}
-                            {/*    Select properties from the dropdown menus below to graph on the*/}
-                            {/*    x and y axes. Hovering over data points provides additional*/}
-                            {/*    information. Scroll to zoom, click and drag to pan, and*/}
-                            {/*    double-click to reset.*/}
-                            {/*</p>*/}
+                        {/*<div className={styles.mainPlotHeader} style={{background: "blue"}}>*/}
+                        {/*<p className={styles.mainPlotTitle}>*/}
+                        {/*    Metamaterials Data Explorer (Pairwise)*/}
+                        {/*</p>*/}
+                        {/*<Link href="/umap">*/}
+                        <div style={{margin: "8px", marginLeft: "20px"}}>
+                            <Button size='medium' href="/umap" variant="contained">Visualize
+                                in Reduced Dimension</Button>
                         </div>
+
+                        {/*</Link>*/}
+                        {/*<p className={styles.mainPlotSub}>*/}
+                        {/*    Select properties from the dropdown menus below to graph on the*/}
+                        {/*    x and y axes. Hovering over data points provides additional*/}
+                        {/*    information. Scroll to zoom, click and drag to pan, and*/}
+                        {/*    double-click to reset.*/}
+                        {/*</p>*/}
+                        {/*</div>*/}
                         <PairwiseWrapper
                             data={activeData}
                             setDataPoint={setDataPoint}
