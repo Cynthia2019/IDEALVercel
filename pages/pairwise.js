@@ -15,6 +15,7 @@ import {colorAssignment, s3BucketList} from "@/util/constants";
 import processData from "../util/processData";
 import Button from '@mui/material/Button';
 import * as React from "react";
+import Head from 'next/head'
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -156,6 +157,9 @@ export default function Pairwise({fetchedNames}) {
 
     return (
         <div>
+            <head>
+                <title>Metamaterials Data Explorer (Pairwise)</title>
+            </head>
             <Header/>
             <div
                 className={styles.body}
