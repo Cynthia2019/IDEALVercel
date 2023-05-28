@@ -17,15 +17,30 @@
 .data-row {
     margin: 0px 6px;
     display: flex;
+    width: 95%;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
 }
 
-.data-row-closed {
-    margin: 0px 6px;
+@media (max-width: 1268px) {
+    .data-row {
+        flex-direction: column; /* Change to column layout for smaller screens */
+    }
+}
+/*.template-button {*/
+/*    flex-shrink: inherit;*/
+/*    width: %;*/
+/*    box-sizing: border-box;*/
+/*}*/
 
+.data-row-closed {
+    margin: 0px 0px;
     display: flex;
+    width: 95%;
     flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .data-title {

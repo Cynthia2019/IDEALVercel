@@ -21,7 +21,11 @@ export default function poisson({dataPoint}) {
     };
     var data = [trace1];
     var layout = {
-        title: 'Poisson\'s Ratio',
+        title: {
+            text: 'Poisson\'s Ratio',
+            // yref: 'paper',
+            // y: 0.95,
+        },
         automargin: true,
         font: {
             family: 'Arial, sans-serif',
@@ -29,13 +33,19 @@ export default function poisson({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        // width: 300,
-        // height: 330,
+        width: 300,
+        height: 290,
         polar: {
             radialaxis: {
                 visible: true,
                 range: [0, 2]
             }
+        },
+        margin: {
+            b: 60,
+            t: 80,
+            l: 60,
+            r: 60,
         },
         // margin: {
         //     pad: 1000,
@@ -51,6 +61,7 @@ export default function poisson({dataPoint}) {
         width: "100%",
         height: "100%",
     }
+
     return (
         <Plot
             data={data}

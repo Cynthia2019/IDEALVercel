@@ -377,6 +377,7 @@ const DataSelector = ({
 					<Button icon={<UploadOutlined />}>Upload</Button>
 				</Upload>
 				<Button
+					className={styles["template-button"]}
 					variant="contained"
 					onClick={downloadTemplate}
 					id="downloadBtn"

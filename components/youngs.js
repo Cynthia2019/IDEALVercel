@@ -22,16 +22,26 @@ export default function youngs({dataPoint}) {
     };
     var data = [trace1];
     var layout = {
-        title: 'Young\'s Modulus',
+        title: {
+            text: 'Young\'s Modulus',
+            // yref: 'paper',
+            // y: 0.5,
+        },
         font: {
             family: 'Arial, sans-serif',
             size: 12,
             color: '#000'
         },
-        automargin: true,
+        // automargin: true,
+        margin: {
+            b: 60,
+            t: 80,
+            l: 60,
+            r: 60,
+        },
         orientation: -90,
-        // width: 300,
-        // height: 330,
+        width: 300,
+        height: 290,
         polar: {
             radialaxis: {
                 visible: true,
@@ -44,7 +54,6 @@ export default function youngs({dataPoint}) {
         responsive: true
     }
     var style = {
-        marginTop: '0px',
         width: "100%",
         height: "100%",
 
