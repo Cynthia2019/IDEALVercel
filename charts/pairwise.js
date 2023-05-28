@@ -115,26 +115,26 @@ class Pairwise {
 
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 14)
+            .attr("font-size", 18)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
             .data(x)
             .join("text")
-            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding * 1.5},${i * (cellHeight + padding) + marginTop * 9}) rotate(270)`)
+            .attr("transform", (d, i) => `translate(${0 - marginLeft + padding },${i * (cellHeight + padding) + marginTop * 9}) rotate(270)`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .attr("dy", ".71em")
             .text(d => d);
 
         if (x === y) this.svg.append("g")
-            .attr("font-size", 14)
+            .attr("font-size", 18)
             .attr("font-family", "sans-serif")
             .attr("font-weight", "bold")
             .selectAll("text")
             .data(y)
             .join("text")
-            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding) + marginBottom - padding / 2},${cellHeight * 6 + marginBottom + padding * 4})`)
+            .attr("transform", (d, i) => `translate(${i * (cellWidth + padding) + marginBottom - padding / 2},${cellHeight * 6 + marginBottom + padding * 4.5})`)
             .attr("x", padding / 2)
             .attr("y", padding / 2)
             .text(d => d);
@@ -183,7 +183,7 @@ class Pairwise {
             .join("g")
             .attr("transform", (d, i) => `translate(0,${i * (cellHeight + padding)})`)
             .attr("class", "yAxisGroup")
-            .style("font-size","12px")
+            .style("font-size","14px")
             .each(function (yScale) {
                 d3.select(this).call(yAxis.scale(yScale));
             })
@@ -195,7 +195,7 @@ class Pairwise {
             .join("g")
             .attr("transform", (d, i) => `translate(${i * (cellWidth + padding)}, ${height - marginBottom - marginTop})`)
             .attr("class", "xAxisGroup")
-            .style("font-size","12px")
+            .style("font-size","14px")
             .each(function (xScale, columns) {
                 d3.select(this).call(xAxis.scale(xScale))
             })
