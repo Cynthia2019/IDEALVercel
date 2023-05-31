@@ -61,10 +61,10 @@ export default function Pairwise({fetchedNames}) {
     async function getAllData() {
         console.log('pairwise get all data')
         const env = process.env.NODE_ENV
-        let url = 'https://metamaterials-srv.northwestern.edu/model'
+        let url = 'https://metamaterials-srv.northwestern.edu./model'
         // let url = 'http://localhost:8000/model?data='
         if (env == 'production') {
-            url = 'https://metamaterials-srv.northwestern.edu/model'
+            url = 'https://metamaterials-srv.northwestern.edu./model'
         }
         let response = await fetch(`${url}`, {
             method: "POST",

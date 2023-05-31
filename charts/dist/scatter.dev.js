@@ -182,10 +182,10 @@ function () {
               case 0:
                 env = process.env.NODE_ENV; //   let url= 'http://localhost:8000/model?data='
 
-                url = 'https://metamaterials-srv.northwestern.edu/model?data=';
+                url = 'https://metamaterials-srv.northwestern.edu./model?data=';
 
                 if (env == 'production') {
-                  url = 'https://metamaterials-srv.northwestern.edu/model?data=';
+                  url = 'https://metamaterials-srv.northwestern.edu./model?data=';
                 }
 
                 _context.next = 5;

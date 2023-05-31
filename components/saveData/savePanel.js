@@ -28,10 +28,10 @@ const SavePanel = ({ selectedData, setReset }) => {
     });
     async function getDiversity(body) {
       const env = process.env.NODE_ENV
-      let url= 'https://metamaterials-srv.northwestern.edu/diversity/'
+      let url= 'https://metamaterials-srv.northwestern.edu./diversity/'
       // let url= 'http://localhost:8000/model?data='
       if (env == 'production') {
-          url = 'https://metamaterials-srv.northwestern.edu/diversity/'
+          url = 'https://metamaterials-srv.northwestern.edu./diversity/'
       }
       try {
         const response = await fetch(`${url}`, {

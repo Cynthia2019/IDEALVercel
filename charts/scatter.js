@@ -231,9 +231,9 @@ class Scatter {
     async function getKnnData(data) {
       const env = process.env.NODE_ENV
    //   let url= 'http://localhost:8000/model?data='
-      let url = 'https://metamaterials-srv.northwestern.edu/model?data='
+      let url = 'https://metamaterials-srv.northwestern.edu./model?data='
       if (env == 'production') {
-        url = 'https://metamaterials-srv.northwestern.edu/model?data='
+        url = 'https://metamaterials-srv.northwestern.edu./model?data='
       }
       let response = await fetch(
         `${url}[${data}]`,
