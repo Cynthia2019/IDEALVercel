@@ -15,6 +15,7 @@ import {colorAssignment, s3BucketList} from "@/util/constants";
 import processData from "../util/processData";
 import Button from '@mui/material/Button';
 import * as React from "react";
+import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from 'next/head'
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;

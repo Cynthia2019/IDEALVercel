@@ -70,7 +70,4 @@ export default function youngs({dataPoint}) {
     );
 }
 
-// window.onresize = function() {
-//     Plotly.Plots.resize(youngs);
-// };
-//
+
