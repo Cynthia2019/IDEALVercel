@@ -1,21 +1,41 @@
 
+function sigFigs(n, sig) {
+    let neg = false;
+    if (n == 0) {
+        return 0;
+    }
+    if (n < 0) {
+        neg = true;
+        n = -n;
+    }
+  let mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
+  return neg ? -Math.round(n * mult) / mult : Math.round(n * mult) / mult
+}
+
+function expo(x, f) {
+    return Number.parseFloat(x).toExponential(f);
+}
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 const processData = (d, i) => {
+        console.log('processData')
         let youngs = d.youngs?.match(regex)?.map(parseFloat);
+        youngs = youngs.map((young) => sigFigs(young, 4));
         let poisson = d.poisson?.match(regex)?.map(parseFloat);
-        // !i ? console.log('index', i, d) : null;
+        poisson = poisson.map((p) => sigFigs(p, 4));
+
+    // !i ? console.log('index', i, d) : null;
         let processed = {
           index: i, 
           name: d.dataset_name, 
           color: d.dataset_color,
-          C11: parseFloat(d.C11),
-          C12: parseFloat(d.C12),
-          C22: parseFloat(d.C22),
-          C16: parseFloat(d.C16),
-          C26: parseFloat(d.C26),
-          C66: parseFloat(d.C66),
+          C11: sigFigs(parseFloat(d.C11), 4).toExponential(4),
+          C12: sigFigs(parseFloat(d.C12), 4),
+          C22: sigFigs(parseFloat(d.C22), 4).toExponential(4),
+          C16: sigFigs(parseFloat(d.C16), 4),
+          C26: sigFigs(parseFloat(d.C26), 4).toExponential(4),
+          C66: sigFigs(parseFloat(d.C66), 4).toExponential(4),
           condition: d.condition,
           symmetry: d.symmetry,
           CM0: d.CM0,
