@@ -396,13 +396,13 @@ class Pairwise {
                     "Column: " +
                     column  +
                     "<br>Range: " +
-                    (d3.min(temp_arr) > 0 ? d3.min(temp_arr) : 0) +
+                    (d3.min(temp_arr) > 0 ? expo(d3.min(temp_arr), 3) : 0) +
                     " to " +
-                    (d3.max(temp_arr) > 0 ? d3.max(temp_arr) : 0) +
+                    (d3.max(temp_arr) > 0 ? expo(d3.max(temp_arr), 3) : 0) +
                     "<br>Mean: " +
-                    d3.mean(temp_arr) +
+                    expo(d3.mean(temp_arr), 3) +
                     "<br>Median: " +
-                    d3.median(temp_arr)
+                    expo(d3.median(temp_arr), 3)
 
                     // "<br>symmetry: " +
                     // finalData[d]["symmetry"]
