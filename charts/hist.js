@@ -232,7 +232,8 @@ class Hist {
                     all_bins.push(...bins);
                     let temp_tooltip = {}
                     if (organizedData[i]) {
-                        let temp_arr = finalData.map((d, i) => d[query1])
+                        // console.log('organized data', organizedData[i])
+                        let temp_arr = organizedData[i].data.map((d, i) => d[query1])
                         // temp_tooltip["max"] = d3.max(temp_arr)
                         // temp_tooltip["min"] = d3.min(temp_arr)
                         temp_tooltip["name"] = organizedData[i].name
