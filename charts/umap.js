@@ -315,27 +315,27 @@ class Umap {
             .style("padding", "10px")
             .style("visibility", "hidden");
 
-        let mouseover = function (e, d) {
-            d3.select(this)
-                .attr("r", circleFocusSize)
-                .style("stroke", "black")
-                .style("stroke-width", 2)
-                .style("fill-opacity", 1);
-            setDataPoint(d);
-            tooltip.style("visibility", "visible").transition().duration(200);
-        };
-
-        let mousemove = function (e, d) {
-            tooltip
-                .html(
-                    `${query1}: ` +
-                    d[query1] +
-                    `<br>${query2}: ` +
-                    d[query2]
-                )
-                .style("top", e.pageY + 10 + "px")
-                .style("left", e.pageX + 10 + "px");
-        };
+        // let mouseover = function (e, d) {
+        //     d3.select(this)
+        //         .attr("r", circleFocusSize)
+        //         .style("stroke", "black")
+        //         .style("stroke-width", 2)
+        //         .style("fill-opacity", 1);
+        //     setDataPoint(d);
+        //     tooltip.style("visibility", "visible").transition().duration(200);
+        // };
+        //
+        // let mousemove = function (e, d) {
+        //     tooltip
+        //         .html(
+        //             `${query1}: ` +
+        //             d[query1] +
+        //             `<br>${query2}: ` +
+        //             d[query2]
+        //         )
+        //         .style("top", e.pageY + 10 + "px")
+        //         .style("left", e.pageX + 10 + "px");
+        // };
 
         let mouseleave = function (e, d) {
             tooltip.style("visibility", "hidden").transition().duration(200);
@@ -392,8 +392,8 @@ class Umap {
             .style("stroke-width", 2)
             .style("fill-opacity", 0.8)
             .on("mousedown", mousedown)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
+            // .on("mouseover", mouseover)
+            // .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
             .attr("cx", (d) => this.xScale(d[query1]))
             .attr("cy", (d) => this.yScale(d[query2]));
