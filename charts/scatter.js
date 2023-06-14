@@ -118,9 +118,10 @@ class Scatter {
     this.query2 = query2;
     let datasets = data;
     
-
+    console.log('scatter update')
     let finalData = [].concat(...datasets);
 
+    console.log('finalData', finalData)
     //remove elements to avoid repeated append
     d3.selectAll(".legend").remove();
     d3.select(".tooltip").remove();
@@ -205,10 +206,10 @@ class Scatter {
               d["name"] +
               "<br>symmetry: " +
               d["symmetry"] +
-              "<br>Material_0: " +
-              d.CM0 +
-              "<br>Material_1: " +
-              d.CM1 +
+              // "<br>Material_0: " +
+              // d.CM0 +
+              // "<br>Material_1: " +
+              // d.CM1 +
               `<br>${query1}: ` +
               d[query1] +
               `<br>${query2}: ` +
@@ -231,9 +232,9 @@ class Scatter {
     async function getKnnData(data) {
       const env = process.env.NODE_ENV
    //   let url= 'http://localhost:8000/model?data='
-      let url = 'https://metamaterials-srv.northwestern.edu./model?data='
+      let url = 'https://metamaterials-srv.northwestern.edu/model?data='
       if (env == 'production') {
-        url = 'https://metamaterials-srv.northwestern.edu./model?data='
+        url = 'https://metamaterials-srv.northwestern.edu/model?data='
       }
       let response = await fetch(
         `${url}[${data}]`,
