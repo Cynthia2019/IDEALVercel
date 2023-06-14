@@ -158,9 +158,9 @@ export default function Pairwise({fetchedNames}) {
 
     return (
         <div>
-            <head>
-                <title>Metamaterials Data Explorer (Pairwise)</title>
-            </head>
+            {/*<head>*/}
+            {/*    <title>Metamaterials Data Explorer (Pairwise)</title>*/}
+            {/*</head>*/}
             <Header/>
             <div
                 className={styles.body}
