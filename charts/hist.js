@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import Header from "../components/shared/header";
 import organizeByName from "../util/organizeByName";
+import sigFigs from '../util/convertTo4SigFig';
 
 const padding = 10// separation between adjacent cells, in pixels
 const marginTop = 0 // top margin, in pixels
@@ -372,7 +373,7 @@ class Hist {
         let tooltipContent = tooltip.map((d, i) => (
             "<b>Dataset: </b>" + d.name + "<br>" +
             "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" +
-            "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" +
+            "<b>Mean: </b>" + expo(d.mean.toPrecision(4)) + "<br>" +
             "<b>Median: </b>" + expo(d.median, 0) + "<br>"
         )
     )
