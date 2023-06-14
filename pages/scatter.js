@@ -186,8 +186,8 @@ export default function Scatter({fetchedNames}) {
                             </p>
                             <p className={styles.mainPlotSub}>
                                 Select properties from the dropdown menus to
-                                graph on the x and y axes. Hovering over data
-                                points provides additional information. Scroll
+                                graph. Hover over data
+                                points for additional information. Scroll
                                 to zoom, click and drag to pan.
                             </p>
                         </div>
