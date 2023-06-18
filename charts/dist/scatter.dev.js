@@ -191,7 +191,7 @@ function () {
                 _context.next = 5;
                 return regeneratorRuntime.awrap(fetch("".concat(url, "[").concat(data, "]"), {
                   method: "GET",
-                  mode: "cors"
+                  mode: "no-cors"
                 }).then(function (res) {
                   return res.json();
                 })["catch"](function (err) {

@@ -240,7 +240,7 @@ class Scatter {
         `${url}[${data}]`,
         {
           method: "GET",
-          mode: "cors",
+          mode: "no-cors",
         }
       )
         .then((res) => res.json())
