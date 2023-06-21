@@ -75,106 +75,64 @@ export default function Scatter({fetchedNames}) {
         setActiveData(filtered_datasets);
     };
 
-    async function getAllData() {
-        const env = process.env.NODE_ENV;
-        let url = "https://metamaterials-srv.northwestern.edu/model/";
-        // let url= 'http://localhost:8000/model?data='
-        if (env == "production") {
-            url = "https://metamaterials-srv.northwestern.edu/model/";
-        }
-        let response = await fetch(`${url}`, {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            credentials: "same-origin",
-            headers: {"Content-Type": "application/json"},
-            redirect: "follow",
-        })
-            .then((res) => {
-                console.log(res);
-                return res.json();
-            })
-            .catch((err) => console.log("scatter get all data err", err));
-        return response;
-    }
+	async function fetchDataFromAWS(info, index) {
+		const command = new GetObjectCommand({
+			// Bucket: info.bucket_name,
+			Bucket: "ideal-dataset-1",
+			Key: info.name,
+			cacheControl: "no-cache",
+		});
 
-    useEffect(() => {
-        async function fetchData(info, index) {
-            const command = new GetObjectCommand({
-                Bucket: 'ideal-dataset-1',
-                Key: info.name,
-                cacheControl: "no-cache",
-            });
-            console.log("scatter fetching data s3 response", command);
-            await s3Client.send(command).then((res) => {
-                let body = res.Body.transformToByteArray();
-                body.then((stream) => {
-                    new Response(stream, {
-                        headers: {"Content-Type": "text/csv"},
-                    })
-                        .text()
-                        .then((data) => {
-                            let parsed = csvParse(data);
+		await s3Client.send(command).then((res) => {
+			let body = res.Body.transformToByteArray();
+			body.then((stream) => {
+				new Response(stream, {
+					headers: { "Content-Type": "text/csv" },
+				})
+					.text()
+					.then((data) => {
+						let parsed = csvParse(data);
 
-                            let processedData = parsed.map((dataset, i) => {
-                                return processData(dataset, i);
-                            });
-                            processedData.map(
-                                (p) =>
-                                    (p.name = availableDatasetNames[index].name)
-                            );
-                            processedData.map(
-                                (p) => (p.color = colorAssignment[index])
-                            );
-                            setDatasets((prev) => [...prev, ...processedData]);
-                            setDataPoint(processedData[0]);
-                            setActiveData((prev) => [
-                                ...prev,
-                                ...processedData,
-                            ]);
-                        });
-                });
-            });
-        }
+						let processedData = parsed.map((dataset, i) => {
+							return processData(dataset, i);
+						});
+						processedData.map(
+							(p) => (p.name = availableDatasetNames[index].name)
+						);
+						processedData.map(
+							(p) => (p.color = colorAssignment[index])
+						);
+						setDatasets((prev) => [...prev, ...processedData]);
+						setDataPoint(processedData[0]);
+						setActiveData((prev) => [...prev, ...processedData]);
+					});
+			});
+		});
+	}
 
-        try {
-            getAllData().then((res) => {
-                if (!res) {
-                    availableDatasetNames.map((info, i) => fetchData(info, i));
-                    return;
-                }
-                res = JSON.parse(res);
-                const processedData = res.map((datapoint, i) => {
-                    return processData(datapoint, i);
-                });
-                setDatasets(processedData);
-                setDataPoint(processedData[0]);
-                setActiveData(processedData);
-                const newAvailableDatasetNames = processedData
-                    .map((item) => item.name)
-                    .filter(
-                        (name, index, currentVal) =>
-                            currentVal.indexOf(name) === index
-                    );
-                const colors = processedData
-                    .map((item) => item.color)
-                    .filter(
-                        (color, index, currentVal) =>
-                            currentVal.indexOf(color) === index
-                    );
-                setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
+	useEffect(() => {
+		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+	}, [availableDatasetNames.length]);
 
-                    return {
-                        bucket_name: "ideal-dataset-1",
-                        name: name,
-                        color: colors[i]
-                    }
-                }));
-            });
-        } catch (err) {
-            console.log("unexpected error");
-        }
-    }, [availableDatasetNames.length]);
+	useEffect(() => {
+		const url = 'https://metamaterials-srv.northwestern.edu/model/';
+		const data = activeData.map((d) => [
+			d.C11,
+			d.C12,
+			d.C22,
+			d.C16,
+			d.C26,
+			d.C66,
+		]);
+		fetch(url, {
+			method: "POST",
+			mode: "cors",
+			body: JSON.stringify({
+				data: data,
+				n_neighbors: 5,
+			}),
+		}).catch((err) => console.log("pairwise refit knn error", err));
+	}, [activeData]);
 
     const [open, setOpen] = useState(true);
 
@@ -205,6 +163,7 @@ export default function Scatter({fetchedNames}) {
                             setNeighbors={setNeighbors}
                             reset={reset}
                             setReset={setReset}
+                            datasets={datasets}
                         />
                     </div>
                     <div className={styles.subPlots}>
@@ -268,5 +227,28 @@ export default function Scatter({fetchedNames}) {
             </div>
         </div>
     );
+}
+
+export async function getStaticProps() {
+    let fetchedNames = []
+    const listObjectCommand = new ListObjectsCommand({
+        Bucket: 'ideal-dataset-1',
+        cacheControl: "no-cache",
+    })
+    await s3Client.send(listObjectCommand).then((res) => {
+        const names = res.Contents.map(content => content.Key)
+        for (let i = 0; i < names.length; i++) {
+            fetchedNames.push({
+                bucket_name: 'ideal-dataset-1',
+                name: names[i],
+                color: colorAssignment[i]
+            })
+        }
+    })
+    return {
+        props: {
+            fetchedNames: fetchedNames
+        }
+    }
 }
 

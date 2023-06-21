@@ -17,6 +17,7 @@ const ScatterWrapper = ({
 	setNeighbors,
 	reset,
 	setReset,
+	datasets
 }) => {
 	const chartArea = useRef(null);
 	const legendArea = useRef(null);
@@ -53,6 +54,7 @@ const ScatterWrapper = ({
 				view,
 				reset,
 				setReset,
+				datasets
 			});
 		}
 	}, [chart, query1, query2, data, view, reset]);

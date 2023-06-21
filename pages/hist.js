@@ -52,90 +52,65 @@ export default function Hist({ fetchedNames }) {
     });
     setActiveData(filtered_datasets);
   };
-  async function getAllData() {
-    const env = process.env.NODE_ENV
-    let url= 'https://metamaterials-srv.northwestern.edu./model'
-   // let url= 'http://localhost:8000/model?data='
-    if (env == 'production') {
-        url = 'https://metamaterials-srv.northwestern.edu./model'
-    }
-    let response = await fetch(`${url}`, {
-      method: "POST",
-      mode: "cors",
-    })
-      .then((res) => res.json())
-      .catch((err) => console.log(err));
-    return response;
-  }
+	async function fetchDataFromAWS(info, index) {
+		const command = new GetObjectCommand({
+			// Bucket: info.bucket_name,
+			Bucket: "ideal-dataset-1",
+			Key: info.name,
+			cacheControl: "no-cache",
+		});
 
-  useEffect(() => {
-    async function fetchData(info, index) {
-      const command = new GetObjectCommand({
-        Bucket: 'ideal-dataset-1',
-        Key: info.name,
-        cacheControl: "no-cache",
-      });
+		await s3Client.send(command).then((res) => {
+			console.log(info.name);
+			let body = res.Body.transformToByteArray();
+			body.then((stream) => {
+				new Response(stream, {
+					headers: { "Content-Type": "text/csv" },
+				})
+					.text()
+					.then((data) => {
+						let parsed = csvParse(data);
 
-      await s3Client.send(command).then((res) => {
-        let body = res.Body.transformToByteArray();
-        body.then((stream) => {
-          new Response(stream, { headers: { "Content-Type": "text/csv" } })
-            .text()
-            .then((data) => {
-              let parsed = csvParse(data);
+						let processedData = parsed.map((dataset, i) => {
+							return processData(dataset, i);
+						});
+						processedData.map(
+							(p) => (p.name = availableDatasetNames[index].name)
+						);
+						processedData.map(
+							(p) => (p.color = colorAssignment[index])
+						);
+						setDatasets((prev) => [...prev, ...processedData]);
+						setDataPoint(processedData[0]);
+						setActiveData((prev) => [...prev, ...processedData]);
+					});
+			});
+		});
+	}
 
-              let processedData = parsed.map((dataset, i) => {
-                return processData(dataset, i);
-              });
-              processedData.map(
-                (p) => (p.name = availableDatasetNames[index].name)
-              );
-              processedData.map((p) => (p.color = colorAssignment[index]));
-              setDatasets((prev) => [...prev, ...processedData]);
-              setDataPoint(processedData[0]);
-              setActiveData((prev) => [...prev, ...processedData]);
-            });
-        });
-      });
-    }
+	useEffect(() => {
+		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+	}, [availableDatasetNames.length]);
 
-    try {
-      getAllData().then((res) => {
-        if (!res) {
-          availableDatasetNames.map((info, i) => fetchData(info, i));
-          return;
-        }
-        res = JSON.parse(res);
-        const processedData = res.map((dataset, i) => {
-          return processData(dataset, i);
-        });
-        setDatasets(processedData);
-        setDataPoint(processedData[0]);
-        setActiveData(processedData);
-				const newAvailableDatasetNames = processedData
-					.map((item) => item.name)
-					.filter(
-						(name, index, currentVal) =>
-							currentVal.indexOf(name) === index
-					);
-        const colors = processedData
-					.map((item) => item.color)
-					.filter(
-						(color, index, currentVal) =>
-							currentVal.indexOf(color) === index
-					);
-				setAvailableDatasetNames(newAvailableDatasetNames.map((name, i) => {
-          return {
-            bucket_name: "ideal-dataset-1",
-            name: name,
-            color: colors[i]
-            }
-            }));
-      });
-    } catch (err) {
-      console.log("unexpected error");
-    }
-  }, [availableDatasetNames.length]);
+	useEffect(() => {
+		const url = 'https://metamaterials-srv.northwestern.edu/model/';
+		const data = activeData.map((d) => [
+			d.C11,
+			d.C12,
+			d.C22,
+			d.C16,
+			d.C26,
+			d.C66,
+		]);
+		fetch(url, {
+			method: "POST",
+			mode: "cors",
+			body: JSON.stringify({
+				data: data,
+				n_neighbors: 5,
+			}),
+		}).catch((err) => console.log("pairwise refit knn error", err));
+	}, [activeData]);
 
   const wrapperClasses = classNames(
     "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",

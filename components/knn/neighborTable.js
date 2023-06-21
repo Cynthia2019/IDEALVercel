@@ -2,17 +2,17 @@ import { Table, Col, Row } from "antd";
 import StructureWrapper from "@/components/structureWrapper";
 
 const NeighborTable = ({ data }) => {
+  console.log(data)
   let columns = []
   if (data.length != 0 && data[0]) {
     let flatten = Object.entries(data[0]);
     columns = flatten.map(([key, value], i) => ({
-      key: `neighbor-col-${i}`,
-      dataIndex: key,
+      key: `neighbor-col-${key}-${i}`,
       render: (i, record) => {
         if (record) {
           const row = value;
           return (
-            <Col key={`neighbor-col-${i}`}>
+            <Col key={`neighbor-col-${key}-${i}`}>
               <Row justify={"start"} align={"center"}>
                 <StructureWrapper
                   data={{
@@ -37,7 +37,9 @@ const NeighborTable = ({ data }) => {
           );
         }
       },
-    }));
+    })
+    );
+    console.log(columns)
   }
   return (
     <Table

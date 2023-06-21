@@ -27,12 +27,7 @@ const SavePanel = ({ selectedData, setReset }) => {
       return { data: arr };
     });
     async function getDiversity(body) {
-      const env = process.env.NODE_ENV
       let url= 'https://metamaterials-srv.northwestern.edu./diversity/'
-      // let url= 'http://localhost:8000/model?data='
-      if (env == 'production') {
-          url = 'https://metamaterials-srv.northwestern.edu./diversity/'
-      }
       try {
         const response = await fetch(`${url}`, {
           body: body,
@@ -41,12 +36,13 @@ const SavePanel = ({ selectedData, setReset }) => {
         const jsonData = await response.json();
         setDiversity(jsonData[0]);
       }
-      catch (err) {
-        console.log(err.message);
+      catch (err) {   
         setDiversity({})
       }
     }
-    getDiversity(JSON.stringify(formated));
+    if (selectedData.length >= 10) {
+      getDiversity(JSON.stringify(formated));
+    }
   }, [selectedData]);
   return (
     <div className={styles.saveSection}>
@@ -82,6 +78,11 @@ const SavePanel = ({ selectedData, setReset }) => {
           <Box component="span">
             <h3>Total:&nbsp;{selectedData.length}</h3>
           </Box>
+          {Object.keys(diversity).length === 0 && (
+            <Box component="span">
+              <h5 style={{color:'#FFB347'}}>Select more data points to get diversity score</h5>
+            </Box>
+          )}
           <Box component="span">
             <h3>Diversity raw:&nbsp;{diversity?.raw}</h3>
           </Box>

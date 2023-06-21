@@ -125,8 +125,6 @@ class Umap {
         setReset,
         knn
     ) {
-        console.log('knn')
-        console.log(knn)
         this.data = data;
         this.query1 = "X";
         this.query2 = "Y";

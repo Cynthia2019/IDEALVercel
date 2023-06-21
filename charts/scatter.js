@@ -112,16 +112,14 @@ class Scatter {
     view,
     reset,
     setReset,
+    datasets
   }) {
     this.data = data;
     this.query1 = query1;
     this.query2 = query2;
-    let datasets = data;
     
-    console.log('scatter update')
-    let finalData = [].concat(...datasets);
+    let finalData = [].concat(...data);
 
-    console.log('finalData', finalData)
     //remove elements to avoid repeated append
     d3.selectAll(".legend").remove();
     d3.select(".tooltip").remove();
@@ -189,7 +187,6 @@ class Scatter {
         .style("visibility", "hidden");
 
     let mouseover = function (e, d) {
-      console.log("mouseover")
       d3.select(this)
           .attr("r", circleFocusSize)
           .style("stroke", "black")
@@ -206,14 +203,10 @@ class Scatter {
               d["name"] +
               "<br>symmetry: " +
               d["symmetry"] +
-              // "<br>Material_0: " +
-              // d.CM0 +
-              // "<br>Material_1: " +
-              // d.CM1 +
               `<br>${query1}: ` +
-              d[query1] +
+              d[query1].toExponential(4) +
               `<br>${query2}: ` +
-              d[query2]
+              d[query2].toExponential(4)
           )
           .style("top", e.pageY + 10 + "px")
           .style("left", e.pageX + 10 + "px");
@@ -230,17 +223,12 @@ class Scatter {
     };
 
     async function getKnnData(data) {
-      const env = process.env.NODE_ENV
-   //   let url= 'http://localhost:8000/model?data='
-      let url = 'https://metamaterials-srv.northwestern.edu/model?data='
-      if (env == 'production') {
-        url = 'https://metamaterials-srv.northwestern.edu/model?data='
-      }
+      const url = 'https://metamaterials-srv.northwestern.edu/model?data='
       let response = await fetch(
         `${url}[${data}]`,
         {
           method: "GET",
-          mode: "no-cors",
+          mode: "cors",
         }
       )
         .then((res) => res.json())
@@ -266,17 +254,18 @@ class Scatter {
       if (view == 'neighbor') {
         target.classed("selected", true);
         getKnnData(inputData).then((data) => {
-          console.log("get knn data")
           let indices = data.indices
           let distances = data.distances
+          // index should be the index of the data in the current active dataset
           d3.selectAll(".dataCircle")
             .data(finalData)
             .classed("highlighted", function (datum) {
-              return indices.includes(datum.index);
+              return indices.includes(finalData.indexOf(datum));
             })
+          d3.selectAll(".dataCircle")
             .classed("masked", function (datum) {
-              return !(indices.includes(datum.index));
-            });
+              return !this.getAttribute('class').includes("highlighted");
+            })
 
             let neighborElements = d3.selectAll('.highlighted')
             let masked = d3.selectAll('.masked')
@@ -285,9 +274,8 @@ class Scatter {
             let neighbors = [];
             neighborElements.each((d, i) => {
               d['outline_color'] = nnColorAssignment[i]
-              console.log(d, indices.indexOf(d.index), d.index)
-              d['distance'] = distances[indices.indexOf(d.index)]
-              return neighbors.push(d)
+              d['distance'] = distances[indices.indexOf(finalData.indexOf(d))]
+              neighbors.push(d)
             });
             neighbors.sort((a, b) => a.distance - b.distance)
             neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)

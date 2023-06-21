@@ -8,24 +8,6 @@ import { csvParse } from 'd3'
 import { useState, useEffect } from 'react';
 import s3Client from "@/pages/api/aws";
 
-//   async function fetchData(info, allData) {
-//     const command = new GetObjectCommand({
-//         Bucket: info.bucket_name,
-//         Key: info.file_name,
-//       })
-
-//       await s3Client.send(command).then((res) => {
-//         let body = res.Body.transformToByteArray();
-//         body.then((stream) => {
-//           new Response(stream, { headers: { "Content-Type": "text/csv" } })
-//             .text()
-//             .then((data) => {
-//              const processedData =  processData(csvParse(data))
-//              allData.push(processedData)
-//             });
-//         });
-//       });
-//   }
 
 export default function Home({fetchedNames}) {
     // useEffect(() => {

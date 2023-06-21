@@ -105,13 +105,13 @@ function () {
           setNeighbors = _ref.setNeighbors,
           view = _ref.view,
           reset = _ref.reset,
-          setReset = _ref.setReset;
+          setReset = _ref.setReset,
+          datasets = _ref.datasets;
       this.data = data;
       this.query1 = query1;
       this.query2 = query2;
-      var datasets = data;
 
-      var finalData = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(datasets)); //remove elements to avoid repeated append
+      var finalData = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(data)); //remove elements to avoid repeated append
 
 
       d3.selectAll(".legend").remove();
@@ -158,14 +158,13 @@ function () {
       var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
 
       var mouseover = function mouseover(e, d) {
-        console.log("mouseover");
         d3.select(this).attr("r", circleFocusSize).style("stroke", "black").style("stroke-width", 2).style("fill-opacity", 1);
         setDataPoint(d);
         tooltip.style("visibility", "visible").transition().duration(200);
       };
 
       var mousemove = function mousemove(e, d) {
-        tooltip.html("Dataset: " + d["name"] + "<br>symmetry: " + d["symmetry"] + "<br>Material_0: " + d.CM0 + "<br>Material_1: " + d.CM1 + "<br>".concat(query1, ": ") + d[query1] + "<br>".concat(query2, ": ") + d[query2]).style("top", e.pageY + 10 + "px").style("left", e.pageX + 10 + "px");
+        tooltip.html("Dataset: " + d["name"] + "<br>symmetry: " + d["symmetry"] + "<br>".concat(query1, ": ") + d[query1].toExponential(4) + "<br>".concat(query2, ": ") + d[query2].toExponential(4)).style("top", e.pageY + 10 + "px").style("left", e.pageX + 10 + "px");
       };
 
       var mouseleave = function mouseleave(e, d) {
@@ -175,34 +174,27 @@ function () {
       };
 
       function getKnnData(data) {
-        var env, url, response;
+        var url, response;
         return regeneratorRuntime.async(function getKnnData$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                env = process.env.NODE_ENV; //   let url= 'http://localhost:8000/model?data='
-
-                url = 'https://metamaterials-srv.northwestern.edu./model?data=';
-
-                if (env == 'production') {
-                  url = 'https://metamaterials-srv.northwestern.edu./model?data=';
-                }
-
-                _context.next = 5;
+                url = 'https://metamaterials-srv.northwestern.edu/model?data=';
+                _context.next = 3;
                 return regeneratorRuntime.awrap(fetch("".concat(url, "[").concat(data, "]"), {
                   method: "GET",
-                  mode: "no-cors"
+                  mode: "cors"
                 }).then(function (res) {
                   return res.json();
                 })["catch"](function (err) {
                   return console.log("fetch error", err.message);
                 }));
 
-              case 5:
+              case 3:
                 response = _context.sent;
                 return _context.abrupt("return", response);
 
-              case 7:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -232,13 +224,14 @@ function () {
         if (view == 'neighbor') {
           target.classed("selected", true);
           getKnnData(inputData).then(function (data) {
-            console.log("get knn data");
             var indices = data.indices;
-            var distances = data.distances;
+            var distances = data.distances; // index should be the index of the data in the current active dataset
+
             d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
-              return indices.includes(datum.index);
-            }).classed("masked", function (datum) {
-              return !indices.includes(datum.index);
+              return indices.includes(finalData.indexOf(datum));
+            });
+            d3.selectAll(".dataCircle").classed("masked", function (datum) {
+              return !this.getAttribute('class').includes("highlighted");
             });
             var neighborElements = d3.selectAll('.highlighted');
             var masked = d3.selectAll('.masked');
@@ -248,9 +241,8 @@ function () {
             var neighbors = [];
             neighborElements.each(function (d, i) {
               d['outline_color'] = _constants.nnColorAssignment[i];
-              console.log(d, indices.indexOf(d.index), d.index);
-              d['distance'] = distances[indices.indexOf(d.index)];
-              return neighbors.push(d);
+              d['distance'] = distances[indices.indexOf(finalData.indexOf(d))];
+              neighbors.push(d);
             });
             neighbors.sort(function (a, b) {
               return a.distance - b.distance;
