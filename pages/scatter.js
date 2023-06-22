@@ -66,14 +66,26 @@ export default function Scatter({fetchedNames}) {
         setQuery2(e.target.value);
     };
 
-    const handleRangeChange = (name, value) => {
-        let filtered_datasets = datasets.filter((d, i) => {
-            console.log(`name: ${name}, value: ${value}`);
-            let filtered = d[name] >= value[0] && d[name] <= value[1];
-            return filtered;
-        });
-        setActiveData(filtered_datasets);
-    };
+	const handleRangeChange = (name, value) => {
+		const activeDatasetNames = activeData.map((d) => d.name);
+		let filtered_datasets = datasets.filter((d, i) => {
+			let filtered =
+				d[name] >= value[0] &&
+				d[name] <= value[1] &&
+				activeDatasetNames.includes(d.name);
+			return filtered;
+		});
+		// remove filtered out data from active data and add to data library
+		let sourceItems = dataLibrary;
+		let destItems = filtered_datasets;
+		const unselected = activeData.filter(
+			(d) => !filtered_datasets.includes(d)
+		);
+
+		sourceItems = sourceItems.concat(unselected);
+		setActiveData(destItems);
+		setDataLibrary(sourceItems);
+	};
 
 	async function fetchDataFromAWS(info, index) {
 		const command = new GetObjectCommand({

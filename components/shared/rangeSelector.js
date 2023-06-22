@@ -8,7 +8,6 @@ const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
 const RangeSelector = ({datasets, activeData, handleChange, open}) => {
         const data = datasets;
         const filtered = activeData;
-        // console.log('filtered', filtered)
         const handleSliderChange = (name, value) => {
             handleChange(name, value);
         };
