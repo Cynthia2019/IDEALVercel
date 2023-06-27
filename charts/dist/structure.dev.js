@@ -41,13 +41,19 @@ function () {
     var marginTop = data.marginTop ? data.marginTop : MARGIN.TOP;
     this.svg = d3.select(element).append("svg").attr("width", width + marginLeft * 2).attr("height", height + marginTop * 2).attr("viewBox", [0, 0, width + marginLeft * 2, height + marginTop * 2]).style("z-index", 10).style("margin-top", "30px").append("g").attr("transform", "translate(".concat(marginLeft, ", ").concat(marginTop, ")"));
     this.svg.append("text").attr("x", width / 2).attr("y", 0 - marginTop / 2).attr("text-anchor", "middle").style("font-size", data.fontSize ? data.fontSize : "16px").style("font-family", 'Arial, sans-serif').text("Unit Cell Geometry");
-    this.svg.append("text").attr("x", width / 2).attr("y", height + marginTop).attr("class", "volumn-ratio").attr("text-anchor", "middle").style("font-size", data.fontSize ? data.fontSize : "16px").style("font-family", 'Arial, sans-serif');
-    this.update(data);
+    this.svg.append("text").attr("x", width / 2).attr("y", height + marginTop).attr("class", "volume-fraction").attr("text-anchor", "middle").style("font-size", data.fontSize ? data.fontSize : "16px").style("font-family", 'Arial, sans-serif');
+    this.update({
+      data: data,
+      element: element
+    });
   }
 
   _createClass(Structure, [{
     key: "update",
-    value: function update(data) {
+    value: function update(_ref) {
+      var data = _ref.data,
+          element = _ref.element,
+          hover = _ref.hover;
       this.data = data.geometry;
       this.color = data.outline_color;
       var height = data.height ? data.height : HEIGHT;
@@ -60,7 +66,8 @@ function () {
       var xScale = d3.scaleLinear().domain([0, 50]).range([0, width]);
       var size = (width + marginLeft * 2) / 50;
       var ratio = this.calculateRatio(this.data);
-      this.svg.select(".volumn-ratio").text("Volumn Ratio: ".concat(ratio));
+      this.svg.select(".volume-fraction").text("Volume Fraction: ".concat(ratio));
+      d3.select(".tooltip").remove();
       var pixels = this.svg.selectAll("rect").data(res);
       pixels.enter().append("rect").merge(pixels).attr("x", function (d) {
         return xScale(d.x);
@@ -70,6 +77,21 @@ function () {
         return d.fill;
       });
       pixels.exit().remove();
+      var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
+
+      var mouseover = function mouseover(event, d) {
+        tooltip.style("visibility", "visible");
+      };
+
+      var mousemove = function mousemove(event, d) {
+        tooltip.html("(".concat(data['CM0'] || 'N/A', ", ").concat(data['CM1'] || 'N/A', ")")).style("left", event.pageX + 10 + "px").style("top", event.pageY + 10 + "px");
+      };
+
+      var mouseleave = function mouseleave(event, d) {
+        tooltip.style("visibility", "hidden");
+      };
+
+      this.svg.on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
     }
   }, {
     key: "calculateRatio",

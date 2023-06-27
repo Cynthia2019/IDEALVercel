@@ -42,9 +42,12 @@ class Structure {
       .style("font-size", data.fontSize ? data.fontSize : "16px") 
       .style("font-family", 'Arial, sans-serif')
     
-    this.update(data);
+    this.update({
+      data, 
+      element,
+    });
   }
-  update(data) {
+  update({data, element, hover}) {
     this.data = data.geometry
     this.color = data.outline_color
     let height = data.height ? data.height : HEIGHT
@@ -63,6 +66,8 @@ class Structure {
     let ratio = this.calculateRatio(this.data)
     this.svg.select(".volume-fraction").text(`Volume Fraction: ${ratio}`);
 
+    d3.select(".tooltip").remove();
+
     const pixels = this.svg.selectAll("rect").data(res);
     pixels
       .enter()
@@ -75,6 +80,33 @@ class Structure {
       .attr("fill", (d) => d.fill);
 
     pixels.exit().remove();
+
+    const tooltip = d3
+    .select(element)
+    .append("div")
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+    .style("visibility", "hidden");
+
+    let mouseover = function (event, d) {
+      tooltip.style("visibility", "visible");
+    }
+    let mousemove = function (event, d) {
+      tooltip
+        .html(`(${data['CM0'] || 'N/A'}, ${data['CM1'] || 'N/A'})`)
+        .style("left", event.pageX + 10 + "px")
+        .style("top", event.pageY + 10 + "px");
+    }
+    let mouseleave = function (event, d) {
+      tooltip.style("visibility", "hidden");
+    }
+    this.svg.on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave)
   
   }
 

@@ -196,17 +196,26 @@ class Scatter {
       tooltip.style("visibility", "visible").transition().duration(200);
     };
 
+    
     let mousemove = function (e, d) {
       tooltip
           .html(
               "Dataset: " +
               d["name"] +
               "<br>symmetry: " +
-              d["symmetry"] +
-              `<br>${query1}: ` +
-              d[query1].toExponential(4) +
-              `<br>${query2}: ` +
-              d[query2].toExponential(4)
+              d["symmetry"] + 
+              `<br>C11: ` +
+              d["C11"].toExponential(4) +
+              `<br>C12: ` +
+              d["C12"].toExponential(4) + 
+              `<br>C22: ` +
+              d["C22"].toExponential(4) + 
+              `<br>C16: ` +
+              d["C16"].toExponential(4) + 
+              `<br>C26: ` +
+              d["C26"].toExponential(4) + 
+              `<br>C66: ` +
+              d["C66"].toExponential(4)
           )
           .style("top", e.pageY + 10 + "px")
           .style("left", e.pageX + 10 + "px");

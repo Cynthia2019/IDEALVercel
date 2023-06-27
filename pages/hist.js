@@ -13,6 +13,7 @@ import s3Client from "@/pages/api/aws";
 import { colorAssignment } from "@/util/constants";
 import processData from "@/util/processData";
 import classNames from "classnames";
+import Head from "next/head";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -136,6 +137,9 @@ export default function Hist({ fetchedNames }) {
 
   return (
     <div>
+      <Head>
+				<title>Metamaterials Data Explorer</title>
+			</Head>
       <Header />
       <div className={styles.body}>
         <Row>

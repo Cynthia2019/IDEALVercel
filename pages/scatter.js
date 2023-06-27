@@ -17,6 +17,7 @@ import {colorAssignment} from "@/util/constants";
 import processData from "../util/processData";
 import {useRouter} from "next/router";
 import classNames from "classnames";
+import Head from "next/head";
 
 const merge = (first, second) => {
     for (let i = 0; i < second.length; i++) {
@@ -150,6 +151,9 @@ export default function Scatter({fetchedNames}) {
 
     return (
         <div>
+            <Head>
+				<title>Metamaterials Data Explorer</title>
+			</Head>
             <Header/>
             <div className={styles.body}>
                 <Row className={styles.firstScreen}>

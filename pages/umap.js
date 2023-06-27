@@ -19,6 +19,7 @@ import {s3BucketList, colorAssignment} from '@/util/constants'
 import processData from "../util/processData";
 import {useRouter} from 'next/router';
 import classNames from "classnames";
+import Head from "next/head";
 
 
 export default function Umap({fetchedNames}) {
@@ -137,6 +138,9 @@ export default function Umap({fetchedNames}) {
 
     return (
         <div>
+            <Head>
+				<title>Metamaterials Data Explorer</title>
+			</Head>
             <Header/>
             <div className={styles.body}>
                 <Row className={styles.firstScreen}>

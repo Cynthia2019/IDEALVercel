@@ -2,7 +2,6 @@ import { Table, Col, Row } from "antd";
 import StructureWrapper from "@/components/structureWrapper";
 
 const NeighborTable = ({ data }) => {
-  console.log(data)
   let columns = []
   if (data.length != 0 && data[0]) {
     let flatten = Object.entries(data[0]);
