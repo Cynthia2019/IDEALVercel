@@ -28,6 +28,12 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                 range={{
                                     draggableTrack: true
                                 }}
+                                // marks={
+                                //     {
+                                //         min: Math.min(...data.map((d) => d[name])),
+                                //         max: Math.max(...data.map((d) => d[name]))
+                                //     }
+                                // }
                                 defaultValue={[
                                     Math.min(...data.map((d) => d[name])),
                                     Math.max(...data.map((d) => d[name])),
