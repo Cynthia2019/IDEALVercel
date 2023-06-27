@@ -97,7 +97,6 @@ function () {
       var umap = new _umapJs.UMAP({
         nNeighbors: knn ? knn : 15
       });
-      console.log(organizedData);
       var temp_data = [];
       organizedData.map(function (d, i) {
         var _iteratorNormalCompletion = true;
@@ -150,7 +149,6 @@ function () {
         }
       });
       temp_data.length ? temp_data = scaler.fit_transform(temp_data) : null;
-      console.log('temp_data', temp_data);
       temp_data.length ? umap.fit(temp_data) : null;
       organizedData.map(function (d, i) {
         var temp_data2 = [];

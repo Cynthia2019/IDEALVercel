@@ -140,7 +140,6 @@ class Umap {
         const umap = new UMAP({
             nNeighbors: knn ? knn : 15,
         });
-        console.log(organizedData)
         let temp_data = []
         organizedData.map((d, i) => {
             for (let data of d.data) {
@@ -153,7 +152,6 @@ class Umap {
         });
 
         temp_data.length ? temp_data = scaler.fit_transform(temp_data) : null;
-        console.log('temp_data', temp_data);
         temp_data.length ? umap.fit(temp_data) : null;
 
         organizedData.map((d, i) => {
