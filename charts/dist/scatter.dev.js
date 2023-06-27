@@ -58,7 +58,7 @@ function isBrushed(brush_coords, cx, cy) {
 var Scatter =
 /*#__PURE__*/
 function () {
-  function Scatter(element, legendElement, data, view) {
+  function Scatter(element, legendElement, data) {
     _classCallCheck(this, Scatter);
 
     this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "scatter-plot-plot").attr("preserveAspectRatio", "xMidYMid meet").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
@@ -81,7 +81,6 @@ function () {
       legendElement: legendElement,
       query1: this.query1,
       query2: this.query2,
-      view: view,
       reset: false
     });
   } //query1: x-axis
@@ -103,7 +102,6 @@ function () {
           selectedData = _ref.selectedData,
           setSelectedData = _ref.setSelectedData,
           setNeighbors = _ref.setNeighbors,
-          view = _ref.view,
           reset = _ref.reset,
           setReset = _ref.setReset,
           datasets = _ref.datasets;
@@ -155,7 +153,7 @@ function () {
       this.yAxisGroup.transition().duration(500).call(yAxisCall);
       this.xLabel.text(this.query1);
       this.yLabel.text(this.query2);
-      var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
+      var tooltip = d3.select(element).append("div").attr("class", "tooltip-scatter").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
 
       var mouseover = function mouseover(e, d) {
         d3.select(this).attr("r", circleFocusSize).style("stroke", "black").style("stroke-width", 2).style("fill-opacity", 1);
@@ -208,51 +206,39 @@ function () {
           return d[c];
         });
         var target = d3.select(this);
-
-        if (view == "brush-on") {
-          target.classed("selected", true);
-        } else if (view == "brush-off") {
-          target.classed("selected", false);
-        }
-
+        target.classed("selected", !target.classed("selected"));
         var selected = [];
         d3.selectAll(".selected").each(function (d, i) {
           return selected.push(d);
         });
-        setSelectedData(selected);
-
-        if (view == 'neighbor') {
-          target.classed("selected", true);
-          getKnnData(inputData).then(function (data) {
-            var indices = data.indices;
-            var distances = data.distances; // index should be the index of the data in the current active dataset
-
-            d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
-              return indices.includes(finalData.indexOf(datum));
-            });
-            d3.selectAll(".dataCircle").classed("masked", function (datum) {
-              return !this.getAttribute('class').includes("highlighted");
-            });
-            var neighborElements = d3.selectAll('.highlighted');
-            var masked = d3.selectAll('.masked');
-            masked.attr('fill', function (d) {
-              return d.color;
-            }).attr('r', circleOriginalSize).classed('selected', false);
-            var neighbors = [];
-            neighborElements.each(function (d, i) {
-              d['outline_color'] = _constants.nnColorAssignment[i];
-              d['distance'] = distances[indices.indexOf(finalData.indexOf(d))];
-              neighbors.push(d);
-            });
-            neighbors.sort(function (a, b) {
-              return a.distance - b.distance;
-            });
-            neighborElements.attr('fill', function (d) {
-              return d.outline_color;
-            }).attr('r', circleFocusSize);
-            setNeighbors(neighbors);
-          });
-        }
+        setSelectedData(selected); //get knn data
+        // target.classed("selected", true);
+        // getKnnData(inputData).then((data) => {
+        //   let indices = data.indices
+        //   let distances = data.distances
+        //   // index should be the index of the data in the current active dataset
+        //   d3.selectAll(".dataCircle")
+        //     .data(finalData)
+        //     .classed("highlighted", function (datum) {
+        //       return indices.includes(finalData.indexOf(datum));
+        //     })
+        //   d3.selectAll(".dataCircle")
+        //     .classed("masked", function (datum) {
+        //       return !this.getAttribute('class').includes("highlighted");
+        //     })
+        //     let neighborElements = d3.selectAll('.highlighted')
+        //     let masked = d3.selectAll('.masked')
+        //     masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
+        //     let neighbors = [];
+        //     neighborElements.each((d, i) => {
+        //       d['outline_color'] = nnColorAssignment[i]
+        //       d['distance'] = distances[indices.indexOf(finalData.indexOf(d))]
+        //       neighbors.push(d)
+        //     });
+        //     neighbors.sort((a, b) => a.distance - b.distance)
+        //     neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
+        //     setNeighbors(neighbors);
+        // });
       };
 
       var zoomedXScale = this.xScale;
@@ -289,22 +275,25 @@ function () {
         var yScale = this.yScale;
 
         if (event.selection) {
-          if (view == "brush-on") {
-            d3.selectAll(".dataCircle").data(finalData).classed("selected", function (d) {
-              return d3.select(this).classed("selected") || isBrushed(event.selection, xScale(d[query1]), yScale(d[query2]));
-            });
-          } else if (view == "brush-off") {
-            d3.selectAll(".selected").classed("selected", function (d) {
-              return isBrushed(event.selection, xScale(d[query1]), yScale(d[query2])) ? false : true;
-            });
-          }
-
-          var selected = [];
-          d3.selectAll(".selected").each(function (d, i) {
-            return selected.push(d);
+          d3.selectAll(".dataCircle").data(finalData).classed("selected", function (d) {
+            return d3.select(this).classed("selected") || isBrushed(event.selection, xScale(d[query1]), yScale(d[query2]));
           });
-          setSelectedData(selected);
-        }
+        } //   else if (view == "brush-off") {
+        //     d3.selectAll(".selected").classed("selected", function (d) {
+        //       return isBrushed(
+        //           event.selection,
+        //           xScale(d[query1]),
+        //           yScale(d[query2])
+        //       )
+        //           ? false
+        //           : true;
+        //     });
+        //   }
+        //   let selected = [];
+        //   d3.selectAll(".selected").each((d, i) => selected.push(d));
+        //   setSelectedData(selected);
+        // }
+
       }.bind(this));
       var legend = this.legend.selectAll(".legend").data(data);
       legend.exit().remove();
@@ -319,16 +308,21 @@ function () {
       }).text(function (d) {
         return d.name;
       }).attr("text-anchor", "left").style("alignment-baseline", "middle");
-      legend.exit().remove();
+      legend.exit().remove(); // this.svg.call(brush);
 
-      if (view === "brush-on" || view === "brush-off") {
-        zoom.on("zoom", null);
-        d3.selectAll(".rectZoom").remove();
-        this.svg.call(brush);
-      } else if (view === "zoom") {
-        brush.on("start brush end", null);
-        this.svg.append("rect").attr("class", "rectZoom").attr("width", WIDTH).attr("height", HEIGHT).call(zoom);
-      }
+      this.svg.append("rect").attr("class", "rectZoom").attr("width", WIDTH).attr("height", HEIGHT).call(zoom).call(brush); // if (view === "brush-on" || view === "brush-off") {
+      //   zoom.on("zoom", null);
+      //   d3.selectAll(".rectZoom").remove();
+      //   this.svg.call(brush);
+      // } else if (view === "zoom") {
+      //   brush.on("start brush end", null);
+      //   this.svg
+      //       .append("rect")
+      //       .attr("class", "rectZoom")
+      //       .attr("width", WIDTH)
+      //       .attr("height", HEIGHT)
+      //       .call(zoom);
+      // }
 
       var circles = this.svg.append("g").attr("clip-path", "url(#clip)").attr("class", "clipPath").selectAll(".dataCircle").data(finalData);
       circles.exit().transition().attr("r", 0).remove();

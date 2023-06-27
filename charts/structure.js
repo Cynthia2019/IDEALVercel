@@ -84,7 +84,7 @@ class Structure {
     const tooltip = d3
     .select(element)
     .append("div")
-    .attr("class", "tooltip")
+    .attr("class", "tooltip-structure")
     .style("background-color", "white")
     .style("border", "solid")
     .style("border-width", "1px")

@@ -1,9 +1,5 @@
 import sigFigs from './convertTo4SigFig';
 
-function expo(x, f) {
-    return Number.parseFloat(x).toExponential(f);
-}
-
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 const processData = (d, i) => {

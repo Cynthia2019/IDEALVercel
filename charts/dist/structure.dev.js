@@ -77,7 +77,7 @@ function () {
         return d.fill;
       });
       pixels.exit().remove();
-      var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
+      var tooltip = d3.select(element).append("div").attr("class", "tooltip-structure").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
 
       var mouseover = function mouseover(event, d) {
         tooltip.style("visibility", "visible");

@@ -22,11 +22,7 @@ const ScatterWrapper = ({
 	const chartArea = useRef(null);
 	const legendArea = useRef(null);
 	const [chart, setChart] = useState(null);
-	const [view, setView] = useState("brush-on");
 
-	const handleChange = (e, nextView) => {
-		setView(nextView);
-	};
 	useEffect(() => {
 		if (!chart) {
 			setChart(
@@ -37,7 +33,6 @@ const ScatterWrapper = ({
 					setDataPoint,
 					selectedData,
 					setSelectedData,
-					view
 				)
 			);
 		} else {
@@ -51,13 +46,12 @@ const ScatterWrapper = ({
 				selectedData,
 				setSelectedData,
 				setNeighbors,
-				view,
 				reset,
 				setReset,
 				datasets
 			});
 		}
-	}, [chart, query1, query2, data, view, reset]);
+	}, [chart, query1, query2, data, reset]);
 
 	return (
 		<div style={{ display: "flex", flexDirection: "row" }}>
@@ -73,11 +67,10 @@ const ScatterWrapper = ({
 			>
 				<ToggleButtonGroup
 					orientation="vertical"
-					value={view}
+					value={'neighbor'}
 					exclusive
-					onChange={handleChange}
 				>
-					<ToggleButton value="zoom" aria-label="zoom">
+					{/* <ToggleButton value="zoom" aria-label="zoom">
 						<ZoomInMapIcon style={{ fontSize: "15px" }} />
 						<span style={{ fontSize: "10px" }}>Zoom</span>
 					</ToggleButton>
@@ -92,7 +85,7 @@ const ScatterWrapper = ({
 							style={{ fontSize: "15px", color: "red" }}
 						/>
 						<span style={{ fontSize: "10px" }}>Deselect Data</span>
-					</ToggleButton>
+					</ToggleButton> */}
 					<ToggleButton
 						value="neighbor"
 						aria-label="find nearest neighbors"
