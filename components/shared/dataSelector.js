@@ -13,10 +13,8 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Button, Upload } from "antd";
 import s3Client from "@/pages/api/aws";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import processData from "@/util/processData";
 import Papa, { parse } from "papaparse";
 import { colorAssignment, requiredColumns } from "@/util/constants";
-import { getAllData } from "@/pages/scatter";
 import {
 	DragDropContext,
 	Droppable,
@@ -36,7 +34,6 @@ import Typography from "@mui/material/Typography";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
-import { csvParse } from "d3";
 import { data_template } from "@/data/constants";
 import FileSaver from "file-saver";
 

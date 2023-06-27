@@ -1,6 +1,6 @@
-import {Slider, Row, Col} from "antd";
+import { Slider, Row, Col } from "antd";
 import styles from "@/styles/rangeSelector.module.css";
-import {useState, useEffect} from "react";
+import sigFigs from "@/util/convertTo4SigFig";
 
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -12,15 +12,15 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
             handleChange(name, value);
         };
 
-        let mins = data.map((d) => Math.min(...rangeList.map((name) => d[name])));
-        let maxs = data.map((d) => Math.max(...rangeList.map((name) => d[name])));
-
         return (
             <div className={styles["property-range"]}>
                 <p className={styles["range-title"]}>Property Range</p>
-                {rangeList.map((name, index) => (
+                {rangeList.map((name, index) => {
+                    return (
+                        <>
                     <Row key={index} justify="center" align='top'
                          className={`${open ? '' : styles["slider-closed"]}`}
+                         style={{marginBottom: "0.5rem"}}
                     >
                         <Col span={4}>{name}</Col>
                         <Col span={20}>
@@ -28,12 +28,6 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                 range={{
                                     draggableTrack: true
                                 }}
-                                // marks={
-                                //     {
-                                //         min: Math.min(...data.map((d) => d[name])),
-                                //         max: Math.max(...data.map((d) => d[name]))
-                                //     }
-                                // }
                                 defaultValue={[
                                     Math.min(...data.map((d) => d[name])),
                                     Math.max(...data.map((d) => d[name])),
@@ -47,10 +41,17 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                 onChange={(value, filteredDatasets) =>
                                     handleSliderChange(name, value)
                                 }
+                                style={{margin: "0"}}
                             />
+                            <Row justify={'space-between'}>
+                                <Col style={{color:'gray'}}>{sigFigs(Math.min(...data.map((d) => d[name])), 4)}</Col>
+                                <Col style={{color:'gray'}}>{Math.max(...data.map((d) => d[name]))}</Col>
+                            </Row>
                         </Col>
                     </Row>
-                ))}
+                    </>
+                )}
+                )}
             </div>
         );
     }
