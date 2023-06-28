@@ -151,7 +151,7 @@ export default function Umap({ fetchedNames }) {
 						<div className={styles.mainPlotHeader}>
 							<p className={styles.mainPlotTitle}>
 								{" "}
-								UMAP Dimension Reduction
+								UMAP (Uniform Manifold Approximation and Projection) Visualization
 							</p>
 						</div>
 						<UmapWrapper
