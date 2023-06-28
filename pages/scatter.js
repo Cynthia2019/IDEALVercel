@@ -180,6 +180,7 @@ export default function Scatter({fetchedNames}) {
                             reset={reset}
                             setReset={setReset}
                             datasets={datasets}
+                            neighbors={neighbors}
                         />
                     </div>
                     <div className={styles.subPlots}>
@@ -191,9 +192,6 @@ export default function Scatter({fetchedNames}) {
                         className={`${
                             open ? styles.selectors : styles.selectorsClosed
                         }`}
-                        // onMouseEnter={onMouseOver}
-                        // onMouseLeave={onMouseOver}
-                        // style={{ transition: "width 300ms cubic-bezier(0.2, 0, 0, 1) 0s" }}
                     >
                         <img
                             src="/control.png"
@@ -231,15 +229,15 @@ export default function Scatter({fetchedNames}) {
                         />
                     </div>
                 </Row>
-                <Row style={{width: '60%'}}>
+                {/* <Row style={{width: '60%'}}>
                     <NeighborPanel neighbors={neighbors}/>
-                </Row>
-                <Row style={{width: '60%'}}>
+                </Row> */}
+                {/* <Row style={{width: '60%'}}>
                     <SavePanel
                         selectedData={selectedData}
                         setReset={setReset}
                     />
-                </Row>
+                </Row> */}
             </div>
         </div>
     );

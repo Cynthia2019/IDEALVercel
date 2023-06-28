@@ -256,35 +256,35 @@ class Scatter {
 
 
       //get knn data
-        // target.classed("selected", true);
-        // getKnnData(inputData).then((data) => {
-        //   let indices = data.indices
-        //   let distances = data.distances
-        //   // index should be the index of the data in the current active dataset
-        //   d3.selectAll(".dataCircle")
-        //     .data(finalData)
-        //     .classed("highlighted", function (datum) {
-        //       return indices.includes(finalData.indexOf(datum));
-        //     })
-        //   d3.selectAll(".dataCircle")
-        //     .classed("masked", function (datum) {
-        //       return !this.getAttribute('class').includes("highlighted");
-        //     })
+      target.classed("selected", true);
+      getKnnData(inputData).then((data) => {
+        let indices = data.indices
+        let distances = data.distances
+        // index should be the index of the data in the current active dataset
+        d3.selectAll(".dataCircle")
+          .data(finalData)
+          .classed("highlighted", function (datum) {
+            return indices.includes(finalData.indexOf(datum));
+          })
+        d3.selectAll(".dataCircle")
+          .classed("masked", function (datum) {
+            return !this.getAttribute('class').includes("highlighted");
+          })
 
-        //     let neighborElements = d3.selectAll('.highlighted')
-        //     let masked = d3.selectAll('.masked')
-        //     masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
-      
-        //     let neighbors = [];
-        //     neighborElements.each((d, i) => {
-        //       d['outline_color'] = nnColorAssignment[i]
-        //       d['distance'] = distances[indices.indexOf(finalData.indexOf(d))]
-        //       neighbors.push(d)
-        //     });
-        //     neighbors.sort((a, b) => a.distance - b.distance)
-        //     neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
-        //     setNeighbors(neighbors);
-        // });
+          let neighborElements = d3.selectAll('.highlighted')
+          let masked = d3.selectAll('.masked')
+          masked.attr('fill', d => d.color).attr('r', circleOriginalSize).classed('selected', false)
+    
+          let neighbors = [];
+          neighborElements.each((d, i) => {
+            d['outline_color'] = nnColorAssignment[i]
+            d['distance'] = distances[indices.indexOf(finalData.indexOf(d))]
+            neighbors.push(d)
+          });
+          neighbors.sort((a, b) => a.distance - b.distance)
+          neighborElements.attr('fill', d => d.outline_color).attr('r', circleFocusSize)
+          setNeighbors(neighbors);
+      });
   
     };
 
@@ -335,7 +335,7 @@ class Scatter {
                   let _yScale = this.yScaleForBrush;
                   d3.selectAll(".dataCircle")
                       .data(finalData)
-                      .classed("selected", function (d) {
+                      .classed("selected", function(d) {
                         return (
                             d3.select(this).classed("selected") ||
                             isBrushed(
@@ -346,6 +346,9 @@ class Scatter {
                         );
                       });
                 } 
+              let selected = [];
+              d3.selectAll(".selected").each((d, i) => selected.push(d));
+              setSelectedData(selected);
             }
         );
     //apply zoom and brush to svg

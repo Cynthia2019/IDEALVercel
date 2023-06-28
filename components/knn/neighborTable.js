@@ -38,7 +38,6 @@ const NeighborTable = ({ data }) => {
       },
     })
     );
-    console.log(columns)
   }
   return (
     <Table
@@ -49,7 +48,7 @@ const NeighborTable = ({ data }) => {
         pageSize: 50,
       }}
       scroll={{
-        y: 240,
+        x: 400
       }}
     />
   );
