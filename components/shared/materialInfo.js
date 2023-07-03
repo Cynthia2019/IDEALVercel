@@ -1,4 +1,5 @@
 import styles from "@/styles/home.pairwise.module.css";
+import { useEffect } from "react";
 
 
 const MaterialInformation = ({dataPoint, open}) => {
@@ -13,8 +14,8 @@ const MaterialInformation = ({dataPoint, open}) => {
                     <h3 style={{margin: '0 10px'}}>Constituent Material 0 Properties</h3>
                 </div>
                 {/*<div className={styles['mat-content-line']}>Type: {dataPoint?.CM0}</div>*/}
-                <div className={styles['mat-content-line']}>Young&apos;s Modulus: {dataPoint.CM0_E? dataPoint.CM0_E : "N/A"}</div>
-                <div className={styles['mat-content-line']}>Poisson&apos;s Ratio: {dataPoint.CM0_nu? dataPoint.CM0_nu : "N/A"}</div>
+                <div className={styles['mat-content-line']}>Young&apos;s Modulus: {dataPoint?.CM0_E? dataPoint.CM0_E : "N/A"}</div>
+                <div className={styles['mat-content-line']}>Poisson&apos;s Ratio: {dataPoint?.CM0_nu? dataPoint.CM0_nu : "N/A"}</div>
                 <div className={styles['materialInformation-black']}>
                     <div className={styles['mat-subtitle-line']}>
                         <div style={{
@@ -25,9 +26,8 @@ const MaterialInformation = ({dataPoint, open}) => {
                         }}></div>
                         <h3 style={{margin: '0 10px'}}>Constituent Material 1 Properties</h3>
                     </div>
-                    {/*<div className={styles['mat-content-line']}>Type: {dataPoint?.CM1}</div>*/}
-                    <div className={styles['mat-content-line']}>Young&apos;s Modulus: {dataPoint.CM1_E? dataPoint.CM1_E : "N/A"}</div>
-                    <div className={styles['mat-content-line']}>Poisson&apos;s Ratio: {dataPoint.CM1_nu? dataPoint.CM1_nu : "N/A"}</div>
+                    <div className={styles['mat-content-line']}>Young&apos;s Modulus: {dataPoint?.CM1_E? dataPoint.CM1_E : "N/A"}</div>
+                    <div className={styles['mat-content-line']}>Poisson&apos;s Ratio: {dataPoint?.CM1_nu? dataPoint.CM1_nu : "N/A"}</div>
                 </div>
             </div>
         </div>

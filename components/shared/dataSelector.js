@@ -138,7 +138,6 @@ const DataSelector = ({
 	const [showData, setShowData] = useState([]);
 
 	useEffect(() => {
-    console.log(page)
 		setShowData(
 			availableDatasetNames.map((item) => {
         return activeData.map((data) => data.name).includes(item.name);
@@ -299,7 +298,6 @@ const DataSelector = ({
 				},
 			});
 			await s3Client.send(command).then((res) => {
-				console.log("fetching data selector");
 				if (res.$metadata.httpStatusCode == 200) {
 					onSuccess(res, file);
 					//if success, process the file data, then add the dataset to the dataset state.
@@ -318,6 +316,7 @@ const DataSelector = ({
 							setAvailableDatasetNames((prevState) => [
 								...prevState,
 								{
+									bucket_name: "ideal-dataset-1",
 									name: file.name,
 									color: colorAssignment[prevState.length],
 								},
@@ -336,7 +335,6 @@ const DataSelector = ({
 					});
 				} else {
 					onError();
-					console.log("failed");
 				}
 			});
 		},

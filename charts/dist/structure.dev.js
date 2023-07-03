@@ -54,6 +54,7 @@ function () {
       var data = _ref.data,
           element = _ref.element,
           hover = _ref.hover;
+      console.log("structure", data);
       this.data = data.geometry;
       this.color = data.outline_color;
       var height = data.height ? data.height : HEIGHT;

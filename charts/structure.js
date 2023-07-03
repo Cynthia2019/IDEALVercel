@@ -48,6 +48,7 @@ class Structure {
     });
   }
   update({data, element, hover}) {
+    console.log("structure", data)
     this.data = data.geometry
     this.color = data.outline_color
     let height = data.height ? data.height : HEIGHT

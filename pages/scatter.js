@@ -16,7 +16,6 @@ import s3Client from "./api/aws";
 import {colorAssignment} from "@/util/constants";
 import processData from "../util/processData";
 import {useRouter} from "next/router";
-import classNames from "classnames";
 import Head from "next/head";
 
 const merge = (first, second) => {
