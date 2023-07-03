@@ -17,17 +17,16 @@ import Button from "@mui/material/Button";
 import * as React from "react";
 import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from "next/head";
+import { fetchNames } from "@/components/fetchNames";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Pairwise({ fetchedNames }) {
+export default function Pairwise() {
 	// record all fetched data from the data library
 	// all data stored in one array
 	const [datasets, setDatasets] = useState([]);
 	// record all available data names in the data library
-	const [availableDatasetNames, setAvailableDatasetNames] = useState(
-		fetchedNames || []
-	);
+	const [availableDatasetNames, setAvailableDatasetNames] = useState([]);
 	// record all currently selected data
 	const [activeData, setActiveData] = useState([]);
 	// record all non active data
@@ -85,7 +84,7 @@ export default function Pairwise({ fetchedNames }) {
 							return processData(dataset, i);
 						});
 						processedData.map(
-							(p) => (p.name = availableDatasetNames[index].name)
+							(p) => (p.name = info.name)
 						);
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -97,9 +96,14 @@ export default function Pairwise({ fetchedNames }) {
 			});
 		});
 	}
+	const fetchData = async () => {
+		const fetchedNames = await fetchNames();
+		setAvailableDatasetNames(fetchedNames.fetchedNames);
+		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+	}
 
 	useEffect(() => {
-		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+		fetchData()
 	}, [availableDatasetNames.length]);
 
 	useEffect(() => {

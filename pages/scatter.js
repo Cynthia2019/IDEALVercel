@@ -17,6 +17,7 @@ import {colorAssignment} from "@/util/constants";
 import processData from "../util/processData";
 import {useRouter} from "next/router";
 import Head from "next/head";
+import {fetchNames} from "@/components/fetchNames";
 
 const merge = (first, second) => {
     for (let i = 0; i < second.length; i++) {
@@ -109,7 +110,7 @@ export default function Scatter({fetchedNames}) {
 							return processData(dataset, i);
 						});
 						processedData.map(
-							(p) => (p.name = availableDatasetNames[index].name)
+							(p) => (p.name = info.name)
 						);
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -122,9 +123,16 @@ export default function Scatter({fetchedNames}) {
 		});
 	}
 
+	const fetchData = async () => {
+		const fetchedNames = await fetchNames();
+		setAvailableDatasetNames(fetchedNames.fetchedNames);
+		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+	}
+
 	useEffect(() => {
-		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+		fetchData()
 	}, [availableDatasetNames.length]);
+
 
 	useEffect(() => {
 		const url = 'https://metamaterials-srv.northwestern.edu/model/';

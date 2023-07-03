@@ -14,6 +14,7 @@ import { colorAssignment } from "@/util/constants";
 import processData from "@/util/processData";
 import classNames from "classnames";
 import Head from "next/head";
+import { fetchNames } from "@/components/fetchNames";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -89,7 +90,7 @@ export default function Hist({ fetchedNames }) {
 							return processData(dataset, i);
 						});
 						processedData.map(
-							(p) => (p.name = availableDatasetNames[index].name)
+							(p) => (p.name = info.name)
 						);
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -102,9 +103,16 @@ export default function Hist({ fetchedNames }) {
 		});
 	}
 
+	const fetchData = async () => {
+		const fetchedNames = await fetchNames();
+		setAvailableDatasetNames(fetchedNames.fetchedNames);
+		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+	}
+
 	useEffect(() => {
-		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+		fetchData()
 	}, [availableDatasetNames.length]);
+
 
 	useEffect(() => {
 		const url = 'https://metamaterials-srv.northwestern.edu/model/';
@@ -126,13 +134,6 @@ export default function Hist({ fetchedNames }) {
 		}).catch((err) => console.log("pairwise refit knn error", err));
 	}, [activeData]);
 
-  const wrapperClasses = classNames(
-    "h-screen ml-3 px-4 pt-8 bg-light flex justify-between flex-col",
-    {
-      ["w-100"]: !toggleCollapse,
-      ["w-20"]: toggleCollapse,
-    }
-  );
   const [open, setOpen] = useState(true);
 
   return (

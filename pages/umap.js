@@ -20,6 +20,7 @@ import processData from "../util/processData";
 import { useRouter } from "next/router";
 import classNames from "classnames";
 import Head from "next/head";
+import { fetchNames } from "@/components/fetchNames";
 
 export default function Umap({ fetchedNames }) {
 	const [datasets, setDatasets] = useState([]);
@@ -64,10 +65,7 @@ export default function Umap({ fetchedNames }) {
 	};
 
 	const handleRangeChange = (name, value) => {
-		// console.log('knn')
-		// console.log(value)
 		setKNN(value);
-		// console.log(knn)
 	};
 
 	async function fetchDataFromAWS(info, index) {
@@ -93,7 +91,7 @@ export default function Umap({ fetchedNames }) {
 							return processData(dataset, i);
 						});
 						processedData.map(
-							(p) => (p.name = availableDatasetNames[index].name)
+							(p) => (p.name = info.name)
 						);
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -106,9 +104,16 @@ export default function Umap({ fetchedNames }) {
 		});
 	}
 
+	const fetchData = async () => {
+		const fetchedNames = await fetchNames();
+		setAvailableDatasetNames(fetchedNames.fetchedNames);
+		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+	}
+
 	useEffect(() => {
-		availableDatasetNames.map((info, i) => fetchDataFromAWS(info, i));
+		fetchData()
 	}, [availableDatasetNames.length]);
+
 
 	useEffect(() => {
 		const url = "https://metamaterials-srv.northwestern.edu/model/";
