@@ -13,8 +13,8 @@ export class StandardScaler {
             const std = Math.sqrt(
                 featureData.reduce((acc, val) => acc + (val - mean) ** 2, 0) / featureData.length
             );
-            console.log(`feature: ${i}`);
-            console.log(`mean: ${mean}, std: ${std}`);
+            // console.log(`feature: ${i}`);
+            // console.log(`mean: ${mean}, std: ${std}`);
             this.means[i] = mean;
             this.stds[i] = std;
         }

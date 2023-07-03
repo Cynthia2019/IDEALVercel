@@ -22,10 +22,10 @@ import classNames from "classnames";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
 
-export default function Umap({ fetchedNames }) {
+export default function Umap() {
 	const [datasets, setDatasets] = useState([]);
 	const [availableDatasetNames, setAvailableDatasetNames] =
-		useState(fetchedNames);
+		useState([]);
 	const [activeData, setActiveData] = useState(datasets);
 	const [dataLibrary, setDataLibrary] = useState([]);
 	const [filteredDatasets, setFilteredDatasets] = useState([]);

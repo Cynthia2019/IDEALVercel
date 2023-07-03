@@ -15,6 +15,8 @@ var _organizeByName = _interopRequireDefault(require("@/util/organizeByName"));
 
 var _standardScaler = require("@/components/shared/standardScaler");
 
+var _constants = require("@/util/constants");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
@@ -28,22 +30,15 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var circleOriginalSize = 5;
-var circleFocusSize = 7;
-var legendSpacing = 4;
+var circleFocusSize = 8;
 var MARGIN = {
   TOP: 0,
   RIGHT: 50,
   BOTTOM: 20,
   LEFT: 50
 };
-var SIDE_BAR_SIZE = 100;
 var WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
 var HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM;
-
-function expo(x, f) {
-  if (x < 1000 && x > -1000) return x.toFixed();
-  return Number(x).toExponential(f);
-}
 
 function isBrushed(brush_coords, cx, cy) {
   var x0 = brush_coords[0][0],
@@ -56,12 +51,20 @@ function isBrushed(brush_coords, cx, cy) {
 var Umap =
 /*#__PURE__*/
 function () {
-  function Umap(element, legendElement, data, setDataPoint, selectedData, setSelectedData, view, knn) {
+  function Umap(_ref) {
+    var element = _ref.element,
+        legendElement = _ref.legendElement,
+        data = _ref.data,
+        setDataPoint = _ref.setDataPoint,
+        selectedData = _ref.selectedData,
+        setSelectedData = _ref.setSelectedData,
+        knn = _ref.knn;
+
     _classCallCheck(this, Umap);
 
-    this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "scatter-plot-plot").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
+    this.svg = d3.select(element).append("svg").attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT).attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM).attr("viewBox", [-MARGIN.LEFT, -MARGIN.TOP, WIDTH + MARGIN.LEFT + MARGIN.RIGHT, HEIGHT + MARGIN.TOP + MARGIN.BOTTOM]).attr("style", "max-width: 100%").append("g").attr("class", "umap-plot-plot").attr("transform", "translate(".concat(MARGIN.LEFT, ", ").concat(MARGIN.TOP, ")")); //Legend
 
-    this.legend = d3.select(legendElement).append("svg").attr("width", 120).append("g").attr("class", "scatter-plot-legend"); // Labels
+    this.legend = d3.select(legendElement).append("svg").attr("width", 120).append("g").attr("class", "umap-plot-legend"); // Labels
 
     this.xLabel = this.svg.append("text").attr("x", WIDTH / 2).attr("y", HEIGHT + 50).attr("text-anchor", "middle").style("fill", "black");
     this.yLabel = this.svg.append("text").attr("x", -HEIGHT / 2).attr("y", -60).attr("text-anchor", "middle").attr("transform", "rotate(-90)").style("fill", "black"); // Append group el to display both axes
@@ -69,27 +72,41 @@ function () {
     this.xAxisGroup = this.svg.append("g").attr("transform", "translate(0, ".concat(HEIGHT, ")")); // Append group el to display both axes
 
     this.yAxisGroup = this.svg.append("g");
-    this.xScale;
-    this.yScale;
-    this.zoomedXScale;
-    this.zoomedYScale;
-    this.update(data, element, legendElement, setDataPoint, this.query1, this.query2, selectedData, setSelectedData, view, false, knn);
+    this.update({
+      data: data,
+      element: element,
+      legendElement: legendElement,
+      setDataPoint: setDataPoint,
+      selectedData: selectedData,
+      setSelectedData: setSelectedData,
+      reset: false,
+      knn: knn
+    });
   } //query1: x-axis
   //query2: y-axis
 
 
   _createClass(Umap, [{
     key: "update",
-    value: function update(data, element, legendElement, setDataPoint, query1, query2, selectedData, setSelectedData, view, reset, setReset, knn) {
-      var _ref,
-          _this = this;
+    value: function update(_ref2) {
+      var _ref3;
 
+      var data = _ref2.data,
+          element = _ref2.element,
+          legendElement = _ref2.legendElement,
+          setDataPoint = _ref2.setDataPoint,
+          selectedData = _ref2.selectedData,
+          setSelectedData = _ref2.setSelectedData,
+          setNeighbors = _ref2.setNeighbors,
+          reset = _ref2.reset,
+          setReset = _ref2.setReset,
+          knn = _ref2.knn,
+          clickedNeighbor = _ref2.clickedNeighbor,
+          setOpenNeighbor = _ref2.setOpenNeighbor;
       this.data = data;
-      this.query1 = "X";
-      this.query2 = "Y";
-      query1 = "X";
-      query2 = "Y";
-      var properties = ['C11', 'C12', 'C22', 'C16', 'C26', 'C66'];
+      var query1 = "X";
+      var query2 = "Y";
+      var properties = ["C11", "C12", "C22", "C16", "C26", "C66"];
       var datasets = [];
       var scaler = new _standardScaler.StandardScaler(); // const embedding = umap.fit(data);
 
@@ -208,13 +225,13 @@ function () {
 
         var res = temp_data2.length ? umap.transform(temp_data2) : null;
         res ? res.map(function (p, i) {
-          d.data[i]['X'] = p[0];
-          d.data[i]['Y'] = p[1];
+          d.data[i]["X"] = p[0];
+          d.data[i]["Y"] = p[1];
         }) : null;
         datasets.push(d.data);
       });
 
-      var finalData = (_ref = []).concat.apply(_ref, datasets); // Split by single data set
+      var finalData = (_ref3 = []).concat.apply(_ref3, datasets); // Split by single data set
       // organizedData.map((d, i) => {
       //     const umap = new UMAP({
       //         nNeighbors: knn,
@@ -249,7 +266,6 @@ function () {
       d3.select(".tooltip").remove();
       d3.selectAll(".dataCircle").remove();
       d3.selectAll("defs").remove();
-      d3.selectAll(".rectZoom").remove();
       d3.selectAll(".clipPath").remove();
       var yScale = d3.scaleLinear().domain([d3.min(finalData, function (d) {
         return d[query2];
@@ -261,100 +277,119 @@ function () {
       }), d3.max(finalData, function (d) {
         return d[query1];
       })]).range([0, WIDTH]);
-
-      if (reset || this.zoomedXScale === undefined) {
-        this.xScale = xScale;
-      } else {
-        this.xScale = this.zoomedXScale;
-      }
-
-      if (reset || this.zoomedYScale === undefined) {
-        this.yScale = yScale;
-      } else {
-        this.yScale = this.zoomedYScale;
-      }
-
+      var chartExtent = [[0, 0], [WIDTH, HEIGHT]];
       var zoom = d3.zoom().scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
-      .extent([[0, 0], [WIDTH, HEIGHT]]).on("zoom", function (event) {
+      .translateExtent(chartExtent).extent(chartExtent).on("zoom", function (event) {
         // recover the new scale
-        var newXScale = event.transform.rescaleX(this.xScale);
-        var newYScale = event.transform.rescaleY(this.yScale); //
-        // // update axes with these new boundaries
-        // let xAxisCall = d3
-        //     .axisBottom(newXScale)
-        //     .tickFormat((x) => `${expo(x, 2)}`);
-        // let yAxisCall = d3
-        //     .axisLeft(newYScale)
-        //     .tickFormat((y) => `${expo(y, 2)}`);
-        // this.xAxisGroup.transition().duration(500).call(xAxisCall);
-        // this.yAxisGroup.transition().duration(500).call(yAxisCall);
-
+        var newXScale = event.transform.rescaleX(xScale);
+        var newYScale = event.transform.rescaleY(yScale);
         d3.selectAll(".dataCircle").data(finalData).attr("cy", function (d) {
           return newYScale(d[query2]);
         }).attr("cx", function (d) {
           return newXScale(d[query1]);
-        }); // zoomedXScale = newXScale;
-        // zoomedYScale = newYScale;
-        // this.zoomedXScale = newXScale;
-        // this.zoomedYScale = newYScale;
-      }.bind(this)); // Add a clipPath: everything out of this area won't be drawn.
+        });
+      });
+      this.svg.call(zoom); // Add a clipPath: everything out of this area won't be drawn.
 
       this.svg.append("defs").append("SVG:clipPath").attr("id", "clip").append("SVG:rect").attr("width", WIDTH).attr("height", HEIGHT).attr("x", 0).attr("y", 0);
-      var xAxisCall = d3.axisBottom(this.xScale).tickFormat("");
+      var xAxisCall = d3.axisBottom(xScale).tickFormat("");
       this.xAxisGroup.transition().duration(500).call(xAxisCall);
-      var yAxisCall = d3.axisLeft(this.yScale).tickFormat("");
-      this.yAxisGroup.transition().duration(500).call(yAxisCall); // this.xLabel.text(this.query1);
-      // this.yLabel.text(this.query2);
+      var yAxisCall = d3.axisLeft(yScale).tickFormat("");
+      this.yAxisGroup.transition().duration(500).call(yAxisCall);
+      var tooltip = d3.select(element).append("div").attr("class", "tooltip-umap").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
 
-      var tooltip = d3.select(element).append("div").attr("class", "tooltip").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden"); // let mouseover = function (e, d) {
-      //     d3.select(this)
-      //         .attr("r", circleFocusSize)
-      //         .style("stroke", "black")
-      //         .style("stroke-width", 2)
-      //         .style("fill-opacity", 1);
-      //     setDataPoint(d);
-      //     tooltip.style("visibility", "visible").transition().duration(200);
-      // };
-      //
-      // let mousemove = function (e, d) {
-      //     tooltip
-      //         .html(
-      //             `${query1}: ` +
-      //             d[query1] +
-      //             `<br>${query2}: ` +
-      //             d[query2]
-      //         )
-      //         .style("top", e.pageY + 10 + "px")
-      //         .style("left", e.pageX + 10 + "px");
-      // };
+      var mouseover = function mouseover(e, d) {
+        d3.select(this).attr("r", circleFocusSize).style("stroke", "black").style("stroke-width", 2).style("fill-opacity", 1);
+        setDataPoint(d);
+        tooltip.style("visibility", "visible").transition().duration(200);
+      };
+
+      var mousemove = function mousemove(e, d) {
+        tooltip.html("".concat(query1, ": ") + d[query1] + "<br>".concat(query2, ": ") + d[query2]).style("top", e.pageY + 10 + "px").style("left", e.pageX + 10 + "px");
+      };
 
       var mouseleave = function mouseleave(e, d) {
         tooltip.style("visibility", "hidden").transition().duration(200);
         d3.select(this).attr("r", circleOriginalSize).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8);
       };
 
+      function getKnnData(data) {
+        var url, response;
+        return regeneratorRuntime.async(function getKnnData$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                url = "https://metamaterials-srv.northwestern.edu/model?data=";
+                _context.next = 3;
+                return regeneratorRuntime.awrap(fetch("".concat(url, "[").concat(data, "]"), {
+                  method: "GET",
+                  mode: "cors"
+                }).then(function (res) {
+                  return res.json();
+                })["catch"](function (err) {
+                  return console.log("fetch error", err.message);
+                }));
+
+              case 3:
+                response = _context.sent;
+                return _context.abrupt("return", response);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        });
+      }
+
       var mousedown = function mousedown(e, d) {
+        var columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
+        var inputData = columns.map(function (c) {
+          return d[c];
+        });
         var target = d3.select(this);
-
-        if (view == "brush-on") {
-          target.classed("selected", true);
-        } else if (view == "brush-off") {
-          target.classed("selected", false);
-        }
-
+        target.classed("selected", !target.classed("selected"));
         var selected = [];
         d3.selectAll(".selected").each(function (d, i) {
           return selected.push(d);
         });
         setSelectedData(selected);
+
+        if (clickedNeighbor) {
+          //get knn data
+          target.classed("selected", true);
+          getKnnData(inputData).then(function (data) {
+            var indices = data.indices;
+            var distances = data.distances; // index should be the index of the data in the current active dataset
+
+            d3.selectAll(".dataCircle").data(finalData).classed("highlighted", function (datum) {
+              return indices.includes(finalData.indexOf(datum));
+            });
+            d3.selectAll(".dataCircle").classed("masked", function (datum) {
+              return !this.getAttribute("class").includes("highlighted");
+            });
+            var neighborElements = d3.selectAll(".highlighted");
+            var masked = d3.selectAll(".masked");
+            masked.attr("fill", function (d) {
+              return d.color;
+            }).attr("r", circleOriginalSize).classed("selected", false);
+            var neighbors = [];
+            neighborElements.each(function (d, i) {
+              d["outline_color"] = _constants.nnColorAssignment[i];
+              d["distance"] = distances[indices.indexOf(finalData.indexOf(d))];
+              neighbors.push(d);
+            });
+            neighbors.sort(function (a, b) {
+              return a.distance - b.distance;
+            });
+            neighborElements.attr("fill", function (d) {
+              return d.outline_color;
+            }).attr("r", circleFocusSize);
+            setNeighbors(neighbors);
+          });
+          setOpenNeighbor(true);
+        }
       };
-
-      var zoomedXScale = this.xScale;
-      var zoomedYScale = this.yScale;
-
-      if (view === "zoom") {
-        this.svg.append("rect").attr("class", "rectZoom").attr("width", WIDTH).attr("height", HEIGHT).call(zoom);
-      }
 
       var circles = this.svg.append("g").attr("clip-path", "url(#clip)").attr("class", "clipPath").selectAll(".dataCircle").data(finalData);
       circles.exit().transition().attr("r", 0).remove();
@@ -362,12 +397,10 @@ function () {
         return d.color;
       }).classed("selected", function (d) {
         return selectedData.includes(d);
-      }).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8).on("mousedown", mousedown) // .on("mouseover", mouseover)
-      // .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave).attr("cx", function (d) {
-        return _this.xScale(d[query1]);
+      }).style("stroke", "none").style("stroke-width", 2).style("fill-opacity", 0.8).on("mousedown", mousedown).on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave).attr("cx", function (d) {
+        return xScale(d[query1]);
       }).attr("cy", function (d) {
-        return _this.yScale(d[query2]);
+        return yScale(d[query2]);
       });
       circles.exit().transition().attr("r", 0).remove();
 

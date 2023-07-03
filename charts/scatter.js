@@ -121,7 +121,6 @@ class Scatter {
 		d3.select(".tooltip").remove();
 		d3.selectAll(".dataCircle").remove();
 		d3.selectAll("defs").remove();
-		d3.selectAll(".rectZoom").remove();
 		d3.selectAll(".clipPath").remove();
 
 		let xScale = d3
@@ -142,17 +141,6 @@ class Scatter {
 
 		this.xScaleForBrush = xScale;
 		this.yScaleForBrush = yScale;
-
-		// if (reset || this.zoomedXScale === undefined) {
-		//   this.xScale = xScale;
-		// } else {
-		//   this.xScale = this.zoomedXScale;
-		// }
-		// if (reset || this.zoomedYScale === undefined) {
-		//   this.yScale = yScale;
-		// } else {
-		//   this.yScale = this.zoomedYScale;
-		// }
 
 		// Add a clipPath: everything out of this area won't be drawn.
 		this.svg
@@ -256,7 +244,6 @@ class Scatter {
 			let selected = [];
 			d3.selectAll(".selected").each((d, i) => selected.push(d));
 			setSelectedData(selected);
-      console.log(clickedNeighbor)
 
 			if (clickedNeighbor) {
 				//get knn data
