@@ -33,8 +33,8 @@ export default function poisson({dataPoint}) {
             color: '#000'
         },
         orientation: -90,
-        width: 300,
-        height: 270,
+        width: 230,
+        height: 230,
         polar: {
             radialaxis: {
                 visible: true,
@@ -42,10 +42,10 @@ export default function poisson({dataPoint}) {
             }
         },
         margin: {
-            b: 60,
-            t: 80,
-            l: 60,
-            r: 60,
+            b: 40,
+            t: 40,
+            l: 40,
+            r: 40,
         },
         // margin: {
         //     pad: 1000,
@@ -57,9 +57,6 @@ export default function poisson({dataPoint}) {
         responsive: true
     }    
     var style = {
-        // marginTop: '-50px',
-        width: "100%",
-        height: "100%",
     }
 
     return (

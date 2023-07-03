@@ -52,9 +52,7 @@ function () {
     key: "update",
     value: function update(_ref) {
       var data = _ref.data,
-          element = _ref.element,
-          hover = _ref.hover;
-      console.log("structure", data);
+          element = _ref.element;
       this.data = data.geometry;
       this.color = data.outline_color;
       var height = data.height ? data.height : HEIGHT;

@@ -34,14 +34,14 @@ export default function youngs({dataPoint}) {
         },
         // automargin: true,
         margin: {
-            b: 60,
-            t: 80,
-            l: 60,
-            r: 60,
+            b: 40,
+            t: 40,
+            l: 40,
+            r: 40,
         },
         orientation: -90,
-        width: 300,
-        height: 270,
+        width: 230,
+        height: 230,
         polar: {
             radialaxis: {
                 visible: true,
@@ -54,9 +54,7 @@ export default function youngs({dataPoint}) {
         responsive: true
     }
     var style = {
-        width: "100%",
-        height: "100%",
-
+        marginTop: '30px'
     }
     return (
         <Plot
