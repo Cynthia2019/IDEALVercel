@@ -22,11 +22,11 @@ export default function poisson({dataPoint}) {
     var data = [trace1];
     var layout = {
         title: {
-            text: 'Poisson\'s Ratio',
+            text: '<b>Poisson\'s Ratio</b>',
             // yref: 'paper',
             // y: 0.95,
         },
-        automargin: true,
+        // automargin: true,
         font: {
             family: 'Arial, sans-serif',
             size: 12,
@@ -42,8 +42,8 @@ export default function poisson({dataPoint}) {
             }
         },
         margin: {
-            b: 40,
-            t: 40,
+            b: 20,
+            t: 80,
             l: 40,
             r: 40,
         },
@@ -55,10 +55,10 @@ export default function poisson({dataPoint}) {
     var config = {
         modeBarButtonsToRemove: ['zoom2d'],
         responsive: true
-    }    
-    var style = {
     }
-
+    var style = {
+        marginTop: '30px'
+    }
     return (
         <Plot
             data={data}

@@ -32,7 +32,9 @@ class Structure {
       .attr("text-anchor", "middle")  
       .style("font-size", data.fontSize ? data.fontSize : "16px") 
       .style("font-family", 'Arial, sans-serif')
-      .text("Unit Cell Geometry");
+      .text("Unit Cell Geometry")
+        .style("font-weight", 700);
+
 
     this.svg.append("text")
       .attr("x", (width / 2))             

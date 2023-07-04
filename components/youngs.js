@@ -23,9 +23,9 @@ export default function youngs({dataPoint}) {
     var data = [trace1];
     var layout = {
         title: {
-            text: 'Young\'s Modulus',
-            // yref: 'paper',
-            // y: 0.5,
+            text: '<b>Young\'s Modulus</b>',
+            yref: 'paper',
+            y: 2,
         },
         font: {
             family: 'Arial, sans-serif',
@@ -34,8 +34,8 @@ export default function youngs({dataPoint}) {
         },
         // automargin: true,
         margin: {
-            b: 40,
-            t: 40,
+            b: 20,
+            t: 80,
             l: 40,
             r: 40,
         },

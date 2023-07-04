@@ -18,6 +18,7 @@ import * as React from "react";
 import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
+import {margin} from "plotly.js/src/plots/layout_attributes";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
