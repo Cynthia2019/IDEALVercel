@@ -155,8 +155,7 @@ export default function Umap() {
 					<div className={styles.mainPlot}>
 						<div className={styles.mainPlotHeader}>
 							<p className={styles.mainPlotTitle}>
-								{" "}
-								UMAP (Uniform Manifold Approximation and Projection) Visualization
+								UMAP Visualization
 							</p>
 						</div>
 						<UmapWrapper
