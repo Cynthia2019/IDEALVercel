@@ -32,8 +32,8 @@
   justify-content: flex-start;
   align-items: center;
   width: 18%;
-  height: 90vh;
-  overflow: hidden;
+  height: 95vh;
+  overflow: inherit;
 }
 
 .selectors {

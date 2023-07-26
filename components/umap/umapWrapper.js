@@ -51,13 +51,16 @@ const UmapWrapper = ({
 	const chartArea = useRef(null);
 	const legendArea = useRef(null);
 	const [chart, setChart] = useState(null);
-	const [clickedNeighbor, setClickedNeighbor] = useState(false);
+	const [clickedNeighbor, setClickedNeighbor] = useState(true);
 	const [openNeighbor, setOpenNeighbor] = useState(false);
 	const [openData, setOpenData] = useState(false);
 	const [neighbors, setNeighbors] = useState([]);
+	const [activateKNN, setActivateKNN ] = useState("#556cd6");
 
 	const toggleFindNeighbors = () => {
 		setClickedNeighbor((current) => !current);
+		setActivateKNN((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
+
 	};
 
 	const handleNeighborClose = () => {
@@ -126,7 +129,7 @@ const UmapWrapper = ({
 					variant="outlined"
 					aria-label="find nearest neighbors"
 					onClick={toggleFindNeighbors}
-					style={{ maxWidth: "300px", backgroundColor: "#556cd6" }}
+					style={{ maxWidth: "300px", backgroundColor: activateKNN }}
 					endIcon={<FcMindMap style={{ fontSize: "25px" }} />}
 				>
 					<span style={{ fontSize: "10px", color: "white" }}>

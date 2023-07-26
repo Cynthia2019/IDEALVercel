@@ -151,6 +151,8 @@ class Hist {
                 .style("stroke-width", 5)
                 .style("fill-opacity", 1);
 
+            tooltip_hist.style("visibility", "visible")
+
             // d3.selectAll('.mean-line' + index)
             //     .raise()
             //     .style("stroke-width", 10)
@@ -415,10 +417,10 @@ class Hist {
             .style("border-width", "2px")
             .style("border-radius", "5px")
             .style("padding", "10px")
-            .style("visibility", "visible")
+            .style("visibility", "hidden")
             .html(tooltipContent.join("<br>"))
             .style("top", 60 + "px")
-            .style("left", 500 + "px");
+            .style("left", 0.5 * width + "px");
 
     }
 
