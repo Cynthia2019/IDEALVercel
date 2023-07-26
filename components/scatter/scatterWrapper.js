@@ -57,9 +57,11 @@ const ScatterWrapper = ({
 	const [clickedNeighbor, setClickedNeighbor] = useState(false); 
 	const [openNeighbor, setOpenNeighbor] = useState(false);
 	const [openData, setOpenData] = useState(false);
+	const [activateKNN, setActivateKNN ] = useState("grey");
 
 	const toggleFindNeighbors = () => {
 		setClickedNeighbor((current) => !current);
+		setActivateKNN((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
 	};
 
 	const handleNeighborClose = () => {
@@ -124,7 +126,7 @@ const ScatterWrapper = ({
 					variant="outlined"
 					aria-label="find nearest neighbors"
 					onClick={toggleFindNeighbors}
-					style={{ maxWidth: "300px", backgroundColor: '#556cd6' }}
+					style={{ maxWidth: "300px", backgroundColor: activateKNN }}
 					endIcon={<FcMindMap style={{ fontSize: "25px" }} />}
 				>
 					<span style={{ fontSize: "10px", color: "white" }}>
