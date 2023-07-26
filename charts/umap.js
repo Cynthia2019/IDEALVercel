@@ -14,8 +14,10 @@ const MARGIN = {
 	LEFT: 50,
 };
 
-const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM;
+const SIDE_BAR_SIZE = 100;
+
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 
 function isBrushed(brush_coords, cx, cy) {
 	var x0 = brush_coords[0][0],
