@@ -54,10 +54,10 @@ const ScatterWrapper = ({
 	const chartArea = useRef(null);
 	const legendArea = useRef(null);
 	const [chart, setChart] = useState(null);
-	const [clickedNeighbor, setClickedNeighbor] = useState(false); 
+	const [clickedNeighbor, setClickedNeighbor] = useState(true);
 	const [openNeighbor, setOpenNeighbor] = useState(false);
 	const [openData, setOpenData] = useState(false);
-	const [activateKNN, setActivateKNN ] = useState("grey");
+	const [activateKNN, setActivateKNN ] = useState("#556cd6");
 
 	const toggleFindNeighbors = () => {
 		setClickedNeighbor((current) => !current);
