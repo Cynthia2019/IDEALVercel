@@ -30,7 +30,6 @@ function isBrushed(brush_coords, cx, cy) {
 class Umap {
 	constructor({
 		element,
-		legendElement,
 		data,
 		setDataPoint,
 		selectedData,
@@ -52,14 +51,6 @@ class Umap {
 			.append("g")
 			.attr("class", "umap-plot-plot")
 			.attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
-
-		//Legend
-		this.legend = d3
-			.select(legendElement)
-			.append("svg")
-			.attr("width", 120)
-			.append("g")
-			.attr("class", "umap-plot-legend");
 
 		// Labels
 		this.xLabel = this.svg
@@ -88,7 +79,6 @@ class Umap {
 		this.update({
 			data,
 			element,
-			legendElement,
 			setDataPoint,
 			selectedData,
 			setSelectedData,
@@ -102,7 +92,6 @@ class Umap {
 	update({
 		data,
 		element,
-		legendElement,
 		setDataPoint,
 		selectedData,
 		setSelectedData,
@@ -145,7 +134,6 @@ class Umap {
 			for (let data of d.data) {
 				let temp_properties = [];
 				for (let p of properties) {
-					// data[p] === 0 ? console.log("zero") : null;
 					temp_properties.push(data[p]);
 				}
 				data.name = d.name;
@@ -154,7 +142,6 @@ class Umap {
 			}
 
 			temp_data2 = scaler.transform(temp_data2);
-			// df2 = dfd.toJSON(df2, {format: 'row'})
 			let res = temp_data2.length ? umap.transform(temp_data2) : null;
 
 			res
@@ -166,36 +153,9 @@ class Umap {
 			datasets.push(d.data);
 		});
 
+
 		let finalData = [].concat(...datasets);
 
-		// Split by single data set
-		// organizedData.map((d, i) => {
-		//     const umap = new UMAP({
-		//         nNeighbors: knn,
-		//     });
-		//     let temp_data = []
-		//     for (let data of d.data) {
-		//         let temp_properties = []
-		//         for (let p of properties) {
-		//             temp_properties.push(data[p])
-		//         }
-		//         data.name = d.name;
-		//         data.color = d.color;
-		//         temp_data.push(temp_properties)
-		//     }
-		//     console.log("temp")
-		//     console.log(temp_data)
-		//     let res = umap.fit(temp_data)
-		//     res.map((p, i) => {
-		//         d.data[i]['X'] = p[0]
-		//         d.data[i]['Y'] = p[1]
-		//     })
-		//     datasets.push(d.data);
-		// });
-		//
-		// let finalData = [].concat(...datasets);
-		//
-		// console.log(`final data`, finalData)
 		//remove elements to avoid repeated append
 		d3.selectAll(".legend").remove();
 		d3.select(".tooltip").remove();
@@ -352,12 +312,12 @@ class Umap {
 
 					let neighbors = [];
 					neighborElements.each((d, i) => {
-						d["outline_color"] = nnColorAssignment[i];
 						d["distance"] =
 							distances[indices.indexOf(finalData.indexOf(d))];
 						neighbors.push(d);
 					});
 					neighbors.sort((a, b) => a.distance - b.distance);
+					neighbors.map((d, i) => d["outline_color"] = nnColorAssignment[i])
 					neighborElements
 						.attr("fill", (d) => d.outline_color)
 						.attr("r", circleFocusSize);

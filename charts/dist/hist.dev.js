@@ -13,6 +13,8 @@ var _header = _interopRequireDefault(require("../components/shared/header"));
 
 var _organizeByName = _interopRequireDefault(require("../util/organizeByName"));
 
+var _convertTo4SigFig = _interopRequireDefault(require("../util/convertTo4SigFig"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
@@ -207,14 +209,8 @@ function () {
       };
 
       var mouseover_hist = function mouseover_hist(e, d) {
-        // console.log(e)
-        // console.log(d)
-        // index = d3.select(this).attr("class")[5]
-        d3.select(this).raise().style("stroke", "black").style("stroke-width", 5).style("fill-opacity", 1); // d3.selectAll('.mean-line' + index)
-        //     .raise()
-        //     .style("stroke-width", 10)
-        //     .style("fill-opacity", 1)
-        //     .style("stroke-dasharray", ("0, 0"))
+        d3.select(this).raise().style("stroke", "black").style("stroke-width", 5).style("fill-opacity", 1);
+        tooltip_hist.style("visibility", "visible");
       }; // Compute values (and promote column names to accessors).
 
 
@@ -294,10 +290,9 @@ function () {
             var temp_tooltip = {};
 
             if (organizedData[_i2]) {
-              var temp_arr = finalData.map(function (d, i) {
+              var temp_arr = organizedData[_i2].data.map(function (d, i) {
                 return d[query1];
-              }); // temp_tooltip["max"] = d3.max(temp_arr)
-              // temp_tooltip["min"] = d3.min(temp_arr)
+              });
 
               temp_tooltip["name"] = organizedData[_i2].name;
               temp_tooltip["color"] = organizedData[_i2].color;
@@ -306,10 +301,7 @@ function () {
               temp_tooltip["mean"] = d3.mean(temp_arr);
               temp_tooltip["median"] = d3.median(temp_arr);
               tooltip.push(temp_tooltip);
-            } // console.log("bins")
-            // console.log(data[i] ? data[i].data.map((d, i) => d[query1]) : null)
-            // console.log(temp_tooltip)
-
+            }
 
             var Y1 = Array.from(bins, function (I0) {
               return d3.sum(I0, function (i) {
@@ -364,23 +356,17 @@ function () {
       var yAxis_line = this.svg.append("g").selectAll("g").data([hist_yScales]).join("g").attr("transform", "translate(".concat(padding * 6 + 5, ",").concat(padding * 16 - 5, ")")).attr("class", "yAxisGroup").call(yAxis.scale(hist_yScales));
       yAxis_line.selectAll("text").attr("font-size", 20).attr("font-family", "sans-serif");
       var xAxis_line = this.svg.append("g").selectAll(".xAxisGroup").data(xScales).join("g").attr("transform", "translate(".concat(width / 15, ", ").concat(width + padding * 10 + 5, ")")).attr("class", "xAxisGroup").call(xAxis.scale(xScales[index]));
-      xAxis_line.selectAll("text").attr("font-size", 18).attr("font-family", "sans-serif").attr("text-anchor", "middle"); // console.log('final_tool_tip')
-      // console.log(tooltip)
-
+      xAxis_line.selectAll("text").attr("font-size", 18).attr("font-family", "sans-serif").attr("text-anchor", "middle");
       setTooltip(tooltip);
       var transitionDuration = 200;
       var exitTransition = d3.transition().duration(transitionDuration);
       var updateTransition = exitTransition.transition().duration(transitionDuration);
       tooltip.map(function (d, i) {
-        var mean = tooltip[i].mean; // console.log('mean-line')
-        // console.log(dataset_dic[i])
-        // console.log(mean)
-        // console.log(xScales[index](mean))
-
+        var mean = tooltip[i].mean;
         d3.select('svg').append('g').append('line').attr('class', 'mean-line' + i).raise().transition(updateTransition).attr("x1", xScales[index](mean) + width / 15).attr("y1", width + padding * 10 + 5).attr("x2", xScales[index](mean) + width / 15).attr("y2", padding * 16 - 5).attr("stroke", colors[dataset_dic[i]]).attr("stroke-width", 6).attr("fill", "None").style("stroke-dasharray", "5, 5");
       });
       var tooltipContent = tooltip.map(function (d, i) {
-        return "<b>Dataset: </b>" + d.name + "<br>" + "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" + "<b>Mean: </b>" + expo(d.mean, 0) + "<br>" + "<b>Median: </b>" + expo(d.median, 0) + "<br>";
+        return "<b>Dataset: </b>" + d.name + "<br>" + "<b>Range: </b>" + expo(d.min, 0) + " to " + expo(d.max, 0) + "<br>" + "<b>Mean: </b>" + expo(d.mean.toPrecision(4)) + "<br>" + "<b>Median: </b>" + expo(d.median, 0) + "<br>";
       }); // let legend = d3.select('svg')
       //     .append('g')
       //     .append("line");
@@ -403,7 +389,7 @@ function () {
       //     .style("text-anchor", "end")
       //     .text("Mean");
 
-      var tooltip_hist = d3.select(container.current).append("div").style("overflow-y", "auto").style("width", '280px').style("height", '200px').attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("stroke", "white").style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)").style("border-width", "2px").style("border-radius", "5px").style("padding", "10px").style("visibility", "visible").html(tooltipContent.join("<br>")).style("top", 60 + "px").style("left", 500 + "px");
+      var tooltip_hist = d3.select(container.current).append("div").style("overflow-y", "auto").style("width", '280px').style("height", '200px').attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("stroke", "white").style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)").style("border-width", "2px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden").html(tooltipContent.join("<br>")).style("top", 60 + "px").style("left", 0.5 * width + "px");
     }
   }]);
 

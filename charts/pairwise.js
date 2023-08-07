@@ -217,7 +217,7 @@ class Pairwise {
            setDataPoint,
            router,
            max_num_datasets) {
-        console.log("updating...");
+
 
         const circleFocusSize = 7;
         const circleSize = 3.5;
@@ -320,7 +320,7 @@ class Pairwise {
         };
 
         let mouseover_hist = function (e, d) {
-            console.log("hist");
+
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", 5)
@@ -330,10 +330,8 @@ class Pairwise {
         };
 
         let mouseover_non_hist = function (e, d) {
-            console.log("non-hist")
-            // console.log(this)
+
             d3.select(this)
-                // .style("fill", "#EAEAEA")
                 .style("stroke", "black")
                 .style("stroke-width", 4)
                 .style("fill-opacity", 1);
@@ -466,20 +464,10 @@ class Pairwise {
         // Construct scales and axes.
         const xScales = X.map(X => xType(d3.extent(X), [0, cellWidth]));
         const yScales = Y.map(Y => yType(d3.extent(Y), [cellHeight, 0]));
-        const zScale = d3.scaleOrdinal(zDomain, colors);
-
-
-        //
-        // d3.selectAll(".hist")
-        //     .on("mouseover", mouseover_hist)
-        //
-        // d3.selectAll(".non-hist")
-        //     .on("mouseover", mouseover_non_hist)
 
 
         this.cell.each(function ([x, y]) {
             if (x != y) {
-                // console.log(this)
                 d3.select(this)
                     .select(".cell")
                     .attr("class", "non_hist")

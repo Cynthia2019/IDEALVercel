@@ -1,6 +1,8 @@
 import { Table, Col, Row } from "antd";
 import StructureWrapper from "@/components/structureWrapper";
 
+const columnNames = ['C11', 'C12', 'C22', 'C16', 'C26', 'C66', 'distance']
+
 const NeighborTable = ({ data }) => {
   let columns = []
   if (data.length != 0 && data[0]) {
@@ -12,7 +14,7 @@ const NeighborTable = ({ data }) => {
           const row = value;
           return (
             <Col key={`neighbor-col-${key}-${i}`}>
-              <Row justify={"start"} align={"center"}>
+              <Row justify={"start"} align={"center"} key={`neighbor-col-${key}-${i}-structure`}>
                 <StructureWrapper
                   data={{
                     geometry: row["geometry"],
@@ -25,13 +27,8 @@ const NeighborTable = ({ data }) => {
                   }}
                 ></StructureWrapper>
               </Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C11: {row["C11"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C12: {row["C12"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C22: {row["C22"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C16: {row["C16"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C26: {row["C26"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>C66: {row["C66"]}</Row>
-              <Row justify={"center"} style={{fontSize:'8px'}}>distance: {row["distance"]}</Row>
+              {columnNames.map((col, i) => 
+              <Row justify={"center"} style={{fontSize:'8px'}} key={`neighbor-col-${key}-${i}-${col}`}>{col}: {row[col]}</Row>)}
             </Col>
           );
         }

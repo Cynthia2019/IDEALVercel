@@ -37,9 +37,7 @@ function () {
         }, 0) / featureData.length;
         var std = Math.sqrt(featureData.reduce(function (acc, val) {
           return acc + Math.pow(val - mean, 2);
-        }, 0) / featureData.length); // console.log(`feature: ${i}`);
-        // console.log(`mean: ${mean}, std: ${std}`);
-
+        }, 0) / featureData.length);
         _this.means[i] = mean;
         _this.stds[i] = std;
       };

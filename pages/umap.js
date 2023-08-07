@@ -3,24 +3,21 @@ import Header from "../components/shared/header";
 import styles from "../styles/umap.module.css";
 import UmapWrapper from "../components/umap/umapWrapper";
 import StructureWrapper from "../components/structureWrapper";
-import { csv, csvParse } from "d3";
+import { csvParse } from "d3";
 import dynamic from "next/dynamic";
 import ParamSelector from "@/components/umap/paramSelector";
 
-// import Umap_DataSelector from "../components/umap_dataSelector";
 import DataSelector from "@/components/shared/dataSelector";
-import RangeSelector from "../components/shared/rangeSelector";
-import MaterialInformation from "../components/shared/materialInfo";
-import SavePanel from "@/components/saveData/savePanel";
-import { Row, Col } from "antd";
+import { Row } from "antd";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import { s3BucketList, colorAssignment } from "@/util/constants";
+import { colorAssignment } from "@/util/constants";
 import processData from "../util/processData";
 import { useRouter } from "next/router";
-import classNames from "classnames";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
+
+import { calculateUmap } from "@/util/calculateUmap";
 
 export default function Umap() {
 	const [datasets, setDatasets] = useState([]);
@@ -28,9 +25,7 @@ export default function Umap() {
 		useState([]);
 	const [activeData, setActiveData] = useState(datasets);
 	const [dataLibrary, setDataLibrary] = useState([]);
-	const [filteredDatasets, setFilteredDatasets] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
-	const [selectedDatasetNames, setSelectedDatasetNames] = useState([]);
 	const [selectedData, setSelectedData] = useState([]);
 	const [reset, setReset] = useState(false);
 	const [knn, setKNN] = useState(15);
@@ -52,9 +47,6 @@ export default function Umap() {
 	const Poisson = dynamic(() => import("../components/poisson"), {
 		ssr: false,
 	});
-
-	const [toggleCollapse, setToggleCollapse] = useState(false);
-	const [isCollapsible, setIsCollapsible] = useState(false);
 
 	const handleQuery1Change = (e) => {
 		setQuery1(e.target.value);
@@ -117,7 +109,7 @@ export default function Umap() {
 
 	useEffect(() => {
 		const url = "https://metamaterials-srv.northwestern.edu/model/";
-		const data = activeData.map((d) => [
+		const data = calculateUmap(activeData, knn).map((d) => [
 			d.C11,
 			d.C12,
 			d.C22,
@@ -132,16 +124,9 @@ export default function Umap() {
 				data: data,
 				n_neighbors: 5,
 			}),
-		}).catch((err) => console.log("pairwise refit knn error", err));
+		}).catch((err) => console.log("umap refit knn error", err));
 	}, [activeData]);
 
-	const wrapperClasses = classNames(
-		"h-screen px-4 pt-8 pb-4 bg-light flex justify-between flex-col",
-		{
-			["w-90"]: !toggleCollapse,
-			["w-20"]: toggleCollapse,
-		}
-	);
 	const [open, setOpen] = useState(true);
 
 	return (

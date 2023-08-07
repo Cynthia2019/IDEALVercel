@@ -143,7 +143,7 @@ function () {
         return yType(d3.extent(Y), [cellHeight, 0]);
       });
       var zScale = d3.scaleOrdinal(zDomain, colors);
-      this.svg = d3.select(container.current).append('svg').attr("width", width).attr("height", height).attr("viewBox", [-marginLeft, -marginTop, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+      this.svg = d3.select(container.current).append('svg').attr("width", width).attr("height", height).attr("viewBox", [-marginLeft, -marginTop, width, height]).attr("style", "outline: thin solid red;").attr("style", "max-width: 100%; height: auto; height: intrinsic;");
       this.cell = this.svg.append("g").selectAll("g").data(d3.cross(d3.range(X.length), d3.range(Y.length))).join("g").attr("fill-opacity", fillOpacity).attr("transform", function (_ref2) {
         var _ref3 = _slicedToArray(_ref2, 2),
             i = _ref3[0],
@@ -153,13 +153,13 @@ function () {
       }); //add rect box frames
 
       this.cell.append("rect").attr("fill", "white").attr("stroke", "grey").attr("stroke-width", 2).attr("width", cellWidth).attr("height", cellHeight).attr("class", "cell");
-      if (x === y) this.svg.append("g").attr("font-size", 14).attr("font-family", "sans-serif").attr("font-weight", "bold").selectAll("text").data(x).join("text").attr("transform", function (d, i) {
-        return "translate(".concat(0 - marginLeft + padding * 1.5, ",").concat(i * (cellHeight + padding) + marginTop * 9, ") rotate(270)");
+      if (x === y) this.svg.append("g").attr("font-size", 18).attr("font-family", "sans-serif").attr("font-weight", "bold").selectAll("text").data(x).join("text").attr("transform", function (d, i) {
+        return "translate(".concat(0 - marginLeft + padding, ",").concat(i * (cellHeight + padding) + marginTop * 9, ") rotate(270)");
       }).attr("x", padding / 2).attr("y", padding / 2).attr("dy", ".71em").text(function (d) {
         return d;
       });
-      if (x === y) this.svg.append("g").attr("font-size", 14).attr("font-family", "sans-serif").attr("font-weight", "bold").selectAll("text").data(y).join("text").attr("transform", function (d, i) {
-        return "translate(".concat(i * (cellWidth + padding) + marginBottom - padding / 2, ",").concat(cellHeight * 6 + marginBottom + padding * 4, ")");
+      if (x === y) this.svg.append("g").attr("font-size", 18).attr("font-family", "sans-serif").attr("font-weight", "bold").selectAll("text").data(y).join("text").attr("transform", function (d, i) {
+        return "translate(".concat(i * (cellWidth + padding) + marginBottom - padding / 2, ",").concat(cellHeight * 6 + marginBottom + padding * 4.5, ")");
       }).attr("x", padding / 2).attr("y", padding / 2).text(function (d) {
         return d;
       });
@@ -228,12 +228,12 @@ function () {
       }).ticks(3);
       this.svg.append("g").selectAll("g").data(yScales).join("g").attr("transform", function (d, i) {
         return "translate(0,".concat(i * (cellHeight + padding), ")");
-      }).attr("class", "yAxisGroup").each(function (yScale) {
+      }).attr("class", "yAxisGroup").style("font-size", "14px").each(function (yScale) {
         d3.select(this).call(yAxis.scale(yScale));
       });
       this.svg.append("g").selectAll(".xAxisGroup").data(xScales).join("g").attr("transform", function (d, i) {
         return "translate(".concat(i * (cellWidth + padding), ", ").concat(height - marginBottom - marginTop, ")");
-      }).attr("class", "xAxisGroup").each(function (xScale, columns) {
+      }).attr("class", "xAxisGroup").style("font-size", "14px").each(function (xScale, columns) {
         d3.select(this).call(xAxis.scale(xScale));
       });
     }
@@ -270,7 +270,6 @@ function () {
       var setDataPoint = arguments.length > 4 ? arguments[4] : undefined;
       var router = arguments.length > 5 ? arguments[5] : undefined;
       var max_num_datasets = arguments.length > 6 ? arguments[6] : undefined;
-      console.log("updating...");
       var circleFocusSize = 7;
       var circleSize = 3.5;
       var legendCircleSize = 5.0;
@@ -307,8 +306,8 @@ function () {
         // z: d => d.species
         colors: data.color
       }, container);
-      var tooltip_hist = d3.select(container.current).append("div").attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
-      var tooltip_circ = d3.select(container.current).append("div").attr("class", "tooltip_circ").style("position", "fixed").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden");
+      var tooltip_hist = d3.select(container.current).append("div").attr("class", "tooltip_hist").style("position", "fixed").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden").raise();
+      var tooltip_circ = d3.select(container.current).append("div").attr("class", "tooltip_circ").style("position", "fixed").style("background-color", "white").style("border", "solid").style("border-width", "1px").style("border-radius", "5px").style("padding", "10px").style("visibility", "hidden").raise();
 
       var mouseover_circ = function mouseover_circ(e, d) {
         d3.select(this).attr("r", circleFocusSize).style("stroke", "black").style("stroke-width", 2).style("fill-opacity", 1);
@@ -327,16 +326,12 @@ function () {
       };
 
       var mouseover_hist = function mouseover_hist(e, d) {
-        console.log("hist");
         d3.select(this).style("stroke", "black").style("stroke-width", 5).style("fill-opacity", 1);
         tooltip_hist.style("visibility", "visible").transition().duration(200);
       };
 
       var mouseover_non_hist = function mouseover_non_hist(e, d) {
-        console.log("non-hist"); // console.log(this)
-
-        d3.select(this) // .style("fill", "#EAEAEA")
-        .style("stroke", "black").style("stroke-width", 4).style("fill-opacity", 1);
+        d3.select(this).style("stroke", "black").style("stroke-width", 4).style("fill-opacity", 1);
       };
 
       var mousedown_non_hist = function mousedown_non_hist(e, d) {
@@ -382,7 +377,7 @@ function () {
           return data[column];
         }));
 
-        tooltip_hist.html("Column: " + column + "<br>Range: " + (d3.min(temp_arr) > 0 ? d3.min(temp_arr) : 0) + " to " + (d3.max(temp_arr) > 0 ? d3.max(temp_arr) : 0) + "<br>Mean: " + d3.mean(temp_arr) + "<br>Median: " + d3.median(temp_arr) // "<br>symmetry: " +
+        tooltip_hist.html("Column: " + column + "<br>Range: " + (d3.min(temp_arr) > 0 ? expo(d3.min(temp_arr), 3) : 0) + " to " + (d3.max(temp_arr) > 0 ? expo(d3.max(temp_arr), 3) : 0) + "<br>Mean: " + expo(d3.mean(temp_arr), 3) + "<br>Median: " + expo(d3.median(temp_arr), 3) // "<br>symmetry: " +
         // finalData[d]["symmetry"]
         // "<br>Material_0: " +
         // finalData[d].CM0 +
@@ -439,13 +434,6 @@ function () {
       var yScales = Y.map(function (Y) {
         return yType(d3.extent(Y), [cellHeight, 0]);
       });
-      var zScale = d3.scaleOrdinal(zDomain, colors); //
-      // d3.selectAll(".hist")
-      //     .on("mouseover", mouseover_hist)
-      //
-      // d3.selectAll(".non-hist")
-      //     .on("mouseover", mouseover_non_hist)
-
       this.cell.each(function (_ref7) {
         var _this = this;
 
@@ -454,7 +442,6 @@ function () {
             y = _ref8[1];
 
         if (x != y) {
-          // console.log(this)
           d3.select(this).select(".cell").attr("class", "non_hist").on("mouseover", mouseover_non_hist).on("mousedown", mousedown_non_hist).on("mouseout", mouseleave_rec);
           d3.select(this).selectAll("circle") //.data(finalData)
           .data(I.filter(function (i) {
