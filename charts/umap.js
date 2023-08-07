@@ -27,6 +27,11 @@ function isBrushed(brush_coords, cx, cy) {
 	return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
 }
 
+function expo(x, f) {
+	if (x < 1000 && x > -1000) return x;
+	return Number(x).toExponential(f);
+}
+
 class Umap {
 	constructor({
 		element,
@@ -48,9 +53,9 @@ class Umap {
 				HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
 			])
 			.attr("style", "max-width: 100%")
-			.append("g")
-			.attr("class", "umap-plot-plot")
-			.attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
+
+		//brush
+		this.svg.append("g").attr("class", "brush");
 
 		// Labels
 		this.xLabel = this.svg
@@ -75,6 +80,8 @@ class Umap {
 
 		// Append group el to display both axes
 		this.yAxisGroup = this.svg.append("g");
+		this.xScaleForBrush;
+		this.yScaleForBrush;
 
 		this.update({
 			data,
@@ -157,8 +164,7 @@ class Umap {
 		let finalData = [].concat(...datasets);
 
 		//remove elements to avoid repeated append
-		d3.selectAll(".legend").remove();
-		d3.select(".tooltip").remove();
+		d3.select(".tooltip-umap").remove();
 		d3.selectAll(".dataCircle").remove();
 		d3.selectAll("defs").remove();
 		d3.selectAll(".clipPath").remove();
@@ -179,27 +185,69 @@ class Umap {
 			])
 			.range([0, WIDTH]);
 
+		this.xScaleForBrush = xScale;
+		this.yScaleForBrush = yScale;
+
 		const chartExtent = [
 			[0, 0],
 			[WIDTH, HEIGHT],
 		];
 
+		// Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
 		let zoom = d3
 			.zoom()
 			.scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
-            .translateExtent(chartExtent)
+			.translateExtent(chartExtent)
 			.extent(chartExtent)
 			.on("zoom", (event) => {
 				// recover the new scale
 				let newXScale = event.transform.rescaleX(xScale);
 				let newYScale = event.transform.rescaleY(yScale);
 
+				// update axes with these new boundaries
+				let xAxisCall = d3
+					.axisBottom(newXScale)
+					.tickFormat((x) => `${expo(x, 2)}`);
+				let yAxisCall = d3
+					.axisLeft(newYScale)
+					.tickFormat((y) => `${expo(y, 2)}`);
+				this.xAxisGroup.transition().duration(500).call(xAxisCall);
+				this.yAxisGroup.transition().duration(500).call(yAxisCall);
+
+				this.xScaleForBrush = newXScale;
+				this.yScaleForBrush = newYScale;
+
 				d3.selectAll(".dataCircle")
 					.data(finalData)
 					.attr("cy", (d) => newYScale(d[query2]))
 					.attr("cx", (d) => newXScale(d[query1]));
 			});
-		this.svg.call(zoom)
+
+		let brush = d3.brush().on("brush end", (event) => {
+			if (event.sourceEvent?.type === "zoom") return; // ignore brush-by-zoom
+			if (event.selection) {
+				let _xScale = this.xScaleForBrush;
+				let _yScale = this.yScaleForBrush;
+				d3.selectAll(".dataCircle")
+					.data(finalData)
+					.classed("selected", function (d) {
+						return (
+							d3.select(this).classed("selected") ||
+							isBrushed(
+								event.selection,
+								_xScale(d[query1]),
+								_yScale(d[query2])
+							)
+						);
+					});
+			}
+			let selected = [];
+			d3.selectAll(".selected").each((d, i) => selected.push(d));
+			setSelectedData(selected);
+		});
+		//apply zoom and brush to svg
+		this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
+		this.svg.call(zoom).on("mousedown.zoom", null);
 		// Add a clipPath: everything out of this area won't be drawn.
 		this.svg
 			.append("defs")

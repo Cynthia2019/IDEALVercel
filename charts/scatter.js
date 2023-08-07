@@ -49,14 +49,6 @@ class Scatter {
 		//brush
 		this.svg.append("g").attr("class", "brush");
 
-		// //Legend
-		// this.legend = d3
-		//     .select(legendElement)
-		//     .append("svg")
-		//     .attr("width", 120)
-		//     .append("g")
-		//     .attr("class", "scatter-plot-legend");
-
 		// Labels
 		this.xLabel = this.svg
 			.append("text")
@@ -350,31 +342,6 @@ class Scatter {
 		//apply zoom and brush to svg
 		this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
 		this.svg.call(zoom).on("mousedown.zoom", null);
-
-		// let legend = this.legend.selectAll(".legend").data(data);
-
-		// legend.exit().remove();
-
-		// legend
-		//     .enter()
-		//     .append("circle")
-		//     .attr("class", "legend")
-		//     .attr("r", circleOriginalSize)
-		//     .attr("cx", 10)
-		//     .attr("cy", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
-		//     .style("fill", (d) => d.color);
-		// //Create legend labels
-		// legend
-		//     .enter()
-		//     .append("text")
-		//     .attr("class", "legend")
-		//     .attr("x", 20)
-		//     .attr("y", (d, i) => (circleOriginalSize * 2 + legendSpacing) * i + 30)
-		//     .text((d) => d.name)
-		//     .attr("text-anchor", "left")
-		//     .style("alignment-baseline", "middle");
-
-		// legend.exit().remove();
 
 		let circles = this.svg
 			.append("g")
