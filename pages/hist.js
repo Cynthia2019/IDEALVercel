@@ -113,27 +113,6 @@ export default function Hist({ fetchedNames }) {
 		fetchData()
 	}, [availableDatasetNames.length]);
 
-
-	useEffect(() => {
-		const url = 'https://metamaterials-srv.northwestern.edu/model/';
-		const data = activeData.map((d) => [
-			d.C11,
-			d.C12,
-			d.C22,
-			d.C16,
-			d.C26,
-			d.C66,
-		]);
-		fetch(url, {
-			method: "POST",
-			mode: "cors",
-			body: JSON.stringify({
-				data: data,
-				n_neighbors: 5,
-			}),
-		}).catch((err) => console.log("pairwise refit knn error", err));
-	}, [activeData]);
-
   const [open, setOpen] = useState(true);
 
   return (

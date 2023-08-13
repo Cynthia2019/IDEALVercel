@@ -215,12 +215,16 @@ class Scatter {
 				.style("fill-opacity", 0.8);
 		};
 
-		async function getKnnData(data) {
+		async function getKnnData(dataPoint) {
 			const url =
-				"https://metamaterials-srv.northwestern.edu/model?data=";
-			let response = await fetch(`${url}[${data}]`, {
-				method: "GET",
+				"https://metamaterials-srv.northwestern.edu./model/";
+			let response = await fetch(url, {
+				method: "POST",
 				mode: "cors",
+				body: JSON.stringify({
+					dataPoint: [dataPoint],
+					data: finalData.map(d => [d.C11, d.C12, d.C22, d.C16, d.C26, d.C66])
+				})
 			})
 				.then((res) => res.json())
 				.catch((err) => console.log("fetch error", err.message));
@@ -229,7 +233,7 @@ class Scatter {
 
 		let mousedown = function (e, d) {
 			let columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
-			let inputData = columns.map((c) => d[c]);
+			let inputDataPoint = columns.map((c) => d[c]);
 			let target = d3.select(this);
 			target.classed("selected", !target.classed("selected"));
 
@@ -240,9 +244,10 @@ class Scatter {
 			if (clickedNeighbor) {
 				//get knn data
 				target.classed("selected", true);
-				getKnnData(inputData).then((data) => {
+				getKnnData(inputDataPoint).then((data) => {
 					let indices = data.indices;
 					let distances = data.distances;
+					console.log(indices, distances)
 					// index should be the index of the data in the current active dataset
 					d3.selectAll(".dataCircle")
 						.data(finalData)

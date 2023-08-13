@@ -306,13 +306,16 @@ class Umap {
 				.style("stroke-width", 2)
 				.style("fill-opacity", 0.8);
 		};
-
-        async function getKnnData(data) {
+		async function getKnnData(dataPoint) {
 			const url =
-				"https://metamaterials-srv.northwestern.edu/model?data=";
-			let response = await fetch(`${url}[${data}]`, {
-				method: "GET",
+				"https://metamaterials-srv.northwestern.edu./model/";
+			let response = await fetch(url, {
+				method: "POST",
 				mode: "cors",
+				body: JSON.stringify({
+					dataPoint: [dataPoint],
+					data: finalData.map(d => [d.X, d.Y]),
+				})
 			})
 				.then((res) => res.json())
 				.catch((err) => console.log("fetch error", err.message));
@@ -320,7 +323,7 @@ class Umap {
 		}
 
 		let mousedown = function (e, d) {
-            let columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
+            let columns = ["X", "Y"];
 			let inputData = columns.map((c) => d[c]);
 
             let target = d3.select(this);

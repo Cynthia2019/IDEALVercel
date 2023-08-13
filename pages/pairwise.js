@@ -107,26 +107,6 @@ export default function Pairwise() {
 		fetchData()
 	}, [availableDatasetNames.length]);
 
-	useEffect(() => {
-		const url = 'https://metamaterials-srv.northwestern.edu/model/';
-		const data = activeData.map((d) => [
-			d.C11,
-			d.C12,
-			d.C22,
-			d.C16,
-			d.C26,
-			d.C66,
-		]);
-		fetch(url, {
-			method: "POST",
-			mode: "cors",
-			body: JSON.stringify({
-				data: data,
-				n_neighbors: 5,
-			}),
-		}).catch((err) => console.log("pairwise refit knn error", err));
-	}, [activeData]);
-
 	const [open, setOpen] = useState(true);
 
 	return (
@@ -148,14 +128,6 @@ export default function Pairwise() {
 							</Button>
 						</div>
 
-						{/*</Link>*/}
-						{/*<p className={styles.mainPlotSub}>*/}
-						{/*    Select properties from the dropdown menus below to graph on the*/}
-						{/*    x and y axes. Hovering over data points provides additional*/}
-						{/*    information. Scroll to zoom, click and drag to pan, and*/}
-						{/*    double-click to reset.*/}
-						{/*</p>*/}
-						{/*</div>*/}
 						<PairwiseWrapper
 							data={activeData}
 							setDataPoint={setDataPoint}
@@ -207,22 +179,3 @@ export default function Pairwise() {
 		</div>
 	);
 }
-
-// async function getAllData() {
-//     console.log('pairwise get all data')
-//     const env = process.env.NODE_ENV
-//     let url = 'https://metamaterials-srv.northwestern.edu./model/'
-//     // let url = 'http://localhost:8000/model?data='
-//     if (env == 'production') {
-//         url = 'https://metamaterials-srv.northwestern.edu./model/'
-//     }
-//     let response = await fetch(`${url}`, {
-//         method: "POST",
-//         mode: "cors",
-//     })
-//         .then((res) => {
-//             return res.json()
-//         })
-//         .catch((err) => console.log('pairwise get all data error', err));
-//     return response;
-// }
