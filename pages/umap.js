@@ -28,7 +28,7 @@ export default function Umap() {
 	const [dataPoint, setDataPoint] = useState({});
 	const [selectedData, setSelectedData] = useState([]);
 	const [reset, setReset] = useState(false);
-	const [knn, setKNN] = useState(15);
+	const [knn, setKNN] = useState(30);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
@@ -104,7 +104,7 @@ export default function Umap() {
 
 	useEffect(() => {
 		fetchData()
-	}, [availableDatasetNames.length]);
+	}, []);
 
 
 	const [open, setOpen] = useState(true);

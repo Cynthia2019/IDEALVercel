@@ -1,5 +1,7 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
+import organizeByName from "@/util/organizeByName";
+import {UMAP} from "umap-js";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 8;

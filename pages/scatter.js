@@ -131,7 +131,7 @@ export default function Scatter({fetchedNames}) {
 
 	useEffect(() => {
 		fetchData()
-	}, [availableDatasetNames.length]);
+	}, []);
 
     const [open, setOpen] = useState(true);
 

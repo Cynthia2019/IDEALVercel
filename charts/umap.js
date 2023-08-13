@@ -117,10 +117,10 @@ class Umap {
 
 		let scaler = new StandardScaler();
 
-		// const embedding = umap.fit(data);
+
 		let organizedData = organizeByName(data);
 		const umap = new UMAP({
-			nNeighbors: knn ? knn : 15,
+			nNeighbors: knn ? knn : 30,
 		});
 		let temp_data = [];
 		organizedData.map((d, i) => {
@@ -147,9 +147,8 @@ class Umap {
 				data.color = d.color;
 				temp_data2.push(temp_properties);
 			}
-
 			temp_data2 = scaler.transform(temp_data2);
-			let res = temp_data2.length ? umap.transform(temp_data2) : null;
+			let res = temp_data2.length  ? umap.transform(temp_data2) : null;
 
 			res
 				? res.map((p, i) => {

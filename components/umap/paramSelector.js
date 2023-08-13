@@ -5,7 +5,7 @@ import { useState } from "react";
 const RangeSelector = ({ datasets, activeData, handleChange }) => {
 	const data = datasets;
 	const filtered = activeData;
-	const [inputValue, setInputValue] = useState(15);
+	const [inputValue, setInputValue] = useState(30);
 	const handleInputChange = (name, newValue) => {
 		setInputValue(newValue);
 		handleSliderChange(name, newValue);
@@ -16,9 +16,9 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 	};
 
 	const marks = {
-		1: "1",
-		15: "15",
-		30: "30",
+		5: "5",
+		25: "25",
+		50: "50",
 	};
 
 	return (
@@ -33,7 +33,7 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 					neighboring sample points) used for manifold approximation.
 					Larger values result in more global views of the manifold,
 					while smaller values result in more local data being
-					preserved. (Default: 15)
+					preserved. (Default: 30)
 				</Row>
 				<Row style={{width:'80%'}} justify={'space-between'} wrap={true}>
 					<Col span={16}>
@@ -41,9 +41,9 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 							marks={marks}
 							className={styles["slider"]}
 							value={inputValue}
-							defaultValue={[15]}
-							min={1}
-							max={30}
+							defaultValue={[30]}
+							min={5}
+							max={50}
 							onChange={(value, filteredDatasets) =>
 								handleSliderChange(name, value)
 							}
@@ -51,8 +51,8 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 					</Col>
 					<Col span={6}>
 						<InputNumber
-							min={1}
-							max={30}
+							min={5}
+							max={50}
 							value={inputValue}
 							onChange={(value, filteredDatasets) =>
 								handleSliderChange(name, value)
