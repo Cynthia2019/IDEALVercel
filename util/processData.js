@@ -5,7 +5,6 @@ const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 const processData = (d, i) => {
         let youngs = d.youngs?.match(regex)?.map(parseFloat).map(young => sigFigs(young, 4));
         let poisson = d.poisson?.match(regex)?.map(parseFloat).map(p => sigFigs(p, 4));
-
         let processed = {
           index: i, 
           name: d.dataset_name, 
