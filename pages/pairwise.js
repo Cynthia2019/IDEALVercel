@@ -57,8 +57,11 @@ export default function Pairwise() {
 		const unselected = activeData.filter(
 			(d) => !filtered_datasets.includes(d)
 		);
-
+		console.log('activeData', activeData)
+		console.log('filtered_datasets', filtered_datasets)
+		console.log('unselected', unselected)
 		sourceItems = sourceItems.concat(unselected);
+		console.log('sourceItems', sourceItems)
 		setActiveData(destItems);
 		setDataLibrary(sourceItems);
 	};
@@ -105,7 +108,7 @@ export default function Pairwise() {
 
 	useEffect(() => {
 		fetchData()
-	}, [availableDatasetNames.length]);
+	}, []);
 
 	const [open, setOpen] = useState(true);
 

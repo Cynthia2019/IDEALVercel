@@ -111,7 +111,7 @@ export default function Hist({ fetchedNames }) {
 
 	useEffect(() => {
 		fetchData()
-	}, [availableDatasetNames.length]);
+	}, []);
 
   const [open, setOpen] = useState(true);
 
