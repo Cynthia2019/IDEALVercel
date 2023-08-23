@@ -56,12 +56,12 @@ const SavePanel = ({ selectedData, setReset }) => {
           >
             Download
           </Button>
-          <Button
-            className={styles["save-table-button"]}
-            endIcon={<RestartAltIcon />}
-            onClick={handleResetClick}
-            color="error"
-          ></Button>
+          {/*<Button*/}
+          {/*  className={styles["save-table-button"]}*/}
+          {/*  endIcon={<RestartAltIcon />}*/}
+          {/*  onClick={handleResetClick}*/}
+          {/*  color="error"*/}
+          {/*></Button>*/}
           <CSVLink
             data={selectedData}
             filename={"saved_data.csv"}
