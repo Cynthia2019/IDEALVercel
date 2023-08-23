@@ -43,12 +43,10 @@ export default function Pairwise() {
 	});
 
 	const handleRangeChange = (name, value) => {
-		const activeDatasetNames = activeData.map((d) => d.name);
 		let filtered_datasets = datasets.filter((d, i) => {
 			let filtered =
 				d[name] >= value[0] &&
-				d[name] <= value[1] &&
-				activeDatasetNames.includes(d.name);
+				d[name] <= value[1]
 			return filtered;
 		});
 		// remove filtered out data from active data and add to data library
@@ -57,11 +55,7 @@ export default function Pairwise() {
 		const unselected = activeData.filter(
 			(d) => !filtered_datasets.includes(d)
 		);
-		console.log('activeData', activeData)
-		console.log('filtered_datasets', filtered_datasets)
-		console.log('unselected', unselected)
 		sourceItems = sourceItems.concat(unselected);
-		console.log('sourceItems', sourceItems)
 		setActiveData(destItems);
 		setDataLibrary(sourceItems);
 	};

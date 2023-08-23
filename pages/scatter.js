@@ -68,12 +68,10 @@ export default function Scatter({fetchedNames}) {
     };
 
 	const handleRangeChange = (name, value) => {
-		const activeDatasetNames = activeData.map((d) => d.name);
 		let filtered_datasets = datasets.filter((d, i) => {
 			let filtered =
 				d[name] >= value[0] &&
-				d[name] <= value[1] &&
-				activeDatasetNames.includes(d.name);
+				d[name] <= value[1]
 			return filtered;
 		});
 		// remove filtered out data from active data and add to data library
