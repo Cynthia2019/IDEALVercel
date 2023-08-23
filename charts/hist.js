@@ -142,14 +142,21 @@ class Hist {
         };
 
         let mouseover_hist = function (e, d) {
-
+            // console.log(e)
+            // console.log(d)
+            // index = d3.select(this).attr("class")[5]
             d3.select(this)
                 .raise()
                 .style("stroke", "black")
                 .style("stroke-width", 5)
                 .style("fill-opacity", 1);
 
-            tooltip_hist.style("visibility", "visible")
+            // d3.selectAll('.mean-line' + index)
+            //     .raise()
+            //     .style("stroke-width", 10)
+            //     .style("fill-opacity", 1)
+            //     .style("stroke-dasharray", ("0, 0"))
+
 
         };
 
@@ -225,8 +232,10 @@ class Hist {
                     all_bins.push(...bins);
                     let temp_tooltip = {}
                     if (organizedData[i]) {
+                        // console.log('organized data', organizedData[i])
                         let temp_arr = organizedData[i].data.map((d, i) => d[query1])
-
+                        // temp_tooltip["max"] = d3.max(temp_arr)
+                        // temp_tooltip["min"] = d3.min(temp_arr)
                         temp_tooltip["name"] = organizedData[i].name
                         temp_tooltip["color"] = organizedData[i].color
                         temp_tooltip["min"] = d3.min(temp_arr)
@@ -235,7 +244,9 @@ class Hist {
                         temp_tooltip["median"] = d3.median(temp_arr)
                         tooltip.push(temp_tooltip)
                     }
-  
+                    // console.log("bins")
+                    // console.log(data[i] ? data[i].data.map((d, i) => d[query1]) : null)
+                    // console.log(temp_tooltip)
                     const Y1 = Array.from(bins, I0 => d3.sum(I0, i => Y0[i]));
 
                     // Compute default domains.
@@ -325,7 +336,8 @@ class Hist {
             .attr("font-family", "sans-serif")
             .attr("text-anchor", "middle")
 
-
+        // console.log('final_tool_tip')
+        // console.log(tooltip)
         setTooltip(tooltip);
 
 
@@ -338,7 +350,10 @@ class Hist {
 
         tooltip.map((d, i) => {
             let mean = tooltip[i].mean
-
+            // console.log('mean-line')
+            // console.log(dataset_dic[i])
+            // console.log(mean)
+            // console.log(xScales[index](mean))
             d3.select('svg')
                 .append('g')
                 .append('line')
@@ -400,7 +415,7 @@ class Hist {
             .style("border-width", "2px")
             .style("border-radius", "5px")
             .style("padding", "10px")
-            .style("visibility", "hidden")
+            .style("visibility", "visible")
             .html(tooltipContent.join("<br>"))
             .style("top", 60 + "px")
             .style("left", 0.5 * width + "px");
