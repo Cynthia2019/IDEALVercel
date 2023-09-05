@@ -16,9 +16,6 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import Papa, { parse } from "papaparse";
 import { colorAssignment, requiredColumns } from "@/util/constants";
 import {
-	DragDropContext,
-	Droppable,
-	Draggable,
 	resetServerContext,
 } from "react-beautiful-dnd";
 import * as React from "react";
@@ -208,7 +205,6 @@ const DataSelector = ({
 					</TableCell>
 
 					<TableCell component="th" scope="row">
-						{/*{dataset.name}*/}
 						<Chip
 							key={dataset.name}
 							label={dataset.name}

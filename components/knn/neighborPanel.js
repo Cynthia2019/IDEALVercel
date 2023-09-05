@@ -19,7 +19,9 @@ const transpose = (data) => {
       C16: data[i]['C16'],
       C26: data[i]['C26'], 
       C66: data[i]['C66'],
-      distance: Math.round(data[i]['distance']*100)/100
+      distance: Math.round(data[i]['distance']*100)/100, 
+      name: data[i]['name'], 
+      color: data[i]['color']
     }
   }
   transposed.push(point)
@@ -29,7 +31,6 @@ const transpose = (data) => {
 
 const NeighborPanel = ({ neighbors }) => {
     const csvLink = useRef() 
-    const theme = useTheme();
   const handleDownloadClick = () => {
     setTimeout(() => {
         csvLink.current.link.click();
