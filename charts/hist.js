@@ -14,6 +14,7 @@ const width = 968 // outer width, in pixels
 
 class Hist {
     constructor(data, container, legendContainer) {
+        this.isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
         this.container = container;
         this.render(data,
             {
@@ -56,11 +57,6 @@ class Hist {
         // Compute the inner dimensions of the cells.
         const cellWidth = (width - marginLeft - marginRight - (X.length - 1) * padding) / X.length;
         const cellHeight = (height - marginTop - marginBottom - (Y.length - 1) * padding) / Y.length;
-
-        // Construct scales and axes.
-        const xScales = X.map(X => xType(d3.extent(X), [0, cellWidth]));
-        const yScales = Y.map(Y => yType(d3.extent(Y), [cellHeight, 0]));
-        const zScale = d3.scaleOrdinal(zDomain, colors);
 
         this.svg = d3
             .select(container.current)
@@ -142,22 +138,11 @@ class Hist {
         };
 
         let mouseover_hist = function (e, d) {
-            // console.log(e)
-            // console.log(d)
-            // index = d3.select(this).attr("class")[5]
             d3.select(this)
                 .raise()
                 .style("stroke", "black")
                 .style("stroke-width", 5)
                 .style("fill-opacity", 1);
-
-            // d3.selectAll('.mean-line' + index)
-            //     .raise()
-            //     .style("stroke-width", 10)
-            //     .style("fill-opacity", 1)
-            //     .style("stroke-dasharray", ("0, 0"))
-
-
         };
 
 
@@ -232,10 +217,9 @@ class Hist {
                     all_bins.push(...bins);
                     let temp_tooltip = {}
                     if (organizedData[i]) {
-                        // console.log('organized data', organizedData[i])
+
                         let temp_arr = organizedData[i].data.map((d, i) => d[query1])
-                        // temp_tooltip["max"] = d3.max(temp_arr)
-                        // temp_tooltip["min"] = d3.min(temp_arr)
+
                         temp_tooltip["name"] = organizedData[i].name
                         temp_tooltip["color"] = organizedData[i].color
                         temp_tooltip["min"] = d3.min(temp_arr)
@@ -244,9 +228,7 @@ class Hist {
                         temp_tooltip["median"] = d3.median(temp_arr)
                         tooltip.push(temp_tooltip)
                     }
-                    // console.log("bins")
-                    // console.log(data[i] ? data[i].data.map((d, i) => d[query1]) : null)
-                    // console.log(temp_tooltip)
+
                     const Y1 = Array.from(bins, I0 => d3.sum(I0, i => Y0[i]));
 
                     // Compute default domains.
@@ -280,8 +262,6 @@ class Hist {
                             .attr("width", d => (bins.length == 1) ? 5 : Math.max(0, xScale(d.x1) - xScale(d.x0) - insetLeft - insetRight))
                             .attr("y", (d, i) => yScale(Y1[i]))
                             .attr("height", (d, i) => yScale(0) - yScale(Y1[i]))
-                            // .on("mouseleave", mouseleave_rec)
-                            // .on("mousemove", mousemove_hist)
                             .attr("transform", `translate(${-width / 10}, ${0})`)
 
                         d3.selectAll(".group" + i)
@@ -379,27 +359,6 @@ class Hist {
         )
     )
 
-        // let legend = d3.select('svg')
-        //     .append('g')
-        //     .append("line");
-        //
-        //
-        //
-        // legend//making a line for legend
-        //     .raise()
-        //     .attr("x1", width - 28)
-        //     .attr("x2", width)
-        //     .attr("y1", 10)
-        //     .attr("y2", 10)
-        //     .style("stroke-dasharray","5,5")//dashed array for line
-        //     .style("stroke", "black");
-        //
-        // legend.append("text")
-        //     .attr("x", width - 44)
-        //     .attr("y", 9)
-        //     .attr("dy", ".35em")
-        //     .style("text-anchor", "end")
-        //     .text("Mean");
         let tooltip_hist = d3
             .select(container.current)
             .append("div")
@@ -409,6 +368,7 @@ class Hist {
             .attr("class", "tooltip_hist")
             .style("position", "fixed")
             .style("background-color", "white")
+            .style("color", "black")
             .style("border", "solid")
             .style("stroke", "white")
             .style("box-shadow", "5px 5px 5px 0px rgba(0,0,0,0.3)")

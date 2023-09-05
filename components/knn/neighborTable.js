@@ -13,7 +13,7 @@ const NeighborTable = ({ data }) => {
         if (record) {
           const row = value;
           return (
-            <Col key={`neighbor-col-${key}-${i}`}>
+            <Col key={`neighbor-col-${key}-${i}`} >
               <Row justify={"start"} align={"center"} key={`neighbor-col-${key}-${i}-structure`}>
                 <StructureWrapper
                   data={{
@@ -23,7 +23,8 @@ const NeighborTable = ({ data }) => {
                     height: 50,
                     marginLeft: 0,
                     marginTop: 30,
-                    fontSize: '8px'
+                    fontSize: '8px',
+                    isDarkMode: false,
                   }}
                 ></StructureWrapper>
               </Row>

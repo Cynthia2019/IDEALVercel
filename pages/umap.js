@@ -17,8 +17,6 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
 
-import { calculateUmap } from "@/util/calculateUmap";
-
 export default function Umap() {
 	const [datasets, setDatasets] = useState([]);
 	const [availableDatasetNames, setAvailableDatasetNames] =
@@ -62,14 +60,12 @@ export default function Umap() {
 
 	async function fetchDataFromAWS(info, index) {
 		const command = new GetObjectCommand({
-			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
 			cacheControl: "no-cache",
 		});
 
 		await s3Client.send(command).then((res) => {
-			console.log(info.name);
 			let body = res.Body.transformToByteArray();
 			body.then((stream) => {
 				new Response(stream, {

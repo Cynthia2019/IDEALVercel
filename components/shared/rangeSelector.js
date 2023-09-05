@@ -1,6 +1,7 @@
 import { Slider, Row, Col } from "antd";
 import styles from "@/styles/rangeSelector.module.css";
 import sigFigs from "@/util/convertTo4SigFig";
+import { Typography } from "@mui/material";
 
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
@@ -14,7 +15,7 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
 
         return (
             <div className={styles["property-range"]}>
-                <p className={styles["range-title"]}>Property Range</p>
+                <Typography color="textPrimary" className={styles["range-title"]}>Property Range</Typography>
                 {rangeList.map((name, index) => {
                     return (
                         <>
@@ -22,7 +23,9 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                          className={`${open ? '' : styles["slider-closed"]}`}
                          style={{marginBottom: "0.5rem"}}
                     >
-                        <Col span={4}>{name}</Col>
+                        <Col span={4}>
+                            <Typography color={"textPrimary"}>{name}</Typography>
+                        </Col>
                         <Col span={20}>
                             <Slider
                                 range={{

@@ -18,7 +18,6 @@ import * as React from "react";
 import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
-import {margin} from "plotly.js/src/plots/layout_attributes";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -65,6 +64,7 @@ export default function Pairwise() {
 			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
+			
 			cacheControl: "no-cache",
 		});
 
@@ -96,6 +96,7 @@ export default function Pairwise() {
 	}
 	const fetchData = async () => {
 		const fetchedNames = await fetchNames();
+		console.log(fetchedNames)
 		setAvailableDatasetNames(fetchedNames.fetchedNames);
 		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
 	}
@@ -135,7 +136,7 @@ export default function Pairwise() {
 						<StructureWrapper data={dataPoint} />
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
-					</div>
+					</div> 
 					<div
 						className={`${
 							open ? styles.selectors : styles.selectorsClosed

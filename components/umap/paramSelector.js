@@ -1,6 +1,7 @@
 import { InputNumber, Slider, Row, Col } from "antd";
 import styles from "@/styles/umap.paramSelector.module.css";
 import { useState } from "react";
+import { Typography } from "@mui/material";
 
 const RangeSelector = ({ datasets, activeData, handleChange }) => {
 	const data = datasets;
@@ -23,19 +24,19 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 
 	return (
 		<div className={styles["property-range"]}>
-			<p className={styles["range-title"]}>Hyperparameter</p>
-				<Row style={{ fontWeight: "bold" }}>
+			<Typography variant="h3" className={styles["range-title"]} color={"textPrimary"}>Hyperparameter</Typography>
+				<Typography style={{ fontWeight: "bold" }} color={"textPrimary"}>
 					Number of neighbors:
-				</Row>
+				</Typography>
 
-				<Row style={{width:'80%'}}>
+				<Typography style={{width:'80%'}} color={"textPrimary"}>
 					The size of local neighborhood (in terms of number of
 					neighboring sample points) used for manifold approximation.
 					Larger values result in more global views of the manifold,
 					while smaller values result in more local data being
 					preserved. (Default: 30)
-				</Row>
-				<Row style={{width:'80%'}} justify={'space-between'} wrap={true}>
+				</Typography>
+				<Typography style={{width:'80%'}} justify={'space-between'} wrap={true} color={"textPrimary"}>
 					<Col span={16}>
 						<Slider
 							marks={marks}
@@ -59,7 +60,7 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 							}
 						/>
 					</Col>
-				</Row>
+				</Typography>
 		</div>
 	);
 };

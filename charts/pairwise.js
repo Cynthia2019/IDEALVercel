@@ -18,6 +18,7 @@ class Pairwise {
 // Released under the ISC license.
 // https://observablehq.com/@d3/splom
     constructor(data, container, legendContainer) {
+        this.isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
         this.container = container;
         // Compute values (and promote column names to accessors)
         this.legend = d3
@@ -347,12 +348,6 @@ class Pairwise {
                 }
             });
 
-
-            // window.open(
-            //     '/scatter',
-            //     '_self' // <- This is what makes it open in a new window.
-            // );
-
         }
 
         let mousedown_hist = function (e, d) {
@@ -373,17 +368,10 @@ class Pairwise {
                     dataset_dic[(Math.floor(d / datasets[0].length))] +
                     "<br>symmetry: " +
                     finalData[d]["symmetry"]
-                    // "<br>Material_0: " +
-                    // finalData[d].CM0 +
-                    // "<br>Material_1: "
-                    // d.CM1 +
-                    // `<br>${query1}: ` +
-                    // d[query1] +
-                    // `<br>${query2}: ` +
-                    // d[query2]
                 )
                 .style("top", e.pageY - 85 + "px")
                 .style("left", e.pageX - 165 + "px");
+            tooltip_circ.style("color", this.isDarkMode ? "white" : "black");
         };
 
         let mousemove_hist = function (e, d) {
@@ -401,20 +389,10 @@ class Pairwise {
                     expo(d3.mean(temp_arr), 3) +
                     "<br>Median: " +
                     expo(d3.median(temp_arr), 3)
-
-                    // "<br>symmetry: " +
-                    // finalData[d]["symmetry"]
-                    // "<br>Material_0: " +
-                    // finalData[d].CM0 +
-                    // "<br>Material_1: "
-                    // d.CM1 +
-                    // `<br>${query1}: ` +
-                    // d[query1] +
-                    // `<br>${query2}: ` +
-                    // d[query2]
                 )
                 .style("top", e.pageY - 110 + "px")
                 .style("left", e.pageX + 10 + "px")
+            tooltip_hist.style("color", this.isDarkMode ? "white" : "black");
         };
 
         d3.select(legendContainer).selectAll(".legend").remove();

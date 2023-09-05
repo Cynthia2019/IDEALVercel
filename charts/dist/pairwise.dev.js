@@ -342,10 +342,7 @@ function () {
             pairwise_query1: x[d[0]],
             pairwise_query2: x[d[1]]
           }
-        }); // window.open(
-        //     '/scatter',
-        //     '_self' // <- This is what makes it open in a new window.
-        // );
+        });
       };
 
       var mousedown_hist = function mousedown_hist(e, d) {

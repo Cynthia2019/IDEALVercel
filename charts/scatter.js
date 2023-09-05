@@ -1,12 +1,8 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
-import organizeByName from "@/util/organizeByName";
-import {UMAP} from "umap-js";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 8;
-
-const legendSpacing = 4;
 
 const MARGIN = {
 	TOP: 0,
@@ -35,6 +31,7 @@ function isBrushed(brush_coords, cx, cy) {
 
 class Scatter {
 	constructor(element, legendElement, data) {
+		this.isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
 		this.svg = d3
 			.select(element)
 			.append("svg")
@@ -200,6 +197,7 @@ class Scatter {
 				)
 				.style("top", e.pageY + 10 + "px")
 				.style("left", e.pageX + 10 + "px");
+			this.isDarkMode ?? tooltip.style("color", "black");
 		};
 
 		let mouseleave = function (e, d) {
@@ -249,7 +247,6 @@ class Scatter {
 				getKnnData(inputDataPoint).then((data) => {
 					let indices = data.indices;
 					let distances = data.distances;
-					console.log(indices, distances)
 					// index should be the index of the data in the current active dataset
 					d3.selectAll(".dataCircle")
 						.data(finalData)

@@ -4,7 +4,7 @@ import NeighborTable from "./neighborTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
 import { CSVLink } from "react-csv";
-
+import { useTheme } from '@mui/material/styles';
 const transpose = (data) => {
   if (data.length == 0) return []
   let transposed = []
@@ -29,6 +29,7 @@ const transpose = (data) => {
 
 const NeighborPanel = ({ neighbors }) => {
     const csvLink = useRef() 
+    const theme = useTheme();
   const handleDownloadClick = () => {
     setTimeout(() => {
         csvLink.current.link.click();

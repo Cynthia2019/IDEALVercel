@@ -47,7 +47,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 	"& .MuiInputBase-input": {
 		borderRadius: 4,
 		position: "relative",
-		backgroundColor: theme.palette.background.paper,
+		backgroundColor: theme.palette.background.default,
 		border: "1px solid #ced4da",
 		fontSize: 16,
 		padding: "10px 26px 10px 12px",
@@ -73,52 +73,58 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 }));
 
 const XAxisSelector = ({ query1, handleQuery1Change }) => {
-  return (
-	<div className={styles["data-content-line"]}>
-		<FormControl variant="standard" fullWidth>
-			<InputLabel id="x-axis-select-label">{query1}</InputLabel>
-			<Select
-				labelId="x-axis-select-label"
-				id="x-axis-select"
-				value={query1}
-				onChange={handleQuery1Change}
-				input={<BootstrapInput />}
-			>
-				{AxisSelections.map((item, index) => {
-					return (
-						<MenuItem value={item} key={index}>
-							{item}
-						</MenuItem>
-					);
-				})}
-			</Select>
-		</FormControl>
-	</div>
-)};
+	return (
+		<div className={styles["data-content-line"]}>
+			<FormControl variant="standard" fullWidth>
+				<InputLabel id="x-axis-select-label">
+					<Typography color="textPrimary" variant="h6">{query1}</Typography>
+				</InputLabel>
+				<Select
+					labelId="x-axis-select-label"
+					id="x-axis-select"
+					value={query1}
+					onChange={handleQuery1Change}
+					input={<BootstrapInput />}
+				>
+					{AxisSelections.map((item, index) => {
+						return (
+							<MenuItem value={item} key={index}>
+								{item}
+							</MenuItem>
+						);
+					})}
+				</Select>
+			</FormControl>
+		</div>
+	);
+};
 
 const YAxisSelector = ({ query2, handleQuery2Change }) => {
-  return (
-	<div className={styles["data-content-line"]}>
-		<FormControl variant="standard" fullWidth>
-			<InputLabel id="x-axis-select-label">{query2}</InputLabel>
-			<Select
-				labelId="x-axis-select-label"
-				id="x-axis-select"
-				value={query2}
-				onChange={handleQuery2Change}
-				input={<BootstrapInput />}
-			>
-				{AxisSelections.map((item, index) => {
-					return (
-						<MenuItem value={item} key={index}>
-							{item}
-						</MenuItem>
-					);
-				})}
-			</Select>
-		</FormControl>
-	</div>
-)};
+	return (
+		<div className={styles["data-content-line"]}>
+			<FormControl variant="standard" fullWidth>
+				<InputLabel id="x-axis-select-label">
+				<Typography color="textPrimary" variant="h6">{query2}</Typography>
+				</InputLabel>
+				<Select
+					labelId="x-axis-select-label"
+					id="x-axis-select"
+					value={query2}
+					onChange={handleQuery2Change}
+					input={<BootstrapInput />}
+				>
+					{AxisSelections.map((item, index) => {
+						return (
+							<MenuItem value={item} key={index}>
+								{item}
+							</MenuItem>
+						);
+					})}
+				</Select>
+			</FormControl>
+		</div>
+	);
+};
 
 const DataSelector = ({
 	page,
@@ -140,8 +146,8 @@ const DataSelector = ({
 	useEffect(() => {
 		setShowData(
 			availableDatasetNames.map((item) => {
-        return activeData.map((data) => data.name).includes(item.name);
-      })
+				return activeData.map((data) => data.name).includes(item.name);
+			})
 		);
 	}, [activeData]);
 
@@ -232,10 +238,11 @@ const DataSelector = ({
 						<Collapse in={open} timeout="auto" unmountOnExit>
 							<Box sx={{ margin: 1 }}>
 								<Typography
-									variant="h6"
+									variant="body"
 									gutterBottom
 									component="div"
-								></Typography>
+									color="textSecondary"
+								>
 								<Box>
 									<h3> Data info: </h3>
 									<p> {dataset.name} </p>
@@ -267,6 +274,7 @@ const DataSelector = ({
 										version (88k).
 									</p>
 								</Box>
+								</Typography>
 							</Box>
 						</Collapse>
 					</TableCell>
@@ -349,7 +357,7 @@ const DataSelector = ({
 					open ? styles["data-row"] : styles["data-row-closed"]
 				}`}
 			>
-				<p className={styles["data-title"]}>Data</p>
+				<Typography color="textPrimary" className={styles["data-title"]}>Data</Typography>
 				<Upload {...props} accept="text/csv">
 					<Button icon={<UploadOutlined />}>Upload</Button>
 				</Upload>
@@ -370,44 +378,47 @@ const DataSelector = ({
 						: styles["data-content-line-closed"]
 				}`}
 			>
-				<FormControl sx={{ m: 1, maxWidth: "100%" }}>
-					<div>
-						<TableContainer
-							component={Paper}
-							sx={{ maxHeight: 235, minWidth: 200 }}
-						>
-							<Table stickyHeader aria-label="simple table">
-								<TableHead>
-									<TableRow>
-										<TableCell></TableCell>
-										<TableCell>Name</TableCell>
-										<TableCell>Select</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{availableDatasetNames.map(
-										(dataset, index) => (
-											<Row
-												key={dataset.name}
-												dataset={dataset}
-												index={index}
-											/>
-										)
-									)}
-								</TableBody>
-							</Table>
-						</TableContainer>
-					</div>
-				</FormControl>
+				<TableContainer
+					component={Paper}
+					sx={{ maxHeight: 235, minWidth: 200, marginTop: "10px" }}
+				>
+					<Table stickyHeader aria-label="simple table">
+						<TableHead>
+							<TableRow>
+								<TableCell></TableCell>
+								<TableCell>Name</TableCell>
+								<TableCell>Select</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{availableDatasetNames.map((dataset, index) => (
+								<Row
+									key={dataset.name}
+									dataset={dataset}
+									index={index}
+								/>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			</div>
 			{page === "scatter" && (
 				<div>
-					<XAxisSelector query1={query1} handleQuery1Change={handleQuery1Change}/>
-					<YAxisSelector query2={query2} handleQuery2Change={handleQuery2Change}/>
+					<XAxisSelector
+						query1={query1}
+						handleQuery1Change={handleQuery1Change}
+					/>
+					<YAxisSelector
+						query2={query2}
+						handleQuery2Change={handleQuery2Change}
+					/>
 				</div>
 			)}
 			{page === "histogram" && (
-					<XAxisSelector query1={query1} handleQuery1Change={handleQuery1Change}/>
+				<XAxisSelector
+					query1={query1}
+					handleQuery1Change={handleQuery1Change}
+				/>
 			)}
 		</div>
 	);

@@ -3,22 +3,20 @@ import styles from "@/styles/Home.module.css";
 import SaveDataTable from "./saveDataTable";
 import Button from "@mui/material/Button";
 import DownloadIcon from "@mui/icons-material/Download";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { useTheme } from "@emotion/react";
 import Box from "@mui/material/Box";
-import { Row, Col } from "antd";
+import { Row, Col, Typography } from "antd";
 import { CSVLink } from "react-csv";
 
 const C_list = ["C11", "C12", "C22", "C16", "C26", "C66"];
 
 const SavePanel = ({ selectedData, setReset }) => {
   const csvLink = useRef();
+  const theme = useTheme(); 
   const handleDownloadClick = () => {
     setTimeout(() => {
       csvLink.current.link.click();
     });
-  };
-  const handleResetClick = () => {
-    setReset(true);
   };
   const [diversity, setDiversity] = useState({});
   useEffect(() => {
@@ -56,12 +54,6 @@ const SavePanel = ({ selectedData, setReset }) => {
           >
             Download
           </Button>
-          {/*<Button*/}
-          {/*  className={styles["save-table-button"]}*/}
-          {/*  endIcon={<RestartAltIcon />}*/}
-          {/*  onClick={handleResetClick}*/}
-          {/*  color="error"*/}
-          {/*></Button>*/}
           <CSVLink
             data={selectedData}
             filename={"saved_data.csv"}
@@ -76,18 +68,18 @@ const SavePanel = ({ selectedData, setReset }) => {
         </Row>
         <Row className={styles["save-table-sidebar"]}>
           <Box component="span">
-            <h3>Total:&nbsp;{selectedData.length}</h3>
+            <Typography color='textSecondary'>Total:&nbsp;{selectedData.length}</Typography>
           </Box>
           {Object.keys(diversity).length === 0 && (
             <Box component="span">
-              <h5 style={{color:'#FFB347'}}>Select more data points to get diversity score</h5>
+              <Typography style={{color:theme.palette.warning.main}}>Select more data points to get diversity score</Typography>
             </Box>
           )}
           <Box component="span">
-            <h3>Diversity raw:&nbsp;{diversity?.raw}</h3>
+            <Typography color='textSecondary'>Diversity raw:&nbsp;{diversity?.raw}</Typography>
           </Box>
           <Box component="span">
-            <h3>Diversity standardized:&nbsp;{diversity?.standardized}</h3>
+            <Typography color='textSecondary'>Diversity standardized:&nbsp;{diversity?.standardized}</Typography>
           </Box>
         </Row>
       </div>
