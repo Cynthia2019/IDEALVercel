@@ -24,7 +24,7 @@ const RangeSelector = ({ datasets, activeData, handleChange }) => {
 
 	return (
 		<div className={styles["property-range"]}>
-			<Typography variant="h3" className={styles["range-title"]} color={"textPrimary"}>Hyperparameter</Typography>
+			<Typography variant="h5" className={styles["range-title"]} color={"textPrimary"}>Hyperparameter</Typography>
 				<Typography style={{ fontWeight: "bold" }} color={"textPrimary"}>
 					Number of neighbors:
 				</Typography>
