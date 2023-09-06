@@ -6,7 +6,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { useTheme } from "@emotion/react";
 import Box from "@mui/material/Box";
 import { Row, Col, Typography } from "antd";
-import { CSVLink } from "react-csv";
+import {CSVDownload, CSVLink} from "react-csv";
 
 const C_list = ["C11", "C12", "C22", "C16", "C26", "C66"];
 
@@ -19,6 +19,8 @@ const SavePanel = ({ selectedData, setReset }) => {
     });
   };
   const [diversity, setDiversity] = useState({});
+  const [customFilename, setCustomFilename] = useState('');
+
   useEffect(() => {
     let formated = selectedData.map((data) => {
       let arr = C_list.map((col) => data[col]);
@@ -47,6 +49,12 @@ const SavePanel = ({ selectedData, setReset }) => {
       <div className={styles["save-data-content-line"]}>
         <p className={styles["data-title"]}>Save Panel</p>
         <div className={styles["save-table-button-group"]}>
+          <input
+              type="text"
+              placeholder="Enter filename..."
+              value={customFilename}
+              onChange={(e) => setCustomFilename(e.target.value)}
+          />
           <Button
             className={styles["save-table-button"]}
             endIcon={<DownloadIcon />}
@@ -56,7 +64,7 @@ const SavePanel = ({ selectedData, setReset }) => {
           </Button>
           <CSVLink
             data={selectedData}
-            filename={"saved_data.csv"}
+            filename={customFilename + ".csv"}
             ref={csvLink}
             target="_blank"
           ></CSVLink>
