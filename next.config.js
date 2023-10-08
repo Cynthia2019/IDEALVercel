@@ -8,7 +8,6 @@ const nextConfig = {
 
 module.exports = {
   reactStrictMode: false,
-  // webpack5: true,
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -17,5 +16,5 @@ module.exports = {
       };
     }
     return config;
-  }, 
+  }
 }

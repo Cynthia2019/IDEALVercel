@@ -17,7 +17,8 @@ import Button from "@mui/material/Button";
 import * as React from "react";
 import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from "next/head";
-import { fetchNames } from "@/components/fetchNames";
+import zlib from "zlib";
+import { Readable, Transform } from "stream";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
@@ -43,9 +44,7 @@ export default function Pairwise() {
 
 	const handleRangeChange = (name, value) => {
 		let filtered_datasets = datasets.filter((d, i) => {
-			let filtered =
-				d[name] >= value[0] &&
-				d[name] <= value[1]
+			let filtered = d[name] >= value[0] && d[name] <= value[1];
 			return filtered;
 		});
 		// remove filtered out data from active data and add to data library
@@ -59,50 +58,55 @@ export default function Pairwise() {
 		setDataLibrary(sourceItems);
 	};
 
-	async function fetchDataFromAWS(info, index) {
-		const command = new GetObjectCommand({
-			// Bucket: info.bucket_name,
-			Bucket: "ideal-dataset-1",
-			Key: info.name,
-			
-			cacheControl: "no-cache",
-		});
+	const getTransformStream = () => {
+		const transform = new Transform({
+			transform: (chunk, encoding, next) => {
+				 next(null, chunk);
+			 },
+		 });
+		 return transform;
+	  };
 
-		await s3Client.send(command).then((res) => {
-			let body = res.Body.transformToByteArray();
-			body.then((stream) => {
-				new Response(stream, {
-					headers: { "Content-Type": "text/csv" },
-				})
-					.text()
-					.then((data) => {
-						let parsed = csvParse(data);
+	const fetchData = async () => {
+		const fetchedNames = await fetch("http://localhost:8000/fetch")
+			.then((res) => res.json())
+			.catch((err) => console.log(err));
+		console.log(fetchedNames);
+		setAvailableDatasetNames(fetchedNames);
+		fetchedNames.map(async (info, i) => {
+			const command = new GetObjectCommand({
+				Bucket: info.bucket_name,
+				Key: info.name,
+			});
+			const s3Response = await s3Client.send(command);
+			let body = await s3Response.Body;
+			const readableStream = body.pipe(zlib.createGunzip()).pipe(getTransformStream());
+			const unzipStream = zlib.createUnzip();
+			readableStream.pipe(unzipStream);
 
-						let processedData = parsed.map((dataset, i) => {
-							return processData(dataset, i);
-						});
-						processedData.map(
-							(p) => (p.name = info.name)
-						);
-						processedData.map(
-							(p) => (p.color = colorAssignment[index])
-						);
-						setDatasets((prev) => [...prev, ...processedData]);
-						setDataPoint(processedData[0]);
-						setActiveData((prev) => [...prev, ...processedData]);
-					});
+			let processedData = [];
+			unzipStream.on("data", (chunk) => {
+				let data = chunk.toString();
+				console.log(data)
+				const parsedData = csvParse(data);
+				const processed = processData(parsedData);
+				processedData = processedData.concat(processed);
+				// setDatasets((prev) => [...prev, processedData]);
+				// setActiveData((prev) => [...prev, processedData]);
+				// setDataLibrary((prev) => [...prev, processedData]);
+			});
+			unzipStream.on("end", () => {
+				console.log("end");
+				console.log(processedData);
+			});
+			unzipStream.on("error", (err) => {
+				console.log(err);
 			});
 		});
-	}
-	const fetchData = async () => {
-		const fetchedNames = await fetchNames();
-		console.log(fetchedNames)
-		setAvailableDatasetNames(fetchedNames.fetchedNames);
-		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
-	}
+	};
 
 	useEffect(() => {
-		fetchData()
+		fetchData();
 	}, []);
 
 	const [open, setOpen] = useState(true);
@@ -132,11 +136,11 @@ export default function Pairwise() {
 							max_num_datasets={availableDatasetNames.length}
 						/>
 					</div>
-					<div className={styles.subPlots}>
+					{/* <div className={styles.subPlots}>
 						<StructureWrapper data={dataPoint} />
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
-					</div> 
+					</div> */}
 					<div
 						className={`${
 							open ? styles.selectors : styles.selectorsClosed

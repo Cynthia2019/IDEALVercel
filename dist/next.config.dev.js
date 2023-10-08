@@ -8,7 +8,6 @@ var nextConfig = {
 
 module.exports = {
   reactStrictMode: false,
-  // webpack5: true,
   webpack: function webpack(config, _ref) {
     var isServer = _ref.isServer;
 
