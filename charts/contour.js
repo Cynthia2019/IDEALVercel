@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
+import organizeByName from "@/util/organizeByName";
 
 const circleOriginalSize = 5;
 const circleFocusSize = 8;
@@ -13,8 +14,8 @@ const MARGIN = {
 
 const SIDE_BAR_SIZE = 100;
 
-const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const WIDTH = 968 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const HEIGHT = 968 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 
 function expo(x, f) {
 	if (x < 1000 && x > -1000) return x;
@@ -77,12 +78,13 @@ class Contour {
 	}
 	//query1: x-axis
 	//query2: y-axis
-	update({ data, element, query1, query2, datasets }) {
+	update({ data, element, query1, query2, max_num_datasets }) {
 		this.data = data;
 		this.query1 = query1;
 		this.query2 = query2;
 
 		let finalData = [].concat(...data);
+		console.log('final', data)
 
 		//remove elements to avoid repeated append
 
@@ -125,50 +127,52 @@ class Contour {
 		this.xLabel.text(this.query1);
 		this.yLabel.text(this.query2);
 
-		// Generate contours using d3-contour
-		const thresholds = 30; // Adjust the range and step as needed
-		const contours = d3
-			.contourDensity()
-			.x((d) => xScale(d[query1]))
-			.y((d) => yScale(d[query2]))
-			.size([WIDTH, HEIGHT]) // Adjust size as needed
-			.thresholds(thresholds)(finalData);
+		let datasets = [];
+		let colors = {}
+		let dataset_dic = {}
 
+		for (let i = 0; i <= max_num_datasets; i++) {
+			datasets.push([])
+		}
+		let organizedData = organizeByName(data);
+		organizedData.map((d, i) => {
+			colors[d.name] = d.color;
+			datasets[i] = (d.data) ? (d.data) : [];
+			dataset_dic[i] = d.name;
+		});
 
-		const contourData = contours.map((c, i) => {
-			data = finalData[i]
-			return {
-				...data,
-				...c
+		for (let i = 0; i <= max_num_datasets; i++) {
+			datasets[i].length > 1 ? console.log('color', datasets[i][3].color) : null;
+
+			const thresholds = 30; // Adjust the range and step as needed
+			const contours = d3
+				.contourDensity()
+				.x((d) => xScale(d[query1]))
+				.y((d) => yScale(d[query2]))
+				.size([WIDTH, HEIGHT]) // Adjust size as needed
+				.thresholds(thresholds)(datasets[i]);
+
+			if (datasets[i].length == 1) {
+				d3.selectAll(".group" + i)
+					.remove()
+			} else {
+				datasets[i].length > 1 ? this.svg
+						.append("g")
+						.selectAll("path")
+						.data(contours)
+						.enter()
+						.append("path")
+						.attr("fill", "none")
+						.attr("d", d3.geoPath())
+						.attr("stroke", colors[dataset_dic[i]]) // Assuming 'color' is the property you want to use
+						.attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
+						.attr("stroke-linejoin", "round")
+						.attr("class", "group" + i)
+
+					: null;
 			}
-		})
 
-		setTimeout(() => { }, 3000);
-
-		console.log(contourData)
-
-		// // Draw contour paths
-		// let contour = this.svg
-		// 					.append("g")
-		// 					.selectAll()
-		// 					.data(contours)
-		// contour
-		// .attr("fill", d => d.color)
-		// .attr("stroke", d => d.color)
-		// .attr("stroke-linejoin", "round")
-		// .join("path")
-		// .attr("stroke-width", (d, i) => (i % 5 ? 0.25 : 1))
-		// .attr("d", d3.geoPath());
-		 this.svg
-			.append("g")
-			.attr("fill", d => d.color)
-			.attr("stroke", "none")
-			.attr("stroke-linejoin", "round")
-			.selectAll()
-			.data(contourData)
-			.join("path")
-			.attr("stroke-width", (d, i) => (i % 5 ? 0.25 : 1))
-			.attr("d", d3.geoPath());
+		}
 
 		let circles = this.svg
 			.append("g")

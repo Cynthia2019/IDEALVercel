@@ -117,6 +117,8 @@ class Hist {
         });
 
         let finalData = [].concat(...datasets);
+        console.log('final_hist', finalData[0].color)
+
         //clean up before updating visuals
         d3.selectAll(".xAxisGroup").remove();
         d3.selectAll(".yAxisGroup").remove();

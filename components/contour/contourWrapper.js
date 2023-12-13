@@ -7,9 +7,10 @@ const ContourWrapper = ({
 	query1,
 	query2,
 	reset,
-	datasets,
+	max_num_datasets
 }) => {
-    const chartArea = useRef(null);
+	//issue is in contour chart, not here
+	const chartArea = useRef(null);
 	const legendArea = useRef(null);
 	const [chart, setChart] = useState(null);
 
@@ -21,6 +22,7 @@ const ContourWrapper = ({
 					chartArea.current,
 					legendArea.current,
 					data
+
 				)
 			);
 		} else {
@@ -31,8 +33,7 @@ const ContourWrapper = ({
 				setDataPoint,
 				query1,
 				query2,
-				datasets,
-			});
+				max_num_datasets});
 		}
 	}, [chart, query1, query2, data, reset]);
     return (

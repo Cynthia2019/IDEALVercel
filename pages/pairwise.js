@@ -90,6 +90,7 @@ export default function Pairwise() {
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
+
 					});
 			});
 		});
@@ -99,6 +100,7 @@ export default function Pairwise() {
 		console.log(fetchedNames)
 		setAvailableDatasetNames(fetchedNames.fetchedNames);
 		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+
 	}
 
 	useEffect(() => {

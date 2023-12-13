@@ -21,14 +21,14 @@ import ContourWrapper from "@/components/contour/contourWrapper";
 
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
-export default function Pairwise() {
+export default function Contour() {
 	// record all fetched data from the data library
 	// all data stored in one array
 	const [datasets, setDatasets] = useState([]);
 	// record all available data names in the data library
 	const [availableDatasetNames, setAvailableDatasetNames] = useState([]);
 	// record all currently selected data
-	const [activeData, setActiveData] = useState([]);
+	const [activeData, setActiveData] = useState([datasets]);
 	// record all non active data
 	const [dataLibrary, setDataLibrary] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
@@ -64,7 +64,6 @@ export default function Pairwise() {
 			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
-			
 			cacheControl: "no-cache",
 		});
 
@@ -99,6 +98,7 @@ export default function Pairwise() {
 		console.log(fetchedNames)
 		setAvailableDatasetNames(fetchedNames.fetchedNames);
 		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+
 	}
 
 	useEffect(() => {
@@ -122,6 +122,7 @@ export default function Pairwise() {
 							max_num_datasets={availableDatasetNames.length}
 							query1={"C11"}
 							query2={"C12"}
+							max_num_datasets={availableDatasetNames.length}
 						/>
 					</div>
 					{/* <div className={styles.subPlots}>
