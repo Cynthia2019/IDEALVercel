@@ -166,8 +166,8 @@ class Contour {
 
         for (let i = 0; i <= max_num_datasets; i++) {
             let bandwidth = 10;
-
-            datasets[i].length > 1 ?
+            console.log('data', datasets[i])
+            datasets[i].length == 98 ?
                 bandwidth = scottsBandwidth2D(datasets[i]) : null;
             // bandwidths.forEach(bandwidth => {
             // 	let logLikelihood = crossValidationLogLikelihood(datasets[i], bandwidth);
@@ -180,14 +180,17 @@ class Contour {
 
             console.log("Optimal Bandwidth:", datasets[i], bandwidth);
 
+            let contours = []
             const thresholds = 10; // Adjust the range and step as needed
-            const contours = d3
-                .contourDensity()
-                .x((d) => xScale(d[query1]))
-                .y((d) => yScale(d[query2]))
-                .size([WIDTH, HEIGHT]) // Adjust size as needed
-                .bandwidth(bandwidth)
-                .thresholds(thresholds)(datasets[i]);
+            if (datasets[i].length == 98) {
+                contours = d3
+                    .contourDensity()
+                    .x((d) => xScale(d[query1]))
+                    .y((d) => yScale(d[query2]))
+                    .size([WIDTH, HEIGHT]) // Adjust size as needed
+                    .bandwidth(bandwidth)
+                    .thresholds(thresholds)(datasets[i]);
+            }
 // Adjust the projection to fit the width and height of the SVG element
 			console.log('contours', contours)
 
@@ -204,27 +207,52 @@ class Contour {
 
             let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
 
-			var projection = d3.geoIdentity()
-				.fitSize([WIDTH, HEIGHT], contours[0]);
+			// var projection = d3.geoIdentity()
+			// 	.fitSize([WIDTH, HEIGHT], contours[0]);
 
 			if (datasets[i].length == 1) {
                 d3.selectAll(".group" + i)
                     .remove()
             } else {
-                datasets[i].length > 1 ? this.svg
+                datasets[i].length == 98 ? this.svg
                         .append("g")
                         .selectAll("path")
                         .data(contours)
                         .enter()
                         .append("path")
                         .attr("fill", d => getDensityColor(colors[dataset_dic[i]], d.value, maxDensity))
-                        .attr("d", d3.geoPath(projection))
+                        .attr("d", d3.geoPath())
                         // .attr("stroke", colors[dataset_dic[i]]) // Assuming 'color' is the property you want to use
                         // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
                         .attr("stroke-linejoin", "round")
                         .attr("class", "group" + i)
 
                     : null;
+
+                if (datasets[i].length == 98) {
+                    let circles = this.svg
+                        .append("g")
+                        .attr("clip-path", "url(#clip)")
+                        .attr("class", "clipPath")
+                        .selectAll(".dataCircle")
+                        .data(datasets[i]);
+
+                    circles
+                        .enter()
+                        .append("circle")
+                        .join(circles)
+                        .attr("r", circleOriginalSize)
+                        .attr("class", "dataCircle")
+                        .attr("fill", (d) => d.color)
+                        .style("stroke", "none")
+                        .style("stroke-width", 2)
+                        .style("fill-opacity", 0.8)
+                        .attr("cx", (d) => xScale(d[query1]))
+                        .attr("cy", (d) => yScale(d[query2]));
+                }
+
+
+
             }
 
         }
@@ -235,8 +263,8 @@ class Contour {
         // 	.attr("class", "clipPath")
         // 	.selectAll(".dataCircle")
         // 	.data(finalData);
-
-
+        //
+        //
         // circles
         // 	.enter()
         // 	.append("circle")
