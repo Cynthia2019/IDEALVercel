@@ -104,6 +104,7 @@ class Contour {
             ])
             .range([HEIGHT, 0]);
 
+        console.log('final_data', finalData)
         // Add a clipPath: everything out of this area won't be drawn.
         this.svg
             .append("defs")
@@ -167,7 +168,7 @@ class Contour {
         for (let i = 0; i <= max_num_datasets; i++) {
             let bandwidth = 10;
             console.log('data', datasets[i])
-            datasets[i].length == 98 ?
+            datasets[i][1] && datasets[i][1].name == "freeform_2d.csv" ?
                 bandwidth = scottsBandwidth2D(datasets[i]) : null;
             // bandwidths.forEach(bandwidth => {
             // 	let logLikelihood = crossValidationLogLikelihood(datasets[i], bandwidth);
@@ -182,7 +183,7 @@ class Contour {
 
             let contours = []
             const thresholds = 10; // Adjust the range and step as needed
-            if (datasets[i].length == 98) {
+            if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
                 contours = d3
                     .contourDensity()
                     .x((d) => xScale(d[query1]))
@@ -214,7 +215,7 @@ class Contour {
                 d3.selectAll(".group" + i)
                     .remove()
             } else {
-                datasets[i].length == 98 ? this.svg
+                datasets[i][1] && datasets[i][1].name == "freeform_2d.csv" ? this.svg
                         .append("g")
                         .selectAll("path")
                         .data(contours)
@@ -229,7 +230,7 @@ class Contour {
 
                     : null;
 
-                if (datasets[i].length == 98) {
+                if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
                     let circles = this.svg
                         .append("g")
                         .attr("clip-path", "url(#clip)")
@@ -246,7 +247,7 @@ class Contour {
                         .attr("fill", (d) => d.color)
                         .style("stroke", "none")
                         .style("stroke-width", 2)
-                        .style("fill-opacity", 0.8)
+                        .style("fill-opacity", 0.1)
                         .attr("cx", (d) => xScale(d[query1]))
                         .attr("cy", (d) => yScale(d[query2]));
                 }
