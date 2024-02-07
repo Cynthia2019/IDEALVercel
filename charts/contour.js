@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import {nnColorAssignment} from "@/util/constants";
 import organizeByName from "@/util/organizeByName";
 
-const circleOriginalSize = 5;
+const circleOriginalSize = 3;
 const circleFocusSize = 8;
 
 const MARGIN = {
@@ -14,8 +14,8 @@ const MARGIN = {
 
 const SIDE_BAR_SIZE = 100;
 
-const WIDTH = 968 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 968 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 
 function expo(x, f) {
     if (x < 1000 && x > -1000) return x;
@@ -35,8 +35,8 @@ class Contour {
             .attr("viewBox", [
                 -MARGIN.LEFT,
                 -MARGIN.TOP,
-                WIDTH - MARGIN.LEFT - MARGIN.RIGHT,
-                HEIGHT - MARGIN.TOP - MARGIN.BOTTOM,
+                WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
+                HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
             .attr("style", "max-width: 100%; overflow: visible")
 
@@ -182,15 +182,15 @@ class Contour {
             console.log("Optimal Bandwidth:", datasets[i], bandwidth);
 
             let contours = []
-            const thresholds = 10; // Adjust the range and step as needed
+            // const thresholds = 10; // Adjust the range and step as needed
             if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
                 contours = d3
                     .contourDensity()
                     .x((d) => xScale(d[query1]))
                     .y((d) => yScale(d[query2]))
                     .size([WIDTH, HEIGHT]) // Adjust size as needed
-                    .bandwidth(bandwidth)
-                    .thresholds(thresholds)(datasets[i]);
+                    .bandwidth(15)
+                    .thresholds(1200)(datasets[i]);
             }
 // Adjust the projection to fit the width and height of the SVG element
 			console.log('contours', contours)
@@ -200,7 +200,7 @@ class Contour {
                 let hsl = d3.hsl(baseColor);
                 // Adjust lightness based on density; you can adjust the formula as needed
                 hsl.l = hsl.l * (1 - (density / maxDensity));
-                hsl.opacity = 0.3;
+                hsl.opacity = 0.1;
 
                 // console.log('hsl', hsl)
                 return hsl.toString();
@@ -223,7 +223,7 @@ class Contour {
                         .append("path")
                         .attr("fill", d => getDensityColor(colors[dataset_dic[i]], d.value, maxDensity))
                         .attr("d", d3.geoPath())
-                        // .attr("stroke", colors[dataset_dic[i]]) // Assuming 'color' is the property you want to use
+                        // .attr("stroke", colors[dataset_dic[i]])
                         // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
                         .attr("stroke-linejoin", "round")
                         .attr("class", "group" + i)
@@ -247,9 +247,10 @@ class Contour {
                         .attr("fill", (d) => d.color)
                         .style("stroke", "none")
                         .style("stroke-width", 2)
-                        .style("fill-opacity", 0.1)
+                        .style("fill-opacity", 0.5)
                         .attr("cx", (d) => xScale(d[query1]))
-                        .attr("cy", (d) => yScale(d[query2]));
+                        .attr("cy", (d) => yScale(d[query2]))
+                        .raise();
                 }
 
 
