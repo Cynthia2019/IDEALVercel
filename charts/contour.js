@@ -247,7 +247,7 @@ class Contour {
                         .attr("fill", (d) => d.color)
                         .style("stroke", "none")
                         .style("stroke-width", 2)
-                        .style("fill-opacity", 0.5)
+                        .style("fill-opacity", 0.1)
                         .attr("cx", (d) => xScale(d[query1]))
                         .attr("cy", (d) => yScale(d[query2]))
                         .raise();
