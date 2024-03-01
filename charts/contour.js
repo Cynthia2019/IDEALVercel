@@ -198,9 +198,23 @@ class Contour {
 
             function getDensityColor(baseColor, density, maxDensity) {
                 let hsl = d3.hsl(baseColor);
-                // Adjust lightness based on density; you can adjust the formula as needed
-                hsl.l = hsl.l * (1 - (density / maxDensity));
-                hsl.opacity = 0.1;
+                // hsl.l = 1 is white, 0 is black
+                //discretize
+                // console.log(hsl.l)
+                // if ((density / maxDensity) < 0.6) console.log('density', (density / maxDensity))
+                if ((density / maxDensity) > 0.8) {
+                    hsl.l = 0.45
+                } else if ((density / maxDensity) > 0.6) {
+                    hsl.l = 0.55
+                }  else {
+                    hsl.l = 0.7
+                }
+                // const minLightness = 0.5;
+                // const lightnessRange = hsl.l - minLightness;
+
+                // hsl.l = minLightness + (lightnessRange * (density / maxDensity));
+                // hsl.l = hsl.l * (1 - (density / maxDensity));
+                hsl.opacity = 0.3;
 
                 // console.log('hsl', hsl)
                 return hsl.toString();
@@ -230,28 +244,28 @@ class Contour {
 
                     : null;
 
-                if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
-                    let circles = this.svg
-                        .append("g")
-                        .attr("clip-path", "url(#clip)")
-                        .attr("class", "clipPath")
-                        .selectAll(".dataCircle")
-                        .data(datasets[i]);
-
-                    circles
-                        .enter()
-                        .append("circle")
-                        .join(circles)
-                        .attr("r", circleOriginalSize)
-                        .attr("class", "dataCircle")
-                        .attr("fill", (d) => d.color)
-                        .style("stroke", "none")
-                        .style("stroke-width", 2)
-                        .style("fill-opacity", 0.1)
-                        .attr("cx", (d) => xScale(d[query1]))
-                        .attr("cy", (d) => yScale(d[query2]))
-                        .raise();
-                }
+                // if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
+                //     let circles = this.svg
+                //         .append("g")
+                //         .attr("clip-path", "url(#clip)")
+                //         .attr("class", "clipPath")
+                //         .selectAll(".dataCircle")
+                //         .data(datasets[i]);
+                //
+                //     circles
+                //         .enter()
+                //         .append("circle")
+                //         .join(circles)
+                //         .attr("r", circleOriginalSize)
+                //         .attr("class", "dataCircle")
+                //         .attr("fill", (d) => d.color)
+                //         .style("stroke", "none")
+                //         .style("stroke-width", 2)
+                //         .style("fill-opacity", 0.1)
+                //         .attr("cx", (d) => xScale(d[query1]))
+                //         .attr("cy", (d) => yScale(d[query2]))
+                //         .raise();
+                // }
 
 
 
