@@ -143,8 +143,6 @@ const DataSelector = ({
 }) => {
 	const [showData, setShowData] = useState([]);
 
-	console.log(dataLoadingStates)
-
 	useEffect(() => {
 		setShowData(
 			availableDatasetNames.map((item) => {

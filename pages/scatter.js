@@ -9,7 +9,7 @@ import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
 import { Row } from "antd";
-import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
 import { colorAssignment, MAX_DATA_POINTS_NUM } from "@/util/constants";
 import processData from "../util/processData";
@@ -32,6 +32,9 @@ export default function Scatter({ fetchedNames }) {
 
 	// record the loading state of data
 	const [dataLoadingStates, setDataLoadingStates] = useState([]);
+
+	//record the whole dataset 
+	const [completeData, setCompleteData] = useState([])
 	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const router = useRouter();
@@ -97,13 +100,17 @@ export default function Scatter({ fetchedNames }) {
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
-						processedData = processedData.slice(
-							0,
-							maxDataPointsPerDataset
-						);
 						processedData.map((p) => (p.name = info.name));
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
+						);
+						setCompleteData((prev) => [...prev, {
+							name: info.name, 
+							data: processedData
+						}])
+						processedData = processedData.slice(
+							0,
+							maxDataPointsPerDataset
 						);
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
@@ -115,7 +122,6 @@ export default function Scatter({ fetchedNames }) {
 									: obj
 							)
 						);
-						localStorage.setItem(info.name, JSON.stringify(processedData))
 					});
 			});
 		});
@@ -137,31 +143,12 @@ export default function Scatter({ fetchedNames }) {
 		);
 	};
 
-	const getData = (info, i) => {
-		const localData = JSON.parse(localStorage.getItem(info.name))
-		if (localData) {
-			setDatasets((prev) => [...prev, ...localData]);
-			setDataPoint(localData[0]);
-			setActiveData((prev) => [...prev, ...localData]);
-			setDataLoadingStates((prev) =>
-				prev.map((obj) =>
-					obj.name === info.name
-						? { ...obj, loading: false }
-						: obj
-				)
-			);
-		}
-		else {
-			fetchDataFromAWS(info, i)
-		}
-	}
-
 	useEffect(() => {
 		fetchDataNames();
 	}, []);
 
 	useEffect(() => {
-		dataLoadingStates.map((info, i) => getData(info, i));
+		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
 	}, [maxDataPointsPerDataset]);
 
 	const [open, setOpen] = useState(true);
@@ -188,11 +175,14 @@ export default function Scatter({ fetchedNames }) {
 						</div>
 						<ScatterWrapper
 							data={activeData}
+							completeData={completeData}
+							maxDataPointsPerDataset={maxDataPointsPerDataset}
 							setDataPoint={setDataPoint}
 							query1={query1}
 							query2={query2}
 							selectedData={selectedData}
 							setSelectedData={setSelectedData}
+							setActiveData={setActiveData}
 							setNeighbors={setNeighbors}
 							reset={reset}
 							setReset={setReset}

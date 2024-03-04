@@ -31,7 +31,9 @@ function isBrushed(brush_coords, cx, cy) {
 
 class Scatter {
 	constructor(element, legendElement, data) {
-		this.isDarkMode = window?.matchMedia && window?.matchMedia('(prefers-color-scheme: dark)').matches;
+		this.isDarkMode =
+			window?.matchMedia &&
+			window?.matchMedia("(prefers-color-scheme: dark)").matches;
 		this.svg = d3
 			.select(element)
 			.append("svg")
@@ -87,13 +89,15 @@ class Scatter {
 	//query2: y-axis
 	update({
 		data,
+		completeData,
+		maxDataPointsPerDataset,
 		element,
-		legendElement,
 		setDataPoint,
 		query1,
 		query2,
 		selectedData,
 		setSelectedData,
+		setActiveData,
 		setNeighbors,
 		reset,
 		setReset,
@@ -216,15 +220,21 @@ class Scatter {
 		};
 
 		async function getKnnData(dataPoint) {
-			const url =
-				"https://metamaterials-srv.northwestern.edu./model/";
+			const url = "https://metamaterials-srv.northwestern.edu./model/";
 			let response = await fetch(url, {
 				method: "POST",
 				mode: "cors",
 				body: JSON.stringify({
 					dataPoint: [dataPoint],
-					data: finalData.map(d => [d.C11, d.C12, d.C22, d.C16, d.C26, d.C66])
-				})
+					data: finalData.map((d) => [
+						d.C11,
+						d.C12,
+						d.C22,
+						d.C16,
+						d.C26,
+						d.C66,
+					]),
+				}),
 			})
 				.then((res) => res.json())
 				.catch((err) => console.log("fetch error", err.message));
@@ -294,7 +304,7 @@ class Scatter {
 		// Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
 		let zoom = d3
 			.zoom()
-			.scaleExtent([0.1, 20]) // This control how much you can unzoom (x1) and zoom (x20)
+			.scaleExtent([0.1, 100]) // This control how much you can unzoom (x1) and zoom (x20)
 			.translateExtent(chartExtent)
 			.extent(chartExtent)
 			.on("zoom", (event) => {
@@ -315,10 +325,53 @@ class Scatter {
 				this.xScaleForBrush = newXScale;
 				this.yScaleForBrush = newYScale;
 
-				d3.selectAll(".dataCircle")
-					.data(finalData)
-					.attr("cy", (d) => newYScale(d[query2]))
-					.attr("cx", (d) => newXScale(d[query1]));
+				// resample data based on the current zoom level
+				const [X0, X1] = xAxisCall.scale().domain();
+				const [Y0, Y1] = yAxisCall.scale().domain();
+				let newFinalData = [].concat(
+					...completeData.map((dataset) => {
+						return dataset.data
+							.filter(
+								(d) =>
+									d[query1] > X0 &&
+									d[query1] < X1 &&
+									d[query2] > Y0 &&
+									d[query2] < Y1
+							)
+							.sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+							.slice(0, maxDataPointsPerDataset);
+					})
+				);
+
+				d3.selectAll(".dataCircle").remove();
+				let circles = this.svg
+					.append("g")
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "clipPath")
+					.selectAll(".dataCircle")
+					.data(newFinalData);
+
+				circles.exit().transition().attr("r", 0).remove();
+				circles
+					.enter()
+					.append("circle")
+					.join(circles)
+					.attr("r", circleOriginalSize)
+					.attr("class", "dataCircle")
+					.attr("fill", (d) => d.color)
+					.classed("selected", function (d) {
+						return selectedData.includes(d);
+					})
+					.style("stroke", "none")
+					.style("stroke-width", 2)
+					.style("fill-opacity", 0.8)
+					.on("mousedown", mousedown)
+					.on("mouseover", mouseover)
+					.on("mousemove", mousemove)
+					.on("mouseleave", mouseleave)
+					.attr("cx", (d) => newXScale(d[query1]))
+					.attr("cy", (d) => newYScale(d[query2]));
+				finalData = newFinalData;
 			});
 
 		let brush = d3.brush().on("brush end", (event) => {

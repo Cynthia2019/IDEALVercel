@@ -40,11 +40,14 @@ const NeighborPaperComponent = (props) => {
 
 const ScatterWrapper = ({
 	data,
+	completeData,
+	maxDataPointsPerDataset,
 	setDataPoint,
 	query1,
 	query2,
 	selectedData,
 	setSelectedData,
+	setActiveData,
 	setNeighbors,
 	reset,
 	setReset,
@@ -94,6 +97,8 @@ const ScatterWrapper = ({
 		} else {
 			chart.update({
 				data,
+				completeData, 
+				maxDataPointsPerDataset,
 				element: chartArea.current,
 				legendElement: legendArea.current,
 				setDataPoint,
@@ -101,6 +106,7 @@ const ScatterWrapper = ({
 				query2,
 				selectedData,
 				setSelectedData,
+				setActiveData,
 				setNeighbors,
 				reset,
 				setReset,
@@ -196,33 +202,3 @@ const ScatterWrapper = ({
 };
 
 export default ScatterWrapper;
-
-{
-	/* <div
-id="main-plot-side-bar"
-style={{
-	display: "flex",
-	flexDirection: "column",
-	zIndex: 10,
-	marginLeft: 10,
-}}
->
-	{/* <ToggleButton value="zoom" aria-label="zoom">
-		<ZoomInMapIcon style={{ fontSize: "15px" }} />
-		<span style={{ fontSize: "10px" }}>Zoom</span>
-	</ToggleButton>
-	<ToggleButton value="brush-on" aria-label="brush-on">
-		<CheckCircleOutlinedIcon
-			style={{ fontSize: "15px", color: "green" }}
-		/>
-		<span style={{ fontSize: "10px" }}>Select Data</span>
-	</ToggleButton>
-	<ToggleButton value="brush-off" aria-label="brush-off">
-		<CancelOutlinedIcon
-			style={{ fontSize: "15px", color: "red" }}
-		/>
-		<span style={{ fontSize: "10px" }}>Deselect Data</span>
-	</ToggleButton> 
-
-</div> */
-}

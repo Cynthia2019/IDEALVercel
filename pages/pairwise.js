@@ -11,13 +11,16 @@ import { Row, Col } from "antd";
 import PairwiseWrapper from "../components/pairwise/pairwiseWrapper";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import { MAX_DATA_POINTS_NUM, colorAssignment, s3BucketList } from "@/util/constants";
+import {
+	MAX_DATA_POINTS_NUM,
+	colorAssignment,
+	s3BucketList,
+} from "@/util/constants";
 import processData from "../util/processData";
 import Button from "@mui/material/Button";
 import * as React from "react";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
-
 
 export default function Pairwise() {
 	// record all fetched data from the data library
@@ -30,9 +33,9 @@ export default function Pairwise() {
 	// record all non active data
 	const [dataLibrary, setDataLibrary] = useState([]);
 	// record the loading state of data
-	const [dataLoadingStates, setDataLoadingStates] = useState([])
+	const [dataLoadingStates, setDataLoadingStates] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200)
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const Youngs = dynamic(() => import("../components/youngs"), {
 		ssr: false,
@@ -96,7 +99,6 @@ export default function Pairwise() {
 									: obj
 							)
 						);
-						localStorage.setItem(info.name, JSON.stringify(processedData))
 					});
 			});
 		});
@@ -118,31 +120,12 @@ export default function Pairwise() {
 		);
 	};
 
-	const getData = (info, i) => {
-		const localData = JSON.parse(localStorage.getItem(info.name))
-		if (localData) {
-			setDatasets((prev) => [...prev, ...localData]);
-			setDataPoint(localData[0]);
-			setActiveData((prev) => [...prev, ...localData]);
-			setDataLoadingStates((prev) =>
-				prev.map((obj) =>
-					obj.name === info.name
-						? { ...obj, loading: false }
-						: obj
-				)
-			);
-		}
-		else {
-			fetchDataFromAWS(info, i)
-		}
-	}
-
 	useEffect(() => {
 		fetchDataNames();
 	}, []);
 
 	useEffect(() => {
-		dataLoadingStates.map((info, i) => getData(info, i));
+		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
 	}, [maxDataPointsPerDataset]);
 
 	const [open, setOpen] = useState(true);

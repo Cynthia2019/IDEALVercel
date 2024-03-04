@@ -83,10 +83,6 @@ export default function Hist({ fetchedNames }) {
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
-						processedData = processedData.slice(
-							0,
-							maxDataPointsPerDataset
-						);
 						processedData.map((p) => (p.name = info.name));
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -100,10 +96,6 @@ export default function Hist({ fetchedNames }) {
 									? { ...obj, loading: false }
 									: obj
 							)
-						);
-						localStorage.setItem(
-							info.name,
-							JSON.stringify(processedData)
 						);
 					});
 			});
@@ -126,28 +118,13 @@ export default function Hist({ fetchedNames }) {
 		);
 	};
 
-	const getData = (info, i) => {
-		const localData = JSON.parse(localStorage.getItem(info.name));
-		if (localData) {
-			setDatasets((prev) => [...prev, ...localData]);
-			setDataPoint(localData[0]);
-			setActiveData((prev) => [...prev, ...localData]);
-			setDataLoadingStates((prev) =>
-				prev.map((obj) =>
-					obj.name === info.name ? { ...obj, loading: false } : obj
-				)
-			);
-		} else {
-			fetchDataFromAWS(info, i);
-		}
-	};
 
 	useEffect(() => {
 		fetchDataNames();
 	}, []);
 
 	useEffect(() => {
-		dataLoadingStates.map((info, i) => getData(info, i));
+		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
 	}, [maxDataPointsPerDataset]);
 
 	const [open, setOpen] = useState(true);

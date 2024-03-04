@@ -122,7 +122,6 @@ export default function Contour() {
 							max_num_datasets={availableDatasetNames.length}
 							query1={"C11"}
 							query2={"C12"}
-							max_num_datasets={availableDatasetNames.length}
 						/>
 					</div>
 					{/* <div className={styles.subPlots}>
