@@ -6,16 +6,16 @@ const circleOriginalSize = 3;
 const circleFocusSize = 8;
 
 const MARGIN = {
-    TOP: 0,
-    RIGHT: 50,
-    BOTTOM: 20,
+    TOP: 50,
+    RIGHT: 10,
+    BOTTOM: 50,
     LEFT: 50,
 };
 
 const SIDE_BAR_SIZE = 100;
 
 const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const HEIGHT = 900 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 
 function expo(x, f) {
     if (x < 1000 && x > -1000) return x;
@@ -60,7 +60,8 @@ class Contour {
         // Append group el to display both axes
         this.xAxisGroup = this.svg
             .append("g")
-            .attr("transform", `translate(0, ${HEIGHT})`);
+            .attr("transform", `translate(0, ${HEIGHT})`)
+
 
         // Append group el to display both axes
         this.yAxisGroup = this.svg.append("g");
@@ -188,7 +189,7 @@ class Contour {
                     .contourDensity()
                     .x((d) => xScale(d[query1]))
                     .y((d) => yScale(d[query2]))
-                    .size([WIDTH, HEIGHT]) // Adjust size as needed
+                    .size([WIDTH, HEIGHT - 46]) // Adjust size as needed
                     .bandwidth(15)
                     .thresholds(1200)(datasets[i]);
             }
@@ -245,6 +246,7 @@ class Contour {
                         // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
                         .attr("stroke-linejoin", "round")
                         .attr("class", "group" + i)
+                        .attr("transform", `translate(50, 0)`)
 
                     : null;
 
