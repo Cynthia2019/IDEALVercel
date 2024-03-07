@@ -9,9 +9,9 @@ import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
 import { Row } from "antd";
-import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import { colorAssignment } from "@/util/constants";
+import { colorAssignment, MAX_DATA_POINTS_NUM } from "@/util/constants";
 import processData from "../util/processData";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -29,6 +29,13 @@ export default function Scatter({ fetchedNames }) {
 	const [selectedData, setSelectedData] = useState([]);
 	const [neighbors, setNeighbors] = useState([]);
 	const [reset, setReset] = useState(false);
+
+	// record the loading state of data
+	const [dataLoadingStates, setDataLoadingStates] = useState([]);
+
+	//record the whole dataset 
+	const [completeData, setCompleteData] = useState([])
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
@@ -75,7 +82,6 @@ export default function Scatter({ fetchedNames }) {
 
 	async function fetchDataFromAWS(info, index) {
 		const command = new GetObjectCommand({
-			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
 			cacheControl: "no-cache",
@@ -98,23 +104,52 @@ export default function Scatter({ fetchedNames }) {
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
 						);
+						setCompleteData((prev) => [...prev, {
+							name: info.name, 
+							data: processedData
+						}])
+						processedData = processedData.slice(
+							0,
+							maxDataPointsPerDataset
+						);
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
+						setDataLoadingStates((prev) =>
+							prev.map((obj) =>
+								obj.name === info.name
+									? { ...obj, loading: false }
+									: obj
+							)
+						);
 					});
 			});
 		});
 	}
-
-	const fetchData = async () => {
-		const fetchedNames = await fetchNames();
-		setAvailableDatasetNames(fetchedNames.fetchedNames);
-		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+	const fetchDataNames = async () => {
+		const fetchedNames = (await fetchNames()).fetchedNames;
+		setAvailableDatasetNames(fetchedNames);
+		setDataLoadingStates(
+			fetchedNames.map((info) => ({
+				...info,
+				loading: true,
+			}))
+		);
+		setMaxDataPointsPerDataset(
+			Math.ceil(
+				MAX_DATA_POINTS_NUM /
+					(fetchedNames.length === 0 ? 1 : fetchedNames.length)
+			)
+		);
 	};
 
 	useEffect(() => {
-		fetchData();
+		fetchDataNames();
 	}, []);
+
+	useEffect(() => {
+		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
+	}, [maxDataPointsPerDataset]);
 
 	const [open, setOpen] = useState(true);
 
@@ -140,11 +175,14 @@ export default function Scatter({ fetchedNames }) {
 						</div>
 						<ScatterWrapper
 							data={activeData}
+							completeData={completeData}
+							maxDataPointsPerDataset={maxDataPointsPerDataset}
 							setDataPoint={setDataPoint}
 							query1={query1}
 							query2={query2}
 							selectedData={selectedData}
 							setSelectedData={setSelectedData}
+							setActiveData={setActiveData}
 							setNeighbors={setNeighbors}
 							reset={reset}
 							setReset={setReset}
@@ -176,6 +214,7 @@ export default function Scatter({ fetchedNames }) {
 							setDatasets={setDatasets}
 							availableDatasetNames={availableDatasetNames}
 							setAvailableDatasetNames={setAvailableDatasetNames}
+							dataLoadingStates={dataLoadingStates}
 							query1={query1}
 							handleQuery1Change={handleQuery1Change}
 							query2={query2}
@@ -198,15 +237,6 @@ export default function Scatter({ fetchedNames }) {
 						/>
 					</div>
 				</Row>
-				{/* <Row style={{width: '60%'}}>
-                    <NeighborPanel neighbors={neighbors}/>
-                </Row> */}
-				{/* <Row style={{width: '60%'}}>
-                    <SavePanel
-                        selectedData={selectedData}
-                        setReset={setReset}
-                    />
-                </Row> */}
 			</div>
 		</div>
 	);

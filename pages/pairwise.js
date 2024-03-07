@@ -11,15 +11,16 @@ import { Row, Col } from "antd";
 import PairwiseWrapper from "../components/pairwise/pairwiseWrapper";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import { colorAssignment, s3BucketList } from "@/util/constants";
+import {
+	MAX_DATA_POINTS_NUM,
+	colorAssignment,
+	s3BucketList,
+} from "@/util/constants";
 import processData from "../util/processData";
 import Button from "@mui/material/Button";
 import * as React from "react";
-import Youngs_d3 from "@/components/shared/youngs_d3";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
-
-const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 export default function Pairwise() {
 	// record all fetched data from the data library
@@ -31,7 +32,10 @@ export default function Pairwise() {
 	const [activeData, setActiveData] = useState([]);
 	// record all non active data
 	const [dataLibrary, setDataLibrary] = useState([]);
+	// record the loading state of data
+	const [dataLoadingStates, setDataLoadingStates] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const Youngs = dynamic(() => import("../components/youngs"), {
 		ssr: false,
@@ -43,9 +47,7 @@ export default function Pairwise() {
 
 	const handleRangeChange = (name, value) => {
 		let filtered_datasets = datasets.filter((d, i) => {
-			let filtered =
-				d[name] >= value[0] &&
-				d[name] <= value[1]
+			let filtered = d[name] >= value[0] && d[name] <= value[1];
 			return filtered;
 		});
 		// remove filtered out data from active data and add to data library
@@ -61,10 +63,8 @@ export default function Pairwise() {
 
 	async function fetchDataFromAWS(info, index) {
 		const command = new GetObjectCommand({
-			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
-			
 			cacheControl: "no-cache",
 		});
 
@@ -81,31 +81,52 @@ export default function Pairwise() {
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
-						processedData.map(
-							(p) => (p.name = info.name)
+						processedData = processedData.slice(
+							0,
+							maxDataPointsPerDataset
 						);
+						processedData.map((p) => (p.name = info.name));
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
 						);
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
-
+						setDataLoadingStates((prev) =>
+							prev.map((obj) =>
+								obj.name === info.name
+									? { ...obj, loading: false }
+									: obj
+							)
+						);
 					});
 			});
 		});
 	}
-	const fetchData = async () => {
-		const fetchedNames = await fetchNames();
-		console.log(fetchedNames)
-		setAvailableDatasetNames(fetchedNames.fetchedNames);
-		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
-
-	}
+	const fetchDataNames = async () => {
+		const fetchedNames = (await fetchNames()).fetchedNames;
+		setAvailableDatasetNames(fetchedNames);
+		setDataLoadingStates(
+			fetchedNames.map((info) => ({
+				...info,
+				loading: true,
+			}))
+		);
+		setMaxDataPointsPerDataset(
+			Math.ceil(
+				MAX_DATA_POINTS_NUM /
+					(fetchedNames.length === 0 ? 1 : fetchedNames.length)
+			)
+		);
+	};
 
 	useEffect(() => {
-		fetchData()
+		fetchDataNames();
 	}, []);
+
+	useEffect(() => {
+		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
+	}, [maxDataPointsPerDataset]);
 
 	const [open, setOpen] = useState(true);
 
@@ -138,7 +159,7 @@ export default function Pairwise() {
 						<StructureWrapper data={dataPoint} />
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
-					</div> 
+					</div>
 					<div
 						className={`${
 							open ? styles.selectors : styles.selectorsClosed
@@ -157,6 +178,7 @@ export default function Pairwise() {
 							setDatasets={setDatasets}
 							availableDatasetNames={availableDatasetNames}
 							setAvailableDatasetNames={setAvailableDatasetNames}
+							dataLoadingStates={dataLoadingStates}
 							activeData={activeData}
 							dataLibrary={dataLibrary}
 							setActiveData={setActiveData}
