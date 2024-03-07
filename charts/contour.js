@@ -199,22 +199,26 @@ class Contour {
             function getDensityColor(baseColor, density, maxDensity) {
                 let hsl = d3.hsl(baseColor);
                 // hsl.l = 1 is white, 0 is black
-                //discretize
-                // console.log(hsl.l)
-                // if ((density / maxDensity) < 0.6) console.log('density', (density / maxDensity))
-                if ((density / maxDensity) > 0.8) {
-                    hsl.l = 0.45
-                } else if ((density / maxDensity) > 0.6) {
+                // We need this seemingly verbose if / else to manually separate colors
+                //
+                if ((density / maxDensity) > 0.4) {
+                    hsl.l = 0.50
+                } else if ((density / maxDensity) > 0.2) {
                     hsl.l = 0.55
-                }  else {
-                    hsl.l = 0.7
+                } else if ((density / maxDensity) > 0.1) {
+                    hsl.l = 0.60
+                } else if ((density / maxDensity) > 0.05) {
+                    hsl.l = 0.65
+                } else {
+                    console.log('density', (density / maxDensity))
+                    hsl.l = 0.80
                 }
                 // const minLightness = 0.5;
                 // const lightnessRange = hsl.l - minLightness;
 
                 // hsl.l = minLightness + (lightnessRange * (density / maxDensity));
                 // hsl.l = hsl.l * (1 - (density / maxDensity));
-                hsl.opacity = 0.3;
+                hsl.opacity = 0.5;
 
                 // console.log('hsl', hsl)
                 return hsl.toString();
