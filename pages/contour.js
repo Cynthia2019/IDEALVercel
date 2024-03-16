@@ -129,7 +129,7 @@ export default function Contour() {
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
 					</div>  */}
-					{/* <div
+					<div
 						className={`${
 							open ? styles.selectors : styles.selectorsClosed
 						}`}
@@ -163,7 +163,7 @@ export default function Contour() {
 							dataPoint={dataPoint}
 							open={open}
 						/>
-					</div> */}
+					</div> 
 				</Row>
 			</div>
 		</div>

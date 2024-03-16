@@ -169,7 +169,7 @@ class Contour {
         for (let i = 0; i <= max_num_datasets; i++) {
             let bandwidth = 10;
             console.log('data', datasets[i])
-            datasets[i][1] && datasets[i][1].name == "freeform_2d.csv" ?
+            datasets[i][1] ?
                 bandwidth = scottsBandwidth2D(datasets[i]) : null;
             // bandwidths.forEach(bandwidth => {
             // 	let logLikelihood = crossValidationLogLikelihood(datasets[i], bandwidth);
@@ -181,6 +181,21 @@ class Contour {
             // }) : null;
 
             console.log("Optimal Bandwidth:", datasets[i], bandwidth);
+            let mouseleave_contour = function (e, d) {
+                // tooltip_hist.style("visibility", "hidden").transition().duration(200);
+                d3.select(this)
+                    .style("stroke", "grey")
+                    .style("stroke-width", 0)
+                    .style("fill-opacity", 0.8);
+            };
+
+            let mouseover_contour = function (e, d) {
+                d3.select(this)
+                    .raise()
+                    .style("stroke", "black")
+                    .style("stroke-width", 5)
+                    .style("fill-opacity", 1);
+            };
 
             let contours = []
             // const thresholds = 10; // Adjust the range and step as needed
@@ -192,6 +207,14 @@ class Contour {
                     .size([WIDTH, HEIGHT - 46]) // Adjust size as needed
                     .bandwidth(15)
                     .thresholds(1200)(datasets[i]);
+            } else {
+                contours = d3
+                    .contourDensity()
+                    .x((d) => xScale(d[query1]))
+                    .y((d) => yScale(d[query2]))
+                    .size([WIDTH, HEIGHT - 46]) // Adjust size as needed
+                    .bandwidth(20)
+                    .thresholds(100)(datasets[i]);
             }
 // Adjust the projection to fit the width and height of the SVG element
 			console.log('contours', contours)
@@ -202,23 +225,23 @@ class Contour {
                 // hsl.l = 1 is white, 0 is black
                 // We need this seemingly verbose if / else to manually separate colors
                 //
-                if ((density / maxDensity) > 0.4) {
-                    hsl.l = 0.50
-                } else if ((density / maxDensity) > 0.2) {
-                    hsl.l = 0.55
-                } else if ((density / maxDensity) > 0.1) {
-                    hsl.l = 0.60
-                } else if ((density / maxDensity) > 0.05) {
-                    hsl.l = 0.65
-                } else {
-                    console.log('density', (density / maxDensity))
-                    hsl.l = 0.80
-                }
+                // if ((density / maxDensity) > 0.4) {
+                //     hsl.l = 0.50
+                // } else if ((density / maxDensity) > 0.2) {
+                //     hsl.l = 0.55
+                // } else if ((density / maxDensity) > 0.1) {
+                //     hsl.l = 0.60
+                // } else if ((density / maxDensity) > 0.05) {
+                //     hsl.l = 0.65
+                // } else {
+                //     console.log('density', (density / maxDensity))
+                //     hsl.l = 0.80
+                // }
                 // const minLightness = 0.5;
                 // const lightnessRange = hsl.l - minLightness;
 
                 // hsl.l = minLightness + (lightnessRange * (density / maxDensity));
-                // hsl.l = hsl.l * (1 - (density / maxDensity));
+                hsl.l = hsl.l * (1 - (density / maxDensity));
                 hsl.opacity = 0.5;
 
                 // console.log('hsl', hsl)
@@ -234,7 +257,7 @@ class Contour {
                 d3.selectAll(".group" + i)
                     .remove()
             } else {
-                datasets[i][1] && datasets[i][1].name == "freeform_2d.csv" ? this.svg
+                datasets[i][1] ? this.svg
                         .append("g")
                         .selectAll("path")
                         .data(contours)
@@ -249,6 +272,11 @@ class Contour {
                         .attr("transform", `translate(50, 0)`)
 
                     : null;
+
+                const legendWidth = 300;
+                const legendHeight = 20;
+                const numberOfSwatches = 5; // Number of different swatches in the legend
+                const maxDensityExample = 1; // Example max density for demonstration
 
                 // if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
                 //     let circles = this.svg
@@ -272,7 +300,9 @@ class Contour {
                 //         .attr("cy", (d) => yScale(d[query2]))
                 //         .raise();
                 // }
-
+                d3.selectAll(".group" + i)
+                    .on("mouseover", mouseover_contour)
+                    .on("mouseleave", mouseleave_contour)
 
 
             }
