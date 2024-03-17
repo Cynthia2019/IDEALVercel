@@ -129,41 +129,41 @@ export default function Contour() {
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
 					</div>  */}
-					<div
-						className={`${
-							open ? styles.selectors : styles.selectorsClosed
-						}`}
-					>
-						<img
-							src="/control.png"
-							className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple
-                m-4 border-2 rounded-full  ${open && "rotate-180"}`}
-							onClick={() => setOpen(!open)}
-							alt="control"
-						/>
+				{/*	<div*/}
+				{/*		className={`${*/}
+				{/*			open ? styles.selectors : styles.selectorsClosed*/}
+				{/*		}`}*/}
+				{/*	>*/}
+				{/*		<img*/}
+				{/*			src="/control.png"*/}
+				{/*			className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple*/}
+                {/*m-4 border-2 rounded-full  ${open && "rotate-180"}`}*/}
+				{/*			onClick={() => setOpen(!open)}*/}
+				{/*			alt="control"*/}
+				{/*		/>*/}
 
-						<DataSelector
-							page={"pairwise"}
-							setDatasets={setDatasets}
-							availableDatasetNames={availableDatasetNames}
-							setAvailableDatasetNames={setAvailableDatasetNames}
-							activeData={activeData}
-							dataLibrary={dataLibrary}
-							setActiveData={setActiveData}
-							setDataLibrary={setDataLibrary}
-							open={open}
-						/>
-						<RangeSelector
-							datasets={datasets}
-							activeData={activeData}
-							handleChange={handleRangeChange}
-							open={open}
-						/>
-						<MaterialInformation
-							dataPoint={dataPoint}
-							open={open}
-						/>
-					</div> 
+				{/*		<DataSelector*/}
+				{/*			page={"pairwise"}*/}
+				{/*			setDatasets={setDatasets}*/}
+				{/*			availableDatasetNames={availableDatasetNames}*/}
+				{/*			setAvailableDatasetNames={setAvailableDatasetNames}*/}
+				{/*			activeData={activeData}*/}
+				{/*			dataLibrary={dataLibrary}*/}
+				{/*			setActiveData={setActiveData}*/}
+				{/*			setDataLibrary={setDataLibrary}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*		<RangeSelector*/}
+				{/*			datasets={datasets}*/}
+				{/*			activeData={activeData}*/}
+				{/*			handleChange={handleRangeChange}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*		<MaterialInformation*/}
+				{/*			dataPoint={dataPoint}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*	</div> */}
 				</Row>
 			</div>
 		</div>

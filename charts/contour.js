@@ -190,8 +190,9 @@ class Contour {
             };
 
             let mouseover_contour = function (e, d) {
+                d3.select(this.parentNode)
+                    .raise();
                 d3.select(this)
-                    .raise()
                     .style("stroke", "black")
                     .style("stroke-width", 5)
                     .style("fill-opacity", 1);
@@ -257,7 +258,8 @@ class Contour {
                 d3.selectAll(".group" + i)
                     .remove()
             } else {
-                datasets[i][1] ? this.svg
+                if (datasets[i][1]) {
+                    let contour = this.svg
                         .append("g")
                         .selectAll("path")
                         .data(contours)
@@ -270,8 +272,11 @@ class Contour {
                         .attr("stroke-linejoin", "round")
                         .attr("class", "group" + i)
                         .attr("transform", `translate(50, 0)`)
+                        .on("mouseover", mouseover_contour)
+                        .on("mouseleave", mouseleave_contour);
+                }
 
-                    : null;
+
 
                 const legendWidth = 300;
                 const legendHeight = 20;
@@ -300,9 +305,8 @@ class Contour {
                 //         .attr("cy", (d) => yScale(d[query2]))
                 //         .raise();
                 // }
-                d3.selectAll(".group" + i)
-                    .on("mouseover", mouseover_contour)
-                    .on("mouseleave", mouseleave_contour)
+                // d3.selectAll(".group" + i)
+
 
 
             }
