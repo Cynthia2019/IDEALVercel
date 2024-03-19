@@ -127,7 +127,16 @@ class Contour {
         this.xLabel.text(this.query1);
         this.yLabel.text(this.query2);
 
-        console.log('query', query1, query2);
+        //clean up before updating visuals
+        d3.selectAll(".xAxisGroup").remove();
+        d3.selectAll(".yAxisGroup").remove();
+        d3.selectAll(".x-label").remove();
+        d3.selectAll(".tooltip_hist").remove();
+
+        for (let i = 0; i <= max_num_datasets; i++) {
+            d3.selectAll(".group" + i).remove()
+            d3.selectAll(".mean-line" + i).remove()
+        }
 
         let datasets = [];
         let colors = {}
@@ -136,6 +145,8 @@ class Contour {
         for (let i = 0; i <= max_num_datasets; i++) {
             datasets.push([])
         }
+        console.log('dataset', datasets);
+
         let organizedData = organizeByName(data);
         organizedData.map((d, i) => {
             colors[d.name] = d.color;
@@ -148,7 +159,6 @@ class Contour {
             const n = values.length;
             const standardDeviationX = d3.deviation(values, d => xScale(d[query1]));
             const standardDeviationY = d3.deviation(values, d => yScale(d[query2]));
-            console.log('std', standardDeviationX, standardDeviationY)
             const factor = Math.pow(n, -1 / 6);
             return (factor * standardDeviationX + factor * standardDeviationY) / 2;
 
@@ -168,19 +178,9 @@ class Contour {
 
         for (let i = 0; i <= max_num_datasets; i++) {
             let bandwidth = 10;
-            console.log('data', datasets[i])
             datasets[i][1] ?
                 bandwidth = scottsBandwidth2D(datasets[i]) : null;
-            // bandwidths.forEach(bandwidth => {
-            // 	let logLikelihood = crossValidationLogLikelihood(datasets[i], bandwidth);
-            // 	console.log('logLikelihood', logLikelihood)
-            // 	if (logLikelihood > maxLogLikelihood) {
-            // 		maxLogLikelihood = logLikelihood;
-            // 		optimalBandwidth = bandwidth;
-            // 	}
-            // }) : null;
 
-            console.log("Optimal Bandwidth:", datasets[i], bandwidth);
             let mouseleave_contour = function (e, d) {
                 // tooltip_hist.style("visibility", "hidden").transition().duration(200);
                 d3.select(this)
@@ -205,49 +205,71 @@ class Contour {
                     .contourDensity()
                     .x((d) => xScale(d[query1]))
                     .y((d) => yScale(d[query2]))
-                    .size([WIDTH, HEIGHT - 46]) // Adjust size as needed
+                    .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
                     .bandwidth(15)
-                    .thresholds(1200)(datasets[i]);
+                    .thresholds(1000)(datasets[i]);
             } else {
                 contours = d3
                     .contourDensity()
                     .x((d) => xScale(d[query1]))
                     .y((d) => yScale(d[query2]))
-                    .size([WIDTH, HEIGHT - 46]) // Adjust size as needed
-                    .bandwidth(20)
-                    .thresholds(100)(datasets[i]);
+                    .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
+                    .bandwidth(25)
+                    .thresholds(50)(datasets[i]);
             }
 // Adjust the projection to fit the width and height of the SVG element
-			console.log('contours', contours)
 
 
-            function getDensityColor(baseColor, density, maxDensity) {
+            function getDensityColorFull(baseColor, density, maxDensity) {
                 let hsl = d3.hsl(baseColor);
                 // hsl.l = 1 is white, 0 is black
                 // We need this seemingly verbose if / else to manually separate colors
                 //
-                // if ((density / maxDensity) > 0.4) {
-                //     hsl.l = 0.50
-                // } else if ((density / maxDensity) > 0.2) {
-                //     hsl.l = 0.55
-                // } else if ((density / maxDensity) > 0.1) {
-                //     hsl.l = 0.60
-                // } else if ((density / maxDensity) > 0.05) {
-                //     hsl.l = 0.65
-                // } else {
-                //     console.log('density', (density / maxDensity))
-                //     hsl.l = 0.80
-                // }
+                if ((density / maxDensity) > 0.4) {
+                    hsl.l = 0.50
+                } else if ((density / maxDensity) > 0.2) {
+                    hsl.l = 0.55
+                } else if ((density / maxDensity) > 0.1) {
+                    hsl.l = 0.60
+                } else if ((density / maxDensity) > 0.05) {
+                    hsl.l = 0.65
+                } else {
+                    hsl.l = 0.80
+                }
                 // const minLightness = 0.5;
                 // const lightnessRange = hsl.l - minLightness;
 
                 // hsl.l = minLightness + (lightnessRange * (density / maxDensity));
-                hsl.l = hsl.l * (1 - (density / maxDensity));
+                // hsl.l = hsl.l * (1 - (density / maxDensity));
                 hsl.opacity = 0.5;
 
                 // console.log('hsl', hsl)
                 return hsl.toString();
             }
+
+            function getDensityColorSample(baseColor, density, maxDensity) {
+                let hsl = d3.hsl(baseColor);
+                // hsl.l = 1 is white, 0 is black
+                // We need this seemingly verbose if / else to manually separate colors
+                //
+                if ((density / maxDensity) > 0.2) {
+                    hsl.l = 0.50
+                } else if ((density / maxDensity) > 0.15) {
+                    hsl.l = 0.55
+                } else if ((density / maxDensity) > 0.10) {
+                    hsl.l = 0.60
+                } else if ((density / maxDensity) > 0.05) {
+                    hsl.l = 0.65
+                } else {
+                    // console.log('density', (density / maxDensity))
+                    hsl.l = 0.80
+                }
+
+                // console.log('hsl', hsl)
+                return hsl.toString();
+            }
+
+
 
             let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
 
@@ -265,15 +287,19 @@ class Contour {
                         .data(contours)
                         .enter()
                         .append("path")
-                        .attr("fill", d => getDensityColor(colors[dataset_dic[i]], d.value, maxDensity))
+                        .attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
+                                d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity)
+                        : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity))
                         .attr("d", d3.geoPath())
                         // .attr("stroke", colors[dataset_dic[i]])
                         // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
-                        .attr("stroke-linejoin", "round")
+                        .attr("stroke-linejoin", "miter")
                         .attr("class", "group" + i)
-                        .attr("transform", `translate(50, 0)`)
+                        .attr("transform", `translate(60, -10)`)
                         .on("mouseover", mouseover_contour)
                         .on("mouseleave", mouseleave_contour);
+                    contour.exit().remove();
+
                 }
 
 
