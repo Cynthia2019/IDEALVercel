@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import organizeByName from "@/util/organizeByName";
 
 const MARGIN = {
-    TOP: 50,
+    TOP: 20,
     RIGHT: 10,
     BOTTOM: 50,
     LEFT: 50,
@@ -10,8 +10,10 @@ const MARGIN = {
 
 const SIDE_BAR_SIZE = 100;
 
-const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const WIDTH = 700 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const LEGEND_WIDTH = 600;
+const LEGEND_HEIGHT = 20;
 
 function expo(x, f) {
     if (x < 1000 && x > -1000) return x;
@@ -24,6 +26,7 @@ class Contour_test {
         this.isDarkMode =
             window?.matchMedia &&
             window?.matchMedia("(prefers-color-scheme: dark)").matches;
+
         this.svg = d3
             .select(element)
             .append("svg")
@@ -34,6 +37,19 @@ class Contour_test {
                 -MARGIN.TOP,
                 WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
                 HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
+            ])
+            .attr("style", "max-width: 100%; overflow: visible");
+
+        this.legendSvg = d3
+            .select(legendElement)
+            .append("svg")
+            .attr("width", LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+            .attr("height", LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+            .attr("viewBox", [
+                -MARGIN.LEFT,
+                -MARGIN.TOP,
+                LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
+                LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
             .attr("style", "max-width: 100%; overflow: visible");
 
@@ -60,9 +76,7 @@ class Contour_test {
 
         // Append group el to display both axes
         this.yAxisGroup = this.svg.append("g");
-        this.xScaleForBrush;
-        this.yScaleForBrush;
-
+        console.log('elements', element, legendElement)
         this.update({
             data: data,
             element: element,
@@ -81,11 +95,13 @@ class Contour_test {
                query1,
                query2,
                datasets,
-               max_num_datasets
+               max_num_datasets,
+               legendElement
            }) {
         this.data = data;
         this.query1 = query1;
         this.query2 = query2;
+        console.log('elements update', this.element, this.legendElement)
 
         let finalData = [].concat(...data);
 
@@ -152,6 +168,40 @@ class Contour_test {
                 .style("fill-opacity", 1);
         };
 
+        let createLegend = (baseColor, isFullDensity) => {
+            const numSamples = 5; // Number of samples in the gradient
+            const maxDensity = 1; // Assuming maxDensity is normalized to 1
+            const legendWidth = LEGEND_WIDTH;
+            const legendHeight = LEGEND_HEIGHT;
+
+            this.legendSvg.selectAll("*").remove();
+
+            // Generate sample density values and their corresponding colors
+            for (let i = 0; i <= numSamples; i++) {
+                let density = (i / numSamples) * maxDensity;
+                let color = isFullDensity
+                    ? getDensityColorFull(baseColor, density, maxDensity)
+                    : getDensityColorSample(baseColor, density, maxDensity);
+
+                // Draw the color rectangle
+                this.legendSvg.append("rect")
+                    .attr("x", i * (legendWidth / numSamples))
+                    .attr("width", legendWidth / numSamples)
+                    .attr("height", legendHeight)
+                    .style("fill", color);
+            }
+
+            // Add labels (you could adjust the density values based on your specific scale)
+                this.legendSvg.selectAll("text")
+                .data(d3.range(numSamples + 1))
+                .enter()
+                .append("text")
+                .attr("x", (d, i) => i * (legendWidth / numSamples))
+                .attr("y", legendHeight + 15)
+                .style("fill", "#000")
+                .style("font-size", "12px")
+                .text((d, i) => `${(i / numSamples).toFixed(2)} density`);
+        }
         function getDensityColorFull(baseColor, density, maxDensity) {
             let hsl = d3.hsl(baseColor);
             // hsl.l = 1 is white, 0 is black
@@ -279,6 +329,7 @@ class Contour_test {
                             .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
                             .bandwidth(15)
                             .thresholds(1000)(datasets[i]);
+                        createLegend(colors[dataset_dic[i]], true);
                     } else {
                         contours = d3
                             .contourDensity()
@@ -287,6 +338,7 @@ class Contour_test {
                             .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
                             .bandwidth(25)
                             .thresholds(50)(datasets[i]);
+                        createLegend(colors[dataset_dic[i]], false);
                     }
 
                     let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
@@ -361,6 +413,7 @@ class Contour_test {
                     .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
                     .bandwidth(15)
                     .thresholds(1000)(datasets[i]);
+                // createLegend(colors[dataset_dic[i]], true);
             } else {
                 contours = d3
                     .contourDensity()
@@ -369,6 +422,7 @@ class Contour_test {
                     .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
                     .bandwidth(25)
                     .thresholds(50)(datasets[i]);
+                createLegend(colors[dataset_dic[i]], false);
             }
 
             let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
