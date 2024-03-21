@@ -168,11 +168,12 @@ class Contour_test {
                 .style("fill-opacity", 1);
         };
 
-        let createLegend = (baseColors) => {
+        let createLegend = (baseColors, zoomed) => {
             const numSamples = 5; // Number of samples in the gradient
             const legendWidth = LEGEND_WIDTH;
             const legendHeight = LEGEND_HEIGHT;
             const legendPadding = 20; // Padding between legends
+            let density_offset = zoomed ? 0.2 : 0;
 
             this.legendSvg.selectAll("*").remove();
             baseColors.forEach((baseColor, index) => {
@@ -184,8 +185,7 @@ class Contour_test {
                     hsl.opacity = 0.5;
 
                     // Interpolating the lightness value between 0.9 (max) and 0.6 (min)
-                    hsl.l = 0.9 - (0.4 * (i / numSamples));
-
+                    hsl.l = (0.9 - density_offset) - ((0.4 - (density_offset)) * (i / numSamples));
                     let color = hsl.toString();
 
                     // Draw the color rectangle for the current legend
@@ -323,6 +323,8 @@ class Contour_test {
                     dataset_dic[i] = d.name;
                 });
 
+                createLegend(Object.values(colors), true);
+
                 // scott's estimation for bandwidth
 
                 for (let i = max_num_datasets; i >= 0; i--) {
@@ -408,7 +410,7 @@ class Contour_test {
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
-        createLegend(Object.values(colors));
+        createLegend(Object.values(colors), false);
 
         for (let i = max_num_datasets; i >= 0; i--) {
             let contours = []
