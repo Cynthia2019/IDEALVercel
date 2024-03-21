@@ -2,15 +2,15 @@ import * as d3 from "d3";
 import organizeByName from "@/util/organizeByName";
 
 const MARGIN = {
-    TOP: 20,
+    TOP: 100,
     RIGHT: 10,
-    BOTTOM: 50,
-    LEFT: 50,
+    BOTTOM: 0,
+    LEFT: 100,
 };
 
 const SIDE_BAR_SIZE = 100;
 
-const WIDTH = 700 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
+const WIDTH = 1000 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
 const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 const LEGEND_WIDTH = 600;
 const LEGEND_HEIGHT = 20;
@@ -47,7 +47,7 @@ class Contour_test {
             .attr("height", LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
             .attr("viewBox", [
                 -MARGIN.LEFT,
-                -MARGIN.TOP,
+                -MARGIN.TOP / 2,
                 LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
                 LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
@@ -168,52 +168,61 @@ class Contour_test {
                 .style("fill-opacity", 1);
         };
 
-        let createLegend = (baseColor, isFullDensity) => {
+        let createLegend = (baseColors) => {
             const numSamples = 5; // Number of samples in the gradient
-            const maxDensity = 1; // Assuming maxDensity is normalized to 1
             const legendWidth = LEGEND_WIDTH;
             const legendHeight = LEGEND_HEIGHT;
+            const legendPadding = 20; // Padding between legends
 
             this.legendSvg.selectAll("*").remove();
+            baseColors.forEach((baseColor, index) => {
+                // Calculate the starting y position for the current legend
+                let yOffset = index * (legendHeight + legendPadding);
 
-            // Generate sample density values and their corresponding colors
-            for (let i = 0; i <= numSamples; i++) {
-                let density = (i / numSamples) * maxDensity;
-                let color = isFullDensity
-                    ? getDensityColorFull(baseColor, density, maxDensity)
-                    : getDensityColorSample(baseColor, density, maxDensity);
+                for (let i = 0; i <= numSamples; i++) {
+                    let hsl = d3.hsl(baseColor);
+                    hsl.opacity = 0.5;
 
-                // Draw the color rectangle
-                this.legendSvg.append("rect")
-                    .attr("x", i * (legendWidth / numSamples))
-                    .attr("width", legendWidth / numSamples)
-                    .attr("height", legendHeight)
-                    .style("fill", color);
-            }
+                    // Interpolating the lightness value between 0.9 (max) and 0.6 (min)
+                    hsl.l = 0.9 - (0.4 * (i / numSamples));
 
-            // Add labels (you could adjust the density values based on your specific scale)
-                this.legendSvg.selectAll("text")
-                .data(d3.range(numSamples + 1))
-                .enter()
-                .append("text")
-                .attr("x", (d, i) => i * (legendWidth / numSamples))
-                .attr("y", legendHeight + 15)
-                .style("fill", "#000")
-                .style("font-size", "12px")
-                .text((d, i) => `${(i / numSamples).toFixed(2)} density`);
+                    let color = hsl.toString();
+
+                    // Draw the color rectangle for the current legend
+                    this.legendSvg.append("rect")
+                        .attr("x", i * (legendWidth / numSamples))
+                        .attr("y", yOffset) // Use yOffset for the y position
+                        .attr("width", legendWidth / numSamples)
+                        .attr("height", legendHeight)
+                        .style("fill", color);
+                }
+
+                // Add labels for the current legend
+                this.legendSvg.selectAll(`.text-${index}`)
+                    .data(d3.range(numSamples + 1))
+                    .enter()
+                    .append("text")
+                    .attr("class", `text-${index}`)
+                    .attr("x", (d, i) => i * (legendWidth / numSamples))
+                    .attr("y", yOffset + legendHeight + 15)
+                    .style("fill", "#000")
+                    .style("font-size", "12px")
+                    .text((d, i) => `${(i / numSamples).toFixed(2)} density`);
+            });
         }
-        function getDensityColorFull(baseColor, density, maxDensity) {
+        function getDensityColorFull(baseColor, density, maxDensity, zoomed) {
             let hsl = d3.hsl(baseColor);
+            let density_offset = zoomed ? 2 : 1;
             // hsl.l = 1 is white, 0 is black
             // We need this seemingly verbose if / else to manually separate colors
             //
-            if ((density / maxDensity) > 0.4) {
+            if ((density / maxDensity) > 0.4 * density_offset) {
                 hsl.l = 0.70
-            } else if ((density / maxDensity) > 0.2) {
+            } else if ((density / maxDensity) > 0.2 * density_offset) {
                 hsl.l = 0.75
-            } else if ((density / maxDensity) > 0.1) {
+            } else if ((density / maxDensity) > 0.1 * density_offset) {
                 hsl.l = 0.80
-            } else if ((density / maxDensity) > 0.05) {
+            } else if ((density / maxDensity) > 0.05 * density_offset) {
                 hsl.l = 0.85
             } else {
                 hsl.l = 0.90
@@ -225,19 +234,20 @@ class Contour_test {
             return hsl.toString();
         }
 
-        function getDensityColorSample(baseColor, density, maxDensity) {
+        function getDensityColorSample(baseColor, density, maxDensity, zoomed) {
             let hsl = d3.hsl(baseColor);
             // hsl.l = 1 is white, 0 is black
             // We need this seemingly verbose if / else to manually separate colors
             //
-            // if ((density / maxDensity) > 0.2) {
-            //     hsl.l = 0.50
-            // } else
-            if ((density / maxDensity) > 0.15) {
+            let density_offset = zoomed ? 2 : 1;
+
+            if ((density / maxDensity) > 0.2 * density_offset) {
+                hsl.l = 0.60
+            } else if ((density / maxDensity) > 0.15 * density_offset) {
                 hsl.l = 0.65
-            } else if ((density / maxDensity) > 0.10) {
+            } else if ((density / maxDensity) > 0.10 * density_offset) {
                 hsl.l = 0.75
-            } else if ((density / maxDensity) > 0.05) {
+            } else if ((density / maxDensity) > 0.05 * density_offset) {
                 hsl.l = 0.85
             } else {
                 // console.log('density', (density / maxDensity))
@@ -305,7 +315,6 @@ class Contour_test {
                 for (let i = 0; i <= max_num_datasets; i++) {
                     datasets.push([])
                 }
-                console.log('dataset', datasets);
 
                 let organizedData = organizeByName(newFinalData);
                 organizedData.map((d, i) => {
@@ -329,7 +338,6 @@ class Contour_test {
                             .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
                             .bandwidth(15)
                             .thresholds(1000)(datasets[i]);
-                        createLegend(colors[dataset_dic[i]], true);
                     } else {
                         contours = d3
                             .contourDensity()
@@ -338,7 +346,6 @@ class Contour_test {
                             .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
                             .bandwidth(25)
                             .thresholds(50)(datasets[i]);
-                        createLegend(colors[dataset_dic[i]], false);
                     }
 
                     let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
@@ -355,8 +362,8 @@ class Contour_test {
                                 .enter()
                                 .append("path")
                                 .attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
-                                    d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity)
-                                    : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity))
+                                    d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, true)
+                                    : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, true))
                                 .attr("d", d3.geoPath())
                                 // .attr("stroke", colors[dataset_dic[i]])
                                 // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
@@ -401,6 +408,7 @@ class Contour_test {
             datasets[i] = (d.data) ? (d.data) : [];
             dataset_dic[i] = d.name;
         });
+        createLegend(Object.values(colors));
 
         for (let i = max_num_datasets; i >= 0; i--) {
             let contours = []
@@ -413,7 +421,6 @@ class Contour_test {
                     .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
                     .bandwidth(15)
                     .thresholds(1000)(datasets[i]);
-                // createLegend(colors[dataset_dic[i]], true);
             } else {
                 contours = d3
                     .contourDensity()
@@ -422,7 +429,6 @@ class Contour_test {
                     .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
                     .bandwidth(25)
                     .thresholds(50)(datasets[i]);
-                createLegend(colors[dataset_dic[i]], false);
             }
 
             let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
@@ -440,8 +446,8 @@ class Contour_test {
                         .enter()
                         .append("path")
                         .attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
-                            d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity)
-                            : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity))
+                            d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, false)
+                            : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, false))
                         .attr("d", d3.geoPath())
                         // .attr("stroke", colors[dataset_dic[i]])
                         // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
@@ -457,6 +463,7 @@ class Contour_test {
             }
 
         }
+
     }
 }
 
