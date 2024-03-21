@@ -147,7 +147,7 @@ class Contour {
         }
         console.log('dataset', datasets);
 
-        let organizedData = organizeByName(data);
+        let organizedData = organizeByName(finalData);
         organizedData.map((d, i) => {
             colors[d.name] = d.color;
             datasets[i] = (d.data) ? (d.data) : [];
@@ -176,7 +176,7 @@ class Contour {
         }
 
 
-        for (let i = 0; i <= max_num_datasets; i++) {
+        for (let i = max_num_datasets; i >= 0; i--) {
             let bandwidth = 10;
             datasets[i][1] ?
                 bandwidth = scottsBandwidth2D(datasets[i]) : null;
@@ -226,15 +226,15 @@ class Contour {
                 // We need this seemingly verbose if / else to manually separate colors
                 //
                 if ((density / maxDensity) > 0.4) {
-                    hsl.l = 0.50
+                    hsl.l = 0.70
                 } else if ((density / maxDensity) > 0.2) {
-                    hsl.l = 0.55
+                    hsl.l = 0.75
                 } else if ((density / maxDensity) > 0.1) {
-                    hsl.l = 0.60
-                } else if ((density / maxDensity) > 0.05) {
-                    hsl.l = 0.65
-                } else {
                     hsl.l = 0.80
+                } else if ((density / maxDensity) > 0.05) {
+                    hsl.l = 0.85
+                } else {
+                    hsl.l = 0.90
                 }
                 // const minLightness = 0.5;
                 // const lightnessRange = hsl.l - minLightness;
@@ -252,23 +252,27 @@ class Contour {
                 // hsl.l = 1 is white, 0 is black
                 // We need this seemingly verbose if / else to manually separate colors
                 //
-                if ((density / maxDensity) > 0.2) {
-                    hsl.l = 0.50
-                } else if ((density / maxDensity) > 0.15) {
-                    hsl.l = 0.55
-                } else if ((density / maxDensity) > 0.10) {
-                    hsl.l = 0.60
-                } else if ((density / maxDensity) > 0.05) {
+                // if ((density / maxDensity) > 0.2) {
+                //     hsl.l = 0.50
+                // } else
+                if ((density / maxDensity) > 0.15) {
                     hsl.l = 0.65
+                } else if ((density / maxDensity) > 0.10) {
+                    hsl.l = 0.75
+                } else if ((density / maxDensity) > 0.05) {
+                    hsl.l = 0.85
                 } else {
                     // console.log('density', (density / maxDensity))
-                    hsl.l = 0.80
+                    hsl.l = 0.90
                 }
+
+                hsl.opacity = 0.5;
 
                 // console.log('hsl', hsl)
                 return hsl.toString();
             }
 
+            console.log('dataset', datasets)
 
 
             let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset

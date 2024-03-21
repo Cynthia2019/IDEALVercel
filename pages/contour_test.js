@@ -35,7 +35,7 @@ export default function Contour_test({ fetchedNames }) {
 
     //record the whole dataset
     const [completeData, setCompleteData] = useState([])
-    const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
+    const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(999999);
 
     const router = useRouter();
     const { pairwise_query1, pairwise_query2 } = router.query;
@@ -137,7 +137,7 @@ export default function Contour_test({ fetchedNames }) {
         );
         setMaxDataPointsPerDataset(
             Math.ceil(
-                MAX_DATA_POINTS_NUM /
+                9999999 /
                 (fetchedNames.length === 0 ? 1 : fetchedNames.length)
             )
         );
@@ -164,13 +164,10 @@ export default function Contour_test({ fetchedNames }) {
                     <div className={styles.mainPlot}>
                         <div className={styles.mainPlotHeader}>
                             <p className={styles.mainPlotTitle}>
-                                Material Data Explorer (Individual Scatter Plot)
+                                Material Data Explorer (Individual Contour Plot)
                             </p>
                             <p className={styles.mainPlotSub}>
-                                Select properties from the dropdown menus to
-                                graph. Hover over data points for additional
-                                information. Scroll to zoom, click and drag to
-                                pan.
+                                Hover over contour plot to bring it to front. Scroll to zoom.
                             </p>
                         </div>
                         <ContourWrapper_test
@@ -190,11 +187,6 @@ export default function Contour_test({ fetchedNames }) {
                             neighbors={neighbors}
                             max_num_datasets={availableDatasetNames.length}
                         />
-                    </div>
-                    <div className={styles.subPlots}>
-                        <StructureWrapper data={dataPoint} />
-                        <Youngs dataPoint={dataPoint} />
-                        <Poisson dataPoint={dataPoint} />
                     </div>
                     <div
                         className={`${
