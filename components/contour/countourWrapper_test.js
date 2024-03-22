@@ -65,7 +65,7 @@ const ContourWrapper_test = ({
                 marginLeft: "30px",
             }}
         >
-            <div id="legend" ref={legendArea}></div>
+            <div id="legend" ref={legendArea}></div>W
             <div id="main-plot" ref={chartArea}></div>
         </div>
     );
