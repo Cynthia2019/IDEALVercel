@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/shared/header";
 import styles from "@/styles/Home.module.css";
-import ScatterWrapper from "../components/scatter/scatterWrapper";
+import ScatterWithContourWrapper from "../components/scatter/scatterWithContourWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csvParse } from "d3";
 import dynamic from "next/dynamic";
@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
 
-export default function Scatter({ fetchedNames }) {
+export default function ScatterWithContour({ fetchedNames }) {
 	const [datasets, setDatasets] = useState([]);
 
 	const [availableDatasetNames, setAvailableDatasetNames] = useState(
@@ -33,8 +33,8 @@ export default function Scatter({ fetchedNames }) {
 	// record the loading state of data
 	const [dataLoadingStates, setDataLoadingStates] = useState([]);
 
-	//record the whole dataset 
-	const [completeData, setCompleteData] = useState([])
+	//record the whole dataset
+	const [completeData, setCompleteData] = useState([]);
 	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const router = useRouter();
@@ -77,17 +77,6 @@ export default function Scatter({ fetchedNames }) {
 
 		sourceItems = sourceItems.concat(unselected);
 		setActiveData(destItems);
-		let destItemsByNameData = destItems.reduce((acc, curr) => {
-			if(!acc[curr.name]) {
-				acc[curr.name] = []
-			}
-			else {
-				acc[curr.name].push(curr)
-			}
-			return acc; 
-		})
-		let destItemsByName = Object.entries(destItemsByNameData).map(([name, values]) => ({name, values}))
-		setCompleteData(destItemsByName)
 		setDataLibrary(sourceItems);
 	};
 
@@ -115,10 +104,13 @@ export default function Scatter({ fetchedNames }) {
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
 						);
-						setCompleteData((prev) => [...prev, {
-							name: info.name, 
-							data: processedData
-						}])
+						setCompleteData((prev) => [
+							...prev,
+							{
+								name: info.name,
+								data: processedData,
+							},
+						]);
 						processedData = processedData.slice(
 							0,
 							maxDataPointsPerDataset
@@ -184,7 +176,7 @@ export default function Scatter({ fetchedNames }) {
 								pan.
 							</p>
 						</div>
-						<ScatterWrapper
+						<ScatterWithContourWrapper
 							data={activeData}
 							completeData={completeData}
 							maxDataPointsPerDataset={maxDataPointsPerDataset}
@@ -199,6 +191,7 @@ export default function Scatter({ fetchedNames }) {
 							setReset={setReset}
 							datasets={datasets}
 							neighbors={neighbors}
+							max_num_datasets={availableDatasetNames.length}
 						/>
 					</div>
 					<div className={styles.subPlots}>

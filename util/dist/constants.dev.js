@@ -29,5 +29,5 @@ var requiredColumns = ["symmetry", "unit_cell_x", "unit_cell_y", "geometry_full"
 exports.requiredColumns = requiredColumns;
 var nnColorAssignment = ["#EA1A7F", "#FEC603", "#A8F387", "#16D6FA", '#6020a4'];
 exports.nnColorAssignment = nnColorAssignment;
-var MAX_DATA_POINTS_NUM = 1000;
+var MAX_DATA_POINTS_NUM = 700;
 exports.MAX_DATA_POINTS_NUM = MAX_DATA_POINTS_NUM;

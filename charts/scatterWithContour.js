@@ -1,7 +1,8 @@
 import * as d3 from "d3";
 import { nnColorAssignment } from "@/util/constants";
+import organizeByName from "@/util/organizeByName";
 
-const circleOriginalSize = 5;
+const circleOriginalSize = 3;
 const circleFocusSize = 8;
 
 const MARGIN = {
@@ -29,8 +30,8 @@ function isBrushed(brush_coords, cx, cy) {
 	return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
 }
 
-class Scatter {
-	constructor(element, legendElement, data) {
+class ScatterWithContour {
+	constructor(element, data) {
 		this.isDarkMode =
 			window?.matchMedia &&
 			window?.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -79,12 +80,12 @@ class Scatter {
 		this.update({
 			data: data,
 			element: element,
-			legendElement: legendElement,
 			query1: this.query1,
 			query2: this.query2,
 			reset: false,
 		});
 	}
+
 	//query1: x-axis
 	//query2: y-axis
 	update({
@@ -97,11 +98,10 @@ class Scatter {
 		query2,
 		selectedData,
 		setSelectedData,
-		setActiveData,
 		setNeighbors,
 		reset,
 		setReset,
-		datasets,
+		max_num_datasets,
 		clickedNeighbor,
 		setOpenNeighbor,
 	}) {
@@ -112,6 +112,7 @@ class Scatter {
 		let finalData = [].concat(...data);
 
 		//remove elements to avoid repeated append
+
 		d3.selectAll(".legend").remove();
 		d3.select(".tooltip").remove();
 		d3.selectAll(".dataCircle").remove();
@@ -136,7 +137,6 @@ class Scatter {
 
 		this.xScaleForBrush = xScale;
 		this.yScaleForBrush = yScale;
-
 		// Add a clipPath: everything out of this area won't be drawn.
 		this.svg
 			.append("defs")
@@ -158,6 +158,17 @@ class Scatter {
 		this.xLabel.text(this.query1);
 		this.yLabel.text(this.query2);
 
+		//clean up before updating visuals
+		d3.selectAll(".xAxisGroup").remove();
+		d3.selectAll(".yAxisGroup").remove();
+		d3.selectAll(".x-label").remove();
+		d3.selectAll(".tooltip_hist").remove();
+
+		for (let i = 0; i <= max_num_datasets; i++) {
+			d3.selectAll(".group" + i).remove();
+			d3.selectAll(".mean-line" + i).remove();
+		}
+
 		let tooltip = d3
 			.select(element)
 			.append("div")
@@ -169,6 +180,37 @@ class Scatter {
 			.style("padding", "10px")
 			.style("visibility", "hidden");
 
+		let datasets = [];
+		let colors = {};
+		let dataset_dic = {};
+
+		for (let i = 0; i <= max_num_datasets; i++) {
+			datasets.push([]);
+		}
+
+		let organizedData = organizeByName(finalData);
+		organizedData.map((d, i) => {
+			colors[d.name] = d.color;
+			datasets[i] = d.data ? d.data : [];
+			dataset_dic[i] = d.name;
+		});
+
+		// scott's estimation for bandwidth
+		function scottsBandwidth2D(values) {
+			const n = values.length;
+			const standardDeviationX = d3.deviation(values, (d) =>
+				xScale(d[query1])
+			);
+			const standardDeviationY = d3.deviation(values, (d) =>
+				yScale(d[query2])
+			);
+			const factor = Math.pow(n, -1 / 6);
+			return (
+				(factor * standardDeviationX + factor * standardDeviationY) / 2
+			);
+		}
+
+        // =============== Mouse Logic ================
 		let mouseover = function (e, d) {
 			d3.select(this)
 				.attr("r", circleFocusSize)
@@ -219,6 +261,75 @@ class Scatter {
 				.style("fill-opacity", 0.8);
 		};
 
+        let mouseleave_contour = function (e, d) {
+            d3.select(this)
+                .style("stroke", "grey")
+                .style("stroke-width", 0)
+                .style("fill-opacity", 0.8);
+        };
+
+        let mouseover_contour = function (e, d) {
+            d3.select(this.parentNode).raise();
+            d3.select(this)
+                .style("stroke", "black")
+                .style("stroke-width", 5)
+                .style("fill-opacity", 1);
+        };
+        // =================================================
+
+
+        //=============== Contours Helper =========================
+
+        function getDensityColorFull(baseColor, density, maxDensity) {
+            let hsl = d3.hsl(baseColor);
+            // hsl.l = 1 is white, 0 is black
+            // We need this seemingly verbose if / else to manually separate colors
+            //
+            if (density / maxDensity > 0.4) {
+                hsl.l = 0.7;
+            } else if (density / maxDensity > 0.2) {
+                hsl.l = 0.75;
+            } else if (density / maxDensity > 0.1) {
+                hsl.l = 0.8;
+            } else if (density / maxDensity > 0.05) {
+                hsl.l = 0.85;
+            } else {
+                hsl.l = 0.9;
+            }
+            hsl.opacity = 0.3;
+            return hsl.toString();
+        }
+
+        function getDensityColorSample(baseColor, density, maxDensity) {
+            let hsl = d3.hsl(baseColor);
+            // hsl.l = 1 is white, 0 is black
+            // We need this seemingly verbose if / else to manually separate colors
+            
+            if (density / maxDensity > 0.15) {
+                hsl.l = 0.6;
+            } else if (density / maxDensity > 0.1) {
+                hsl.l = 0.75;
+            } else if (density / maxDensity > 0.05) {
+                hsl.l = 0.85;
+            } else {
+                hsl.l = 0.9;
+            }
+
+            hsl.opacity = 0.3;
+
+            return hsl.toString();
+        }
+
+
+        // =========== Draw Initial Plots ==========
+		for (let i = max_num_datasets; i >= 0; i--) {
+            drawContour(i, xScale, yScale, this.svg)
+		}
+
+        drawCircles(xScale, yScale, this.svg, finalData)
+        // ==========================================
+
+        // =========== Select Circle Logic ===========
 		async function getKnnData(dataPoint) {
 			const url = "https://metamaterials-srv.northwestern.edu./model/";
 			let response = await fetch(url, {
@@ -295,6 +406,7 @@ class Scatter {
 				setOpenNeighbor(true);
 			}
 		};
+        // ==========================================
 
 		const chartExtent = [
 			[0, 0],
@@ -328,7 +440,6 @@ class Scatter {
 				// resample data based on the current zoom level
 				const [X0, X1] = xAxisCall.scale().domain();
 				const [Y0, Y1] = yAxisCall.scale().domain();
-				console.log(completeData)
 				let newFinalData = [].concat(
 					...completeData.map((dataset) => {
 						return dataset.data
@@ -344,35 +455,14 @@ class Scatter {
 					})
 				);
 
-				d3.selectAll(".dataCircle").remove();
-				let circles = this.svg
-					.append("g")
-					.attr("clip-path", "url(#clip)")
-					.attr("class", "clipPath")
-					.selectAll(".dataCircle")
-					.data(newFinalData);
+                
+                for (let i = max_num_datasets; i >= 0; i--) {
+                    d3.selectAll(".group" + i).remove()
+                    drawContour(i, newXScale, newYScale, this.svg)
+                }
 
-				circles.exit().transition().attr("r", 0).remove();
-				circles
-					.enter()
-					.append("circle")
-					.join(circles)
-					.attr("r", circleOriginalSize)
-					.attr("class", "dataCircle")
-					.attr("fill", (d) => d.color)
-					.classed("selected", function (d) {
-						return selectedData.includes(d);
-					})
-					.style("stroke", "none")
-					.style("stroke-width", 2)
-					.style("fill-opacity", 0.8)
-					.on("mousedown", mousedown)
-					.on("mouseover", mouseover)
-					.on("mousemove", mousemove)
-					.on("mouseleave", mouseleave)
-					.attr("cx", (d) => newXScale(d[query1]))
-					.attr("cy", (d) => newYScale(d[query2]));
-				finalData = newFinalData;
+				d3.selectAll(".dataCircle").remove();
+                drawCircles(newXScale, newYScale, this.svg, newFinalData)
 			});
 
 		let brush = d3.brush().on("brush end", (event) => {
@@ -397,11 +487,88 @@ class Scatter {
 			d3.selectAll(".selected").each((d, i) => selected.push(d));
 			setSelectedData(selected);
 		});
+
 		//apply zoom and brush to svg
 		this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
 		this.svg.call(zoom).on("mousedown.zoom", null);
 
-		let circles = this.svg
+        function drawContour(i, xScale, yScale, svg) {
+            let bandwidth = 10;
+			datasets[i][1]
+				? (bandwidth = scottsBandwidth2D(datasets[i]))
+				: null;
+
+			let contours = [];
+			// const thresholds = 10; // Adjust the range and step as needed
+			if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
+				contours = d3
+					.contourDensity()
+					.x((d) => xScale(d[query1]))
+					.y((d) => yScale(d[query2]))
+					.size([WIDTH, HEIGHT - 35]) // Adjust size as needed
+					.bandwidth(15)
+					.thresholds(1000)(datasets[i]);
+			} else {
+				contours = d3
+					.contourDensity()
+					.x((d) => xScale(d[query1]))
+					.y((d) => yScale(d[query2]))
+					.size([WIDTH, HEIGHT - 67]) // Adjust size as needed
+					.bandwidth(25)
+					.thresholds(50)(datasets[i]);
+			}
+
+			let maxDensity = d3.max(contours, (d) => d.value); // Maximum density for the current dataset
+
+			if (datasets[i].length == 1) {
+				d3.selectAll(".group" + i).remove();
+			} else {
+				if (datasets[i][1]) {
+					let contour = svg
+						.append("g")
+						.selectAll("path")
+						.data(contours)
+						.enter()
+						.append("path")
+						.attr(
+							"fill",
+							datasets[i][1].name == "freeform_2d.csv"
+								? (d) =>
+										getDensityColorFull(
+											colors[dataset_dic[i]],
+											d.value,
+											maxDensity
+										)
+								: (d) =>
+										getDensityColorSample(
+											colors[dataset_dic[i]],
+											d.value,
+											maxDensity
+										)
+						)
+						.attr("d", d3.geoPath())
+						.attr("stroke-linejoin", "miter")
+						.attr("class", "group" + i)
+						.attr("transform", `translate(60, -10)`)
+						.on("mouseover", mouseover_contour)
+						.on("mouseleave", mouseleave_contour);
+					contour.exit().remove();
+				}
+			}
+        }
+        // ============= Reset Logic ==============
+
+        if (reset) {
+			this.svg.call(zoom.transform, d3.zoomIdentity);
+			d3.selectAll(".selected").classed("selected", false);
+			setSelectedData([]);
+			setReset(false);
+		}
+
+
+        // ============= Draw Plot Logic ================
+        function drawCircles(xScale, yScale, svg, data) {
+            let circles = svg
 			.append("g")
 			.attr("clip-path", "url(#clip)")
 			.attr("class", "clipPath")
@@ -430,13 +597,9 @@ class Scatter {
 			.attr("cy", (d) => yScale(d[query2]));
 
 		circles.exit().transition().attr("r", 0).remove();
-		if (reset) {
-			this.svg.call(zoom.transform, d3.zoomIdentity);
-			d3.selectAll(".selected").classed("selected", false);
-			setSelectedData([]);
-			setReset(false);
-		}
-	}
+        finalData = data 
+        }
+ 	}
 }
 
-export default Scatter;
+export default ScatterWithContour;
