@@ -156,7 +156,7 @@ class Contour_test {
             d3.select(this)
                 .style("stroke", "grey")
                 .style("stroke-width", 0)
-                .style("fill-opacity", 0.8);
+                .attr("opacity", 0.5);
         };
 
         let mouseover_contour = function (e, d) {
@@ -165,7 +165,7 @@ class Contour_test {
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", 5)
-                .style("fill-opacity", 1);
+                .attr("opacity", 1);
         };
 
         let createLegend = (baseColors, zoomed) => {
@@ -273,115 +273,115 @@ class Contour_test {
             .translateExtent(chartExtent)
             .extent(chartExtent)
             .on("zoom", (event) => {
-                // recover the new scale
-                let newXScale = event.transform.rescaleX(xScale);
-                let newYScale = event.transform.rescaleY(yScale);
-
-                // update axes with these new boundaries
-                let xAxisCall = d3
-                    .axisBottom(newXScale)
-                    .tickFormat((x) => `${expo(x, 2)}`);
-                let yAxisCall = d3
-                    .axisLeft(newYScale)
-                    .tickFormat((y) => `${expo(y, 2)}`);
-                this.xAxisGroup.transition().duration(500).call(xAxisCall);
-                this.yAxisGroup.transition().duration(500).call(yAxisCall);
-
-                // resample data based on the current zoom level
-                const [X0, X1] = xAxisCall.scale().domain();
-                const [Y0, Y1] = yAxisCall.scale().domain();
-                let newFinalData = [].concat(
-                    ...completeData.map((dataset) => {
-                        return dataset.data
-                            .filter(
-                                (d) =>
-                                    d[query1] > X0 &&
-                                    d[query1] < X1 &&
-                                    d[query2] > Y0 &&
-                                    d[query2] < Y1
-                            )
-                            .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-                            .slice(0, maxDataPointsPerDataset);
-                    })
-                );
-                d3.selectAll(".xAxisGroup").remove();
-                d3.selectAll(".yAxisGroup").remove();
-                d3.selectAll(".x-label").remove();
-
-                let datasets = [];
-                let colors = {}
-                let dataset_dic = {}
-
-                for (let i = 0; i <= max_num_datasets; i++) {
-                    datasets.push([])
-                }
-
-                let organizedData = organizeByName(newFinalData);
-                organizedData.map((d, i) => {
-                    colors[d.name] = d.color;
-                    datasets[i] = (d.data) ? (d.data) : [];
-                    dataset_dic[i] = d.name;
-                });
-
-                createLegend(Object.values(colors), true);
-
-                // scott's estimation for bandwidth
-
-                for (let i = max_num_datasets; i >= 0; i--) {
-                    d3.selectAll(".group" + i).remove()
-
-                    let contours = []
-                    // const thresholds = 10; // Adjust the range and step as needed
-                    if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
-                        contours = d3
-                            .contourDensity()
-                            .x((d) => xScale(d[query1]))
-                            .y((d) => yScale(d[query2]))
-                            .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
-                            .bandwidth(15)
-                            .thresholds(1000)(datasets[i]);
-                    } else {
-                        contours = d3
-                            .contourDensity()
-                            .x((d) => xScale(d[query1]))
-                            .y((d) => yScale(d[query2]))
-                            .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
-                            .bandwidth(25)
-                            .thresholds(50)(datasets[i]);
-                    }
-
-                    let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
-
-                    if (datasets[i].length == 1) {
-                        d3.selectAll(".group" + i)
-                            .remove()
-                    } else {
-                        if (datasets[i][1]) {
-                            let contour = this.svg
-                                .append("g")
-                                .selectAll("path")
-                                .data(contours)
-                                .enter()
-                                .append("path")
-                                .attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
-                                    d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, true)
-                                    : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, true))
-                                .attr("d", d3.geoPath())
-                                // .attr("stroke", colors[dataset_dic[i]])
-                                // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
-                                .attr("stroke-linejoin", "miter")
-                                .attr("class", "group" + i)
-                                .attr("transform", `translate(60, -10)`)
-                                .on("mouseover", mouseover_contour)
-                                .on("mouseleave", mouseleave_contour);
-                            contour.exit().remove();
-
-                        }
-
-                    }
-
-                }
-                finalData = newFinalData;
+                // // recover the new scale
+                // let newXScale = event.transform.rescaleX(xScale);
+                // let newYScale = event.transform.rescaleY(yScale);
+                //
+                // // update axes with these new boundaries
+                // let xAxisCall = d3
+                //     .axisBottom(newXScale)
+                //     .tickFormat((x) => `${expo(x, 2)}`);
+                // let yAxisCall = d3
+                //     .axisLeft(newYScale)
+                //     .tickFormat((y) => `${expo(y, 2)}`);
+                // this.xAxisGroup.transition().duration(500).call(xAxisCall);
+                // this.yAxisGroup.transition().duration(500).call(yAxisCall);
+                //
+                // // resample data based on the current zoom level
+                // const [X0, X1] = xAxisCall.scale().domain();
+                // const [Y0, Y1] = yAxisCall.scale().domain();
+                // let newFinalData = [].concat(
+                //     ...completeData.map((dataset) => {
+                //         return dataset.data
+                //             .filter(
+                //                 (d) =>
+                //                     d[query1] > X0 &&
+                //                     d[query1] < X1 &&
+                //                     d[query2] > Y0 &&
+                //                     d[query2] < Y1
+                //             )
+                //             .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+                //             .slice(0, maxDataPointsPerDataset);
+                //     })
+                // );
+                // d3.selectAll(".xAxisGroup").remove();
+                // d3.selectAll(".yAxisGroup").remove();
+                // d3.selectAll(".x-label").remove();
+                //
+                // let datasets = [];
+                // let colors = {}
+                // let dataset_dic = {}
+                //
+                // for (let i = 0; i <= max_num_datasets; i++) {
+                //     datasets.push([])
+                // }
+                //
+                // let organizedData = organizeByName(newFinalData);
+                // organizedData.map((d, i) => {
+                //     colors[d.name] = d.color;
+                //     datasets[i] = (d.data) ? (d.data) : [];
+                //     dataset_dic[i] = d.name;
+                // });
+                //
+                // createLegend(Object.values(colors), true);
+                //
+                // // scott's estimation for bandwidth
+                //
+                // for (let i = max_num_datasets; i >= 0; i--) {
+                //     d3.selectAll(".group" + i).remove()
+                //
+                //     let contours = []
+                //     // const thresholds = 10; // Adjust the range and step as needed
+                //     if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
+                //         contours = d3
+                //             .contourDensity()
+                //             .x((d) => xScale(d[query1]))
+                //             .y((d) => yScale(d[query2]))
+                //             .size([WIDTH, HEIGHT - 35]) // Adjust size as needed
+                //             .bandwidth(15)
+                //             .thresholds(1000)(datasets[i]);
+                //     } else {
+                //         contours = d3
+                //             .contourDensity()
+                //             .x((d) => xScale(d[query1]))
+                //             .y((d) => yScale(d[query2]))
+                //             .size([WIDTH, HEIGHT - 67]) // Adjust size as needed
+                //             .bandwidth(25)
+                //             .thresholds(50)(datasets[i]);
+                //     }
+                //
+                //     let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
+                //
+                //     if (datasets[i].length == 1) {
+                //         d3.selectAll(".group" + i)
+                //             .remove()
+                //     } else {
+                //         if (datasets[i][1]) {
+                //             let contour = this.svg
+                //                 .append("g")
+                //                 .selectAll("path")
+                //                 .data(contours)
+                //                 .enter()
+                //                 .append("path")
+                //                 .attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
+                //                     d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, true)
+                //                     : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, true))
+                //                 .attr("d", d3.geoPath())
+                //                 // .attr("stroke", colors[dataset_dic[i]])
+                //                 // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
+                //                 .attr("stroke-linejoin", "miter")
+                //                 .attr("class", "group" + i)
+                //                 .attr("transform", `translate(60, -10)`)
+                //                 .on("mouseover", mouseover_contour)
+                //                 .on("mouseleave", mouseleave_contour);
+                //             contour.exit().remove();
+                //
+                //         }
+                //
+                //     }
+                //
+                // }
+                // finalData = newFinalData;
 
             });
 
@@ -451,13 +451,14 @@ class Contour_test {
                             d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, false)
                             : d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, false))
                         .attr("d", d3.geoPath())
-                        // .attr("stroke", colors[dataset_dic[i]])
-                        // .attr("stroke-width", (d, i) => (i % 10 ? 0 : 1))
+                        .attr("stroke", "grey")
+                        .attr("stroke-width", 0)
                         .attr("stroke-linejoin", "miter")
                         .attr("class", "group" + i)
                         .attr("transform", `translate(60, -10)`)
                         .on("mouseover", mouseover_contour)
-                        .on("mouseleave", mouseleave_contour);
+                        .on("mouseleave", mouseleave_contour)
+                        .attr("opacity", 0.5);
                     contour.exit().remove();
 
                 }
