@@ -168,6 +168,10 @@ export default function Contour_test({ fetchedNames }) {
                             </p>
                             <p className={styles.mainPlotSub}>
                                 Hover over contour plot to bring it to front. Scroll to zoom.
+                                You can find out how the density plots are generated
+                                <a href="https://d3js.org/d3-contour/density"> here</a>.
+                                The legend denotes the absolute number of points contained in each color.
+
                             </p>
                         </div>
                         <ContourWrapper_test

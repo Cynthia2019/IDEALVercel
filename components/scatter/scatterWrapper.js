@@ -63,7 +63,7 @@ const ScatterWrapper = ({
 	const [activateKNN, setActivateKNN ] = useState("#556cd6");
 
 	const toggleFindNeighbors = () => {
-		setClickedNeighbor((current) => !current);
+		// setClickedNeighbor((current) => !current);
 		setActivateKNN((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
 	};
 
