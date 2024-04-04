@@ -130,6 +130,8 @@ const DataSelector = ({
 	page,
 	availableDatasetNames,
 	setAvailableDatasetNames,
+	datasets,
+	setDatasets,
 	dataLoadingStates,
 	query1,
 	handleQuery1Change,
@@ -139,6 +141,7 @@ const DataSelector = ({
 	dataLibrary,
 	setActiveData,
 	setDataLibrary,
+	setCompleteData, 
 	open,
 }) => {
 	const [showData, setShowData] = useState([]);
@@ -156,6 +159,7 @@ const DataSelector = ({
 		if (!event.target.checked) {
 			let sourceItems = dataLibrary;
 			let destItems = activeData;
+			let destItemsForDatasets = datasets;
 			const unchecked = destItems.filter(
 				(item) => item.name == availableDatasetNames[index].name
 			);
@@ -163,11 +167,17 @@ const DataSelector = ({
 			destItems = destItems.filter(
 				(item) => item.name != availableDatasetNames[index].name
 			);
+			destItemsForDatasets = datasets.filter(
+				(item) => item.name != availableDatasetNames[index].name
+			);
 			sourceItems = sourceItems.concat(unchecked);
 			setActiveData(destItems);
+			setDatasets(destItemsForDatasets)
+			setCompleteData((prev) => (prev.filter(item => item.name != availableDatasetNames[index].name)))
 			setDataLibrary(sourceItems);
 		} else {
 			let sourceItems = activeData;
+			let sourceItemsForDatasets = datasets; 
 			let destItems = dataLibrary;
 			const checked = destItems.filter(
 				(item) => item.name == availableDatasetNames[index].name
@@ -176,7 +186,13 @@ const DataSelector = ({
 				(item) => item.name != availableDatasetNames[index].name
 			);
 			sourceItems = sourceItems.concat(checked);
+			sourceItemsForDatasets = sourceItemsForDatasets.concat(checked)
 			setActiveData(sourceItems);
+			setDatasets(sourceItemsForDatasets)
+			setCompleteData((prev) => [...prev, {
+				name: availableDatasetNames[index].name, 
+				data: sourceItems.filter(item => item.name === availableDatasetNames[index].name)
+			}])
 			setDataLibrary(destItems);
 		}
 		let temp = [...showData];
