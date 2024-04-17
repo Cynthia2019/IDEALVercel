@@ -154,6 +154,14 @@ export default function ScatterWithContour({ fetchedNames }) {
 		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
 	}, [maxDataPointsPerDataset]);
 
+	useEffect(() => {
+		if (availableDatasetNames.length > 0) {
+			const lastIndex = availableDatasetNames.length - 1;
+			const lastInfo = availableDatasetNames[lastIndex];
+			fetchDataFromAWS(lastInfo, lastIndex);
+		}
+	}, [availableDatasetNames]);
+
 	const [open, setOpen] = useState(true);
 
 	return (

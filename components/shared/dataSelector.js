@@ -142,7 +142,7 @@ const DataSelector = ({
 	setActiveData,
 	setDataLibrary,
 	setCompleteData, 
-	open,
+	open
 }) => {
 	const [showData, setShowData] = useState([]);
 
@@ -343,6 +343,19 @@ const DataSelector = ({
 									color: colorAssignment[prevState.length],
 								},
 							]);
+
+
+							// console.log('activeData', activeData)
+							// setActiveData((prevState) => [
+							// 	...prevState,
+							// 	{
+							// 		bucket_name: "ideal-dataset-1",
+							// 		name: file.name,
+							// 		color: colorAssignment[prevState.length],
+							// 	},
+							// ]);
+							// console.log('activeData', activeData)
+
 						},
 					});
 				} else {

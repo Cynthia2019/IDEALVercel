@@ -1,23 +1,23 @@
-import { useState, useEffect, useMemo } from "react";
+import {useState, useEffect, useMemo} from "react";
 import Header from "@/components/shared/header";
 import styles from "@/styles/Home.module.css";
 import ContourWrapper_test from "../components/contour/countourWrapper_test";
 import StructureWrapper from "../components/structureWrapper";
-import { csvParse } from "d3";
+import {csvParse} from "d3";
 import dynamic from "next/dynamic";
 import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
-import { Row } from "antd";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import {Row} from "antd";
+import {GetObjectCommand} from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import { colorAssignment, MAX_DATA_POINTS_NUM } from "@/util/constants";
+import {colorAssignment, MAX_DATA_POINTS_NUM} from "@/util/constants";
 import processData from "../util/processData";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import Head from "next/head";
-import { fetchNames } from "@/components/fetchNames";
+import {fetchNames} from "@/components/fetchNames";
 
-export default function Contour_test({ fetchedNames }) {
+export default function Contour_test({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
 
     const [availableDatasetNames, setAvailableDatasetNames] = useState(
@@ -38,7 +38,7 @@ export default function Contour_test({ fetchedNames }) {
     const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(999999);
 
     const router = useRouter();
-    const { pairwise_query1, pairwise_query2 } = router.query;
+    const {pairwise_query1, pairwise_query2} = router.query;
 
     const [query1, setQuery1] = useState(
         pairwise_query1 ? pairwise_query1 : "C11"
@@ -81,6 +81,7 @@ export default function Contour_test({ fetchedNames }) {
     };
 
     async function fetchDataFromAWS(info, index) {
+        console.log("fetching data from AWS", info, index);
         const command = new GetObjectCommand({
             Bucket: "ideal-dataset-1",
             Key: info.name,
@@ -91,7 +92,7 @@ export default function Contour_test({ fetchedNames }) {
             let body = res.Body.transformToByteArray();
             body.then((stream) => {
                 new Response(stream, {
-                    headers: { "Content-Type": "text/csv" },
+                    headers: {"Content-Type": "text/csv"},
                 })
                     .text()
                     .then((data) => {
@@ -118,7 +119,7 @@ export default function Contour_test({ fetchedNames }) {
                         setDataLoadingStates((prev) =>
                             prev.map((obj) =>
                                 obj.name === info.name
-                                    ? { ...obj, loading: false }
+                                    ? {...obj, loading: false}
                                     : obj
                             )
                         );
@@ -126,6 +127,7 @@ export default function Contour_test({ fetchedNames }) {
             });
         });
     }
+
     const fetchDataNames = async () => {
         const fetchedNames = (await fetchNames()).fetchedNames;
         setAvailableDatasetNames(fetchedNames);
@@ -145,11 +147,19 @@ export default function Contour_test({ fetchedNames }) {
 
     useEffect(() => {
         fetchDataNames();
-    }, [availableDatasetNames]);
+    }, []);
 
     useEffect(() => {
         dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
     }, [maxDataPointsPerDataset]);
+
+    useEffect(() => {
+        if (availableDatasetNames.length > 0) {
+            const lastIndex = availableDatasetNames.length - 1;
+            const lastInfo = availableDatasetNames[lastIndex];
+            fetchDataFromAWS(lastInfo, lastIndex);
+        }
+    }, [availableDatasetNames]);
 
     const [open, setOpen] = useState(true);
 
@@ -158,7 +168,7 @@ export default function Contour_test({ fetchedNames }) {
             <Head>
                 <title>Metamaterials Data Explorer</title>
             </Head>
-            <Header />
+            <Header/>
             <div className={styles.body}>
                 <Row className={styles.firstScreen}>
                     <div className={styles.mainPlot}>

@@ -102,6 +102,13 @@ export default function Umap() {
 		fetchData()
 	}, []);
 
+	useEffect(() => {
+		if (availableDatasetNames.length > 0) {
+			const lastIndex = availableDatasetNames.length - 1;
+			const lastInfo = availableDatasetNames[lastIndex];
+			fetchDataFromAWS(lastInfo, lastIndex);
+		}
+	}, [availableDatasetNames]);
 
 	const [open, setOpen] = useState(true);
 

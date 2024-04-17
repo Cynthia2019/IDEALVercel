@@ -430,7 +430,6 @@ class Contour_test {
 
                 let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
 
-                console.log('dataset', datasets)
                 if (datasets[i].length == 1) {
                     d3.selectAll(".group" + i)
                         .remove()
