@@ -235,15 +235,15 @@ const DataSelector = ({
 					</TableCell>
 
 					<TableCell>
-						{props.dataLoadingState.loading ? (
-							<CircularProgress />
-						) : (
+						{/*{props.dataLoadingState.loading ? (*/}
+						{/*	<CircularProgress />*/}
+						{/*) : (*/}
 							<Checkbox
 								sx={{ "& .MuiSvgIcon-root": { fontSize: 28 } }}
 								onChange={(e) => onIconChange(e, index)}
 								checked={showData[index]}
 							/>
-						)}
+						{/*)}*/}
 					</TableCell>
 				</TableRow>
 				<TableRow

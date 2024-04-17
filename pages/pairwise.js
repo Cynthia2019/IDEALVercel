@@ -23,6 +23,8 @@ import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
 
 export default function Pairwise() {
+	const [completeData, setCompleteData] = useState([]);
+
 	// record all fetched data from the data library
 	// all data stored in one array
 	const [datasets, setDatasets] = useState([]);
@@ -81,6 +83,13 @@ export default function Pairwise() {
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
+						setCompleteData((prev) => [
+							...prev,
+							{
+								name: info.name,
+								data: processedData,
+							},
+						]);
 						processedData = processedData.slice(
 							0,
 							maxDataPointsPerDataset
@@ -174,7 +183,8 @@ export default function Pairwise() {
 						/>
 
 						<DataSelector
-							page={"pairwise"}
+							page={"scatter"}
+							datasets={datasets}
 							setDatasets={setDatasets}
 							availableDatasetNames={availableDatasetNames}
 							setAvailableDatasetNames={setAvailableDatasetNames}
@@ -183,6 +193,7 @@ export default function Pairwise() {
 							dataLibrary={dataLibrary}
 							setActiveData={setActiveData}
 							setDataLibrary={setDataLibrary}
+							setCompleteData={setCompleteData}
 							open={open}
 						/>
 						<RangeSelector

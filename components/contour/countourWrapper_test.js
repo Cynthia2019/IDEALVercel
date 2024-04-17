@@ -11,7 +11,7 @@ import NeighborPanel from "@/components/knn/neighborPanel";
 import SaveIcon from "@mui/icons-material/Save";
 import SavePanel from "@/components/saveData/savePanel";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import {Row} from "antd";
+import {Row, Col} from "antd";
 
 const ContourWrapper_test = ({
                             data,
@@ -84,9 +84,15 @@ const ContourWrapper_test = ({
                 marginLeft: "30px",
             }}
         >
+            <Col>
+            <p style={{ fontWeight: 'bold', fontSize: '24px', marginLeft: 100, marginTop: 10 }}>
+                Legend
+            </p>
             <div id="legend" ref={legendArea}></div>
+            </Col>
             <div id="main-plot" ref={chartArea}></div>
             <Row justify={"space-around"} style={{ width: "100%", marginLeft: "0px"}}>
+
                 <Button
                     variant="outlined"
                     aria-label="Show / Hide Density Plots"

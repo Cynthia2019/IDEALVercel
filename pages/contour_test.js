@@ -145,7 +145,7 @@ export default function Contour_test({ fetchedNames }) {
 
     useEffect(() => {
         fetchDataNames();
-    }, []);
+    }, [availableDatasetNames]);
 
     useEffect(() => {
         dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
@@ -208,6 +208,7 @@ export default function Contour_test({ fetchedNames }) {
 
                         <DataSelector
                             page={"contour_test"}
+                            datasets={datasets}
                             setDatasets={setDatasets}
                             availableDatasetNames={availableDatasetNames}
                             setAvailableDatasetNames={setAvailableDatasetNames}
@@ -220,6 +221,7 @@ export default function Contour_test({ fetchedNames }) {
                             dataLibrary={dataLibrary}
                             setActiveData={setActiveData}
                             setDataLibrary={setDataLibrary}
+                            setCompleteData={setCompleteData}
                             open={open}
                         />
                         <RangeSelector

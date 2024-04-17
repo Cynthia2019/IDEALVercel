@@ -18,6 +18,8 @@ import { fetchNames } from "@/components/fetchNames";
 const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
 export default function Hist({ fetchedNames }) {
+	const [completeData, setCompleteData] = useState([])
+
 	const [datasets, setDatasets] = useState([]);
 	const [availableDatasetNames, setAvailableDatasetNames] = useState(
 		fetchedNames || []
@@ -87,6 +89,10 @@ export default function Hist({ fetchedNames }) {
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
 						);
+						setCompleteData((prev) => [...prev, {
+							name: info.name,
+							data: processedData
+						}])
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
@@ -168,7 +174,8 @@ export default function Hist({ fetchedNames }) {
 							alt="control"
 						/>
 						<DataSelector
-							page={"histogram"}
+							page={"scatter"}
+							datasets={datasets}
 							setDatasets={setDatasets}
 							availableDatasetNames={availableDatasetNames}
 							setAvailableDatasetNames={setAvailableDatasetNames}
@@ -181,6 +188,7 @@ export default function Hist({ fetchedNames }) {
 							dataLibrary={dataLibrary}
 							setActiveData={setActiveData}
 							setDataLibrary={setDataLibrary}
+							setCompleteData={setCompleteData}
 							open={open}
 						/>
 						<RangeSelector

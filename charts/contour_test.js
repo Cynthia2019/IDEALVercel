@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import organizeByName from "@/util/organizeByName";
 
 const MARGIN = {
-    TOP: 100,
+    TOP: 50,
     RIGHT: 10,
     BOTTOM: 0,
     LEFT: 100,
@@ -47,7 +47,7 @@ class Contour_test {
             .attr("height", LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
             .attr("viewBox", [
                 -MARGIN.LEFT,
-                -MARGIN.TOP / 2,
+                -MARGIN.TOP / 4,
                 LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
                 LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
