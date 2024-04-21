@@ -275,6 +275,8 @@ class ScatterWithContour {
 		let mouseover_contour = function (e, d) {
 			d3.select(this.parentNode)
 				.raise();
+			d3.selectAll(".dataCircle").raise();
+			d3.selectAll(".clipPath").raise();
 			d3.select(this)
 				.style("stroke", "black")
 				.style("stroke-width", 5)
@@ -519,7 +521,6 @@ class ScatterWithContour {
 									d[query2] < Y1
 							)
 							.sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-							.slice(0, maxDataPointsPerDataset);
 					})
 				);
 				let new_datasets = [];
@@ -581,8 +582,7 @@ class ScatterWithContour {
 					.y((d) => yScale(d[query2]))
 					.size([WIDTH, HEIGHT - 35]) // Adjust size as needed
 					.bandwidth(15)
-					.thresholds(1000)(datasets[i])
-					.transform({});
+					.thresholds(1000)(datasets[i]);
 			} else {
 				contours = d3
 					.contourDensity()

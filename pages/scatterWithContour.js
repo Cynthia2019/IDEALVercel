@@ -5,7 +5,7 @@ import ScatterWithContourWrapper from "../components/scatter/scatterWithContourW
 import StructureWrapper from "../components/structureWrapper";
 import { csvParse } from "d3";
 import dynamic from "next/dynamic";
-import DataSelector from "@/components/shared/dataSelector";
+import DataSelector from "@/components/scatter/dataSelector_scatterWithContour";
 import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
 import { Row } from "antd";
@@ -175,13 +175,15 @@ export default function ScatterWithContour({ fetchedNames }) {
 					<div className={styles.mainPlot}>
 						<div className={styles.mainPlotHeader}>
 							<p className={styles.mainPlotTitle}>
-								Material Data Explorer (Individual Scatter Plot)
+								Material Data Explorer (Scatter and Contour)
 							</p>
 							<p className={styles.mainPlotSub}>
 								Select properties from the dropdown menus to
 								graph. Hover over data points for additional
 								information. Scroll to zoom, click and drag to
-								pan.
+								pan. You can find out how the density plots are generated
+								<a href="https://d3js.org/d3-contour/density"> here</a>.
+								The legend denotes the absolute number of points contained in each color.
 							</p>
 						</div>
 						<ScatterWithContourWrapper
