@@ -15,7 +15,9 @@ const MARGIN = {
 const SIDE_BAR_SIZE = 100;
 
 const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const HEIGHT = 650 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const LEGEND_WIDTH = 400;
+const LEGEND_HEIGHT = 20;
 
 function expo(x, f) {
 	if (x < 1000 && x > -1000) return x;
@@ -31,7 +33,7 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 class ScatterWithContour {
-	constructor(element, data) {
+	constructor(element, legendElement, data) {
 		this.isDarkMode =
 			window?.matchMedia &&
 			window?.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -48,6 +50,18 @@ class ScatterWithContour {
 			])
 			.attr("style", "max-width: 100%; overflow: visible");
 
+		this.legendSvg = d3
+			.select(legendElement)
+			.append("svg")
+			.attr("width", LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+			.attr("height", LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+			.attr("viewBox", [
+				-MARGIN.LEFT,
+				-MARGIN.TOP / 4,
+				LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
+				LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
+			])
+			.attr("style", "max-width: 100%; overflow: visible");
 		//brush
 		this.svg.append("g").attr("class", "brush");
 
@@ -80,6 +94,7 @@ class ScatterWithContour {
 		this.update({
 			data: data,
 			element: element,
+			legendElement: legendElement,
 			query1: this.query1,
 			query2: this.query2,
 			reset: false,
@@ -104,7 +119,10 @@ class ScatterWithContour {
 		max_num_datasets,
 		clickedNeighbor,
 		setOpenNeighbor,
-	}) {
+	    legendElement,
+	    showDensity
+
+		   }) {
 		this.data = data;
 		this.query1 = query1;
 		this.query2 = query2;
@@ -195,21 +213,6 @@ class ScatterWithContour {
 			dataset_dic[i] = d.name;
 		});
 
-		// scott's estimation for bandwidth
-		function scottsBandwidth2D(values) {
-			const n = values.length;
-			const standardDeviationX = d3.deviation(values, (d) =>
-				xScale(d[query1])
-			);
-			const standardDeviationY = d3.deviation(values, (d) =>
-				yScale(d[query2])
-			);
-			const factor = Math.pow(n, -1 / 6);
-			return (
-				(factor * standardDeviationX + factor * standardDeviationY) / 2
-			);
-		}
-
         // =============== Mouse Logic ================
 		let mouseover = function (e, d) {
 			d3.select(this)
@@ -261,69 +264,134 @@ class ScatterWithContour {
 				.style("fill-opacity", 0.8);
 		};
 
-        let mouseleave_contour = function (e, d) {
-            d3.select(this)
-                .style("stroke", "grey")
-                .style("stroke-width", 0)
-                .style("fill-opacity", 0.8);
-        };
+		let mouseleave_contour = function (e, d) {
+			// tooltip_hist.style("visibility", "hidden").transition().duration(200);
+			d3.select(this)
+				.style("stroke", "grey")
+				.style("stroke-width", 0)
+				.attr("opacity", 0.5);
+		};
 
-        let mouseover_contour = function (e, d) {
-            d3.select(this.parentNode).raise();
-            d3.select(this)
-                .style("stroke", "black")
-                .style("stroke-width", 5)
-                .style("fill-opacity", 1);
-        };
+		let mouseover_contour = function (e, d) {
+			d3.select(this.parentNode)
+				.raise();
+			d3.select(this)
+				.style("stroke", "black")
+				.style("stroke-width", 5)
+				.attr("opacity", 1);
+		};
         // =================================================
 
 
         //=============== Contours Helper =========================
 
-        function getDensityColorFull(baseColor, density, maxDensity) {
-            let hsl = d3.hsl(baseColor);
-            // hsl.l = 1 is white, 0 is black
-            // We need this seemingly verbose if / else to manually separate colors
-            //
-            if (density / maxDensity > 0.4) {
-                hsl.l = 0.7;
-            } else if (density / maxDensity > 0.2) {
-                hsl.l = 0.75;
-            } else if (density / maxDensity > 0.1) {
-                hsl.l = 0.8;
-            } else if (density / maxDensity > 0.05) {
-                hsl.l = 0.85;
-            } else {
-                hsl.l = 0.9;
-            }
-            hsl.opacity = 0.3;
-            return hsl.toString();
-        }
+		let createLegend = (baseColors, zoomed, curr_data) => {
+			const numSamples = 5; // Number of samples in the gradient
+			const legendWidth = LEGEND_WIDTH;
+			const legendHeight = LEGEND_HEIGHT;
+			const legendPadding = 20; // Padding between legends
+			let density_offset = zoomed ? 0.2 : 0;
 
-        function getDensityColorSample(baseColor, density, maxDensity) {
-            let hsl = d3.hsl(baseColor);
-            // hsl.l = 1 is white, 0 is black
-            // We need this seemingly verbose if / else to manually separate colors
-            
-            if (density / maxDensity > 0.15) {
-                hsl.l = 0.6;
-            } else if (density / maxDensity > 0.1) {
-                hsl.l = 0.75;
-            } else if (density / maxDensity > 0.05) {
-                hsl.l = 0.85;
-            } else {
-                hsl.l = 0.9;
-            }
+			this.legendSvg.selectAll("*").remove();
+			baseColors.forEach((baseColor, index) => {
+				// Calculate the starting y position for the current legend
+				let yOffset = index * (legendHeight + legendPadding);
 
-            hsl.opacity = 0.3;
+				for (let i = 0; i <= numSamples; i++) {
+					let hsl = d3.hsl(baseColor);
+					hsl.opacity = 0.5;
 
-            return hsl.toString();
-        }
+					// Interpolating the lightness value between 0.9 (max) and 0.6 (min)
+					hsl.l = (0.9 - density_offset) - ((0.4 - (density_offset)) * (i / numSamples));
+					let color = hsl.toString();
 
+					// Draw the color rectangle for the current legend
+					this.legendSvg.append("rect")
+						.attr("x", i * (legendWidth / numSamples))
+						.attr("y", yOffset) // Use yOffset for the y position
+						.attr("width", legendWidth / numSamples)
+						.attr("height", legendHeight)
+						.style("fill", color);
+				}
+				// Add labels for the current legend
+				this.legendSvg.selectAll(`.text-${index}`)
+					.data(d3.range(numSamples + 1))
+					.enter()
+					.append("text")
+					.attr("class", `text-${index}`)
+					.attr("x", (d, i) => i * (legendWidth / numSamples))
+					.attr("y", yOffset + legendHeight + 15)
+					.style("fill", "#000")
+					.style("font-size", "12px")
+					.text((d, i) => `${(i * curr_data[index].length / numSamples).toFixed(0)} points`);
+			});
+		}
+		function getDensityColorFull(baseColor, density, maxDensity, zoomed) {
+			let hsl = d3.hsl(baseColor);
+			let density_offset = zoomed ? 2.5 : 1;
+			// hsl.l = 1 is white, 0 is black
+			// We need this seemingly verbose if / else to manually separate colors
+			//
+			if ((density / maxDensity) > 0.4 * density_offset) {
+				hsl.l = 0.70
+			} else if ((density / maxDensity) > 0.2 * density_offset) {
+				hsl.l = 0.75
+			} else if ((density / maxDensity) > 0.1 * density_offset) {
+				hsl.l = 0.80
+			} else if ((density / maxDensity) > 0.05 * density_offset) {
+				hsl.l = 0.85
+			} else {
+				hsl.l = 0.90
+			}
 
-        // =========== Draw Initial Plots ==========
-		for (let i = max_num_datasets; i >= 0; i--) {
-            drawContour(i, xScale, yScale, this.svg)
+			hsl.opacity = 0.5;
+
+			// console.log('hsl', hsl)
+			return hsl.toString();
+		}
+
+		function getDensityColorSample(baseColor, density, maxDensity, zoomed) {
+			let hsl = d3.hsl(baseColor);
+			// hsl.l = 1 is white, 0 is black
+			// We need this seemingly verbose if / else to manually separate colors
+			//
+			let density_offset = zoomed ? 2.5 : 1;
+
+			if ((density / maxDensity) > 0.4 * density_offset) {
+				hsl.l = 0.65
+			} else if ((density / maxDensity) > 0.2 * density_offset) {
+				hsl.l = 0.70
+			} else if ((density / maxDensity) > 0.10 * density_offset) {
+				hsl.l = 0.75
+			} else if ((density / maxDensity) > 0.05 * density_offset) {
+				hsl.l = 0.80
+			} else {
+				// console.log('density', (density / maxDensity))
+				hsl.l = 0.90
+			}
+
+			hsl.opacity = 0.5;
+
+			// console.log('hsl', hsl)
+			return hsl.toString();
+		}
+
+		for (let i = 0; i <= max_num_datasets; i++) {
+			d3.selectAll(".group" + i).remove()
+		}
+
+		// =========== Draw Initial Plots ==========
+		if (showDensity) {
+			createLegend(Object.values(colors), false, datasets);
+			for (let i = max_num_datasets; i >= 0; i--) {
+				drawContour(i, xScale, yScale, this.svg, false)
+			}
+		} else {
+			this.legendSvg.selectAll("*").remove();
+			for (let i = 0; i <= max_num_datasets; i++) {
+				d3.selectAll(".group" + i)
+					.remove()
+			}
 		}
 
         drawCircles(xScale, yScale, this.svg, finalData)
@@ -416,7 +484,7 @@ class ScatterWithContour {
 		// Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
 		let zoom = d3
 			.zoom()
-			.scaleExtent([0.1, 100]) // This control how much you can unzoom (x1) and zoom (x20)
+			.scaleExtent([1, 1.5]) // This control how much you can unzoom (x1) and zoom (x20)
 			.translateExtent(chartExtent)
 			.extent(chartExtent)
 			.on("zoom", (event) => {
@@ -454,11 +522,22 @@ class ScatterWithContour {
 							.slice(0, maxDataPointsPerDataset);
 					})
 				);
+				let new_datasets = [];
+				let new_colors = {}
 
-                
-                for (let i = max_num_datasets; i >= 0; i--) {
+				for (let i = 0; i <= max_num_datasets; i++) {
+					new_datasets.push([])
+				}
+				let organizedData = organizeByName(newFinalData);
+				organizedData.map((d, i) => {
+					new_colors[d.name] = d.color;
+					new_datasets[i] = (d.data) ? (d.data) : [];
+				});
+				createLegend(Object.values(new_colors), true, new_datasets);
+
+				for (let i = max_num_datasets; i >= 0; i--) {
                     d3.selectAll(".group" + i).remove()
-                    drawContour(i, newXScale, newYScale, this.svg)
+                    drawContour(i, newXScale, newYScale, this.svg, true)
                 }
 
 				d3.selectAll(".dataCircle").remove();
@@ -492,14 +571,9 @@ class ScatterWithContour {
 		this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
 		this.svg.call(zoom).on("mousedown.zoom", null);
 
-        function drawContour(i, xScale, yScale, svg) {
-            let bandwidth = 10;
-			datasets[i][1]
-				? (bandwidth = scottsBandwidth2D(datasets[i]))
-				: null;
-
-			let contours = [];
-			// const thresholds = 10; // Adjust the range and step as needed
+        function drawContour(i, xScale, yScale, svg, zoomed) {
+			d3.selectAll(".group" + i).remove()
+			let contours = []
 			if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
 				contours = d3
 					.contourDensity()
@@ -507,7 +581,8 @@ class ScatterWithContour {
 					.y((d) => yScale(d[query2]))
 					.size([WIDTH, HEIGHT - 35]) // Adjust size as needed
 					.bandwidth(15)
-					.thresholds(1000)(datasets[i]);
+					.thresholds(1000)(datasets[i])
+					.transform({});
 			} else {
 				contours = d3
 					.contourDensity()
@@ -518,10 +593,11 @@ class ScatterWithContour {
 					.thresholds(50)(datasets[i]);
 			}
 
-			let maxDensity = d3.max(contours, (d) => d.value); // Maximum density for the current dataset
+			let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
 
 			if (datasets[i].length == 1) {
-				d3.selectAll(".group" + i).remove();
+				d3.selectAll(".group" + i)
+					.remove()
 			} else {
 				if (datasets[i][1]) {
 					let contour = svg
@@ -530,30 +606,22 @@ class ScatterWithContour {
 						.data(contours)
 						.enter()
 						.append("path")
-						.attr(
-							"fill",
-							datasets[i][1].name == "freeform_2d.csv"
-								? (d) =>
-										getDensityColorFull(
-											colors[dataset_dic[i]],
-											d.value,
-											maxDensity
-										)
-								: (d) =>
-										getDensityColorSample(
-											colors[dataset_dic[i]],
-											d.value,
-											maxDensity
-										)
-						)
+						.attr("fill", datasets[i][1].name == "freeform_2d.csv" ?
+							d => getDensityColorFull(colors[dataset_dic[i]], d.value, maxDensity, true)
+							: d => getDensityColorSample(colors[dataset_dic[i]], d.value, maxDensity, true))
 						.attr("d", d3.geoPath())
 						.attr("stroke-linejoin", "miter")
 						.attr("class", "group" + i)
-						.attr("transform", `translate(60, -10)`)
+						.attr("transform", `translate(75, -5)`)
 						.on("mouseover", mouseover_contour)
-						.on("mouseleave", mouseleave_contour);
+						.on("mouseleave", mouseleave_contour)
+						.attr("stroke", "grey")
+						.attr("stroke-width", 0)
+						.attr("opacity", 0.5);
 					contour.exit().remove();
+
 				}
+
 			}
         }
         // ============= Reset Logic ==============

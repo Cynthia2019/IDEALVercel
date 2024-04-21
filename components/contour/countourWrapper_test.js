@@ -2,15 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import Contour_test from "../../charts/contour_test";
 import Button from "@mui/material/Button";
 import {FcMindMap} from "react-icons/fc";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import {Typography} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import DialogContent from "@mui/material/DialogContent";
-import NeighborPanel from "@/components/knn/neighborPanel";
-import SaveIcon from "@mui/icons-material/Save";
-import SavePanel from "@/components/saveData/savePanel";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {Row, Col} from "antd";
 
 const ContourWrapper_test = ({

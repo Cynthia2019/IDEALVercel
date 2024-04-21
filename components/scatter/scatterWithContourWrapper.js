@@ -10,7 +10,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import NeighborPanel from "../knn/neighborPanel";
 import SavePanel from "../saveData/savePanel";
-import { Row } from "antd";
+import {Col, Row} from "antd";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
 import CloseIcon from '@mui/icons-material/Close';
@@ -62,10 +62,16 @@ const ScatterWithContourWrapper = ({
 	const [openNeighbor, setOpenNeighbor] = useState(false);
 	const [openData, setOpenData] = useState(false);
 	const [activateKNN, setActivateKNN ] = useState("#556cd6");
+	const [activeDensity, setActiveDensity ] = useState("#556cd6");
 
 	const toggleFindNeighbors = () => {
 		setClickedNeighbor((current) => !current);
 		setActivateKNN((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
+	};
+
+	const toggleDensityPlots = () => {
+		// setClickedNeighbor((current) => !current);
+		setActiveDensity((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
 	};
 
 	const handleNeighborClose = () => {
@@ -88,6 +94,7 @@ const ScatterWithContourWrapper = ({
 			setChart(
 				new ScatterWithContour(
 					chartArea.current,
+					legendArea.current,
 					data,
 					setDataPoint,
 					selectedData,
@@ -100,6 +107,7 @@ const ScatterWithContourWrapper = ({
 				completeData, 
 				maxDataPointsPerDataset,
 				element: chartArea.current,
+				legendElement: legendArea.current,
 				setDataPoint,
 				query1,
 				query2,
@@ -112,10 +120,11 @@ const ScatterWithContourWrapper = ({
 				datasets,
 				max_num_datasets,
 				clickedNeighbor, 
-				setOpenNeighbor
+				setOpenNeighbor,
+				showDensity: activeDensity === "#556cd6"
 			});
 		}
-	}, [chart, query1, query2, data, reset, clickedNeighbor]);
+	}, [chart, query1, query2, data, reset, clickedNeighbor, activeDensity]);
 
 	return (
 		<div
@@ -126,8 +135,26 @@ const ScatterWithContourWrapper = ({
 				marginLeft: "30px",
 			}}
 		>
+			<Col>
+				{activeDensity === "#556cd6" && (
+					<p style={{ fontWeight: 'bold', fontSize: '24px', marginLeft: 50, marginTop: 10 }}>
+						Legend
+					</p>
+				)}
+				<div id="legend" ref={legendArea}></div>
+			</Col>
 			<div id="main-plot" ref={chartArea}></div>
 			<Row justify={"space-around"} style={{ width: "100%", marginTop: "30px" }}>
+				<Button
+					variant="outlined"
+					aria-label="Show / Hide Density Plots"
+					onClick={toggleDensityPlots}
+					style={{ maxWidth: "300px", backgroundColor: activeDensity }}
+				>
+					<span style={{ fontSize: "10px", color: "white" }}>
+						Show / Hide Density Plots
+					</span>
+				</Button>
 				<Button
 					variant="outlined"
 					aria-label="find nearest neighbors"
