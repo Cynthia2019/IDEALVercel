@@ -33,7 +33,7 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 class ScatterWithContour {
-	constructor(element, legendElement, data) {
+	constructor(element, legendElement, data, densityData, scatterData) {
 		this.isDarkMode =
 			window?.matchMedia &&
 			window?.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -93,6 +93,8 @@ class ScatterWithContour {
 
 		this.update({
 			data: data,
+			densityData: densityData,
+			scatterData: scatterData,
 			element: element,
 			legendElement: legendElement,
 			query1: this.query1,
@@ -105,6 +107,8 @@ class ScatterWithContour {
 	//query2: y-axis
 	update({
 		data,
+		densityData,
+		scatterData,
 		completeData,
 		maxDataPointsPerDataset,
 		element,
@@ -128,6 +132,8 @@ class ScatterWithContour {
 		this.query2 = query2;
 
 		let finalData = [].concat(...data);
+		let density_finalData = [].concat(...densityData);
+		let scatter_finalData = [].concat(...scatterData);
 
 		//remove elements to avoid repeated append
 
@@ -206,7 +212,7 @@ class ScatterWithContour {
 			datasets.push([]);
 		}
 
-		let organizedData = organizeByName(finalData);
+		let organizedData = organizeByName(density_finalData);
 		organizedData.map((d, i) => {
 			colors[d.name] = d.color;
 			datasets[i] = d.data ? d.data : [];
@@ -396,7 +402,7 @@ class ScatterWithContour {
 			}
 		}
 
-        drawCircles(xScale, yScale, this.svg, finalData)
+        drawCircles(xScale, yScale, this.svg, scatter_finalData)
         // ==========================================
 
         // =========== Select Circle Logic ===========
@@ -407,7 +413,7 @@ class ScatterWithContour {
 				mode: "cors",
 				body: JSON.stringify({
 					dataPoint: [dataPoint],
-					data: finalData.map((d) => [
+					data: scatter_finalData.map((d) => [
 						d.C11,
 						d.C12,
 						d.C22,
@@ -440,9 +446,9 @@ class ScatterWithContour {
 					let distances = data.distances;
 					// index should be the index of the data in the current active dataset
 					d3.selectAll(".dataCircle")
-						.data(finalData)
+						.data(scatter_finalData)
 						.classed("highlighted", function (datum) {
-							return indices.includes(finalData.indexOf(datum));
+							return indices.includes(scatter_finalData.indexOf(datum));
 						});
 					d3.selectAll(".dataCircle").classed(
 						"masked",
@@ -464,7 +470,7 @@ class ScatterWithContour {
 					neighborElements.each((d, i) => {
 						d["outline_color"] = nnColorAssignment[i];
 						d["distance"] =
-							distances[indices.indexOf(finalData.indexOf(d))];
+							distances[indices.indexOf(scatter_finalData.indexOf(d))];
 						neighbors.push(d);
 					});
 					neighbors.sort((a, b) => a.distance - b.distance);
@@ -551,7 +557,7 @@ class ScatterWithContour {
 				let _xScale = this.xScaleForBrush;
 				let _yScale = this.yScaleForBrush;
 				d3.selectAll(".dataCircle")
-					.data(finalData)
+					.data(scatter_finalData)
 					.classed("selected", function (d) {
 						return (
 							d3.select(this).classed("selected") ||
@@ -641,7 +647,7 @@ class ScatterWithContour {
 			.attr("clip-path", "url(#clip)")
 			.attr("class", "clipPath")
 			.selectAll(".dataCircle")
-			.data(finalData);
+			.data(scatter_finalData);
 
 		circles.exit().transition().attr("r", 0).remove();
 		circles
@@ -665,7 +671,7 @@ class ScatterWithContour {
 			.attr("cy", (d) => yScale(d[query2]));
 
 		circles.exit().transition().attr("r", 0).remove();
-        finalData = data 
+        scatter_finalData = data
         }
  	}
 }

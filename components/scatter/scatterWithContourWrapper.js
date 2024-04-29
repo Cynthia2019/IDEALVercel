@@ -40,6 +40,8 @@ const NeighborPaperComponent = (props) => {
 
 const ScatterWithContourWrapper = ({
 	data,
+	densityData,
+	scatterData,
 	completeData,
 	maxDataPointsPerDataset,
 	setDataPoint,
@@ -96,6 +98,8 @@ const ScatterWithContourWrapper = ({
 					chartArea.current,
 					legendArea.current,
 					data,
+					densityData,
+					scatterData,
 					setDataPoint,
 					selectedData,
 					setSelectedData
@@ -104,6 +108,8 @@ const ScatterWithContourWrapper = ({
 		} else {
 			chart.update({
 				data,
+				densityData,
+				scatterData,
 				completeData, 
 				maxDataPointsPerDataset,
 				element: chartArea.current,
@@ -124,7 +130,7 @@ const ScatterWithContourWrapper = ({
 				showDensity: activeDensity === "#556cd6"
 			});
 		}
-	}, [chart, query1, query2, data, reset, clickedNeighbor, activeDensity]);
+	}, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity]);
 
 	return (
 		<div

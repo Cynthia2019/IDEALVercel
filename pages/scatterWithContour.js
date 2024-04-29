@@ -25,6 +25,10 @@ export default function ScatterWithContour({ fetchedNames }) {
 	);
 	const [activeData, setActiveData] = useState(datasets);
 	const [dataLibrary, setDataLibrary] = useState([]);
+	const [density_activeData, setDensityActiveData] = useState(datasets);
+	const [density_dataLibrary, setDensityDataLibrary] = useState([]);
+	const [scatter_activeData, setScatterActiveData] = useState(datasets);
+	const [scatter_dataLibrary, setScatterDataLibrary] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
 	const [selectedData, setSelectedData] = useState([]);
 	const [neighbors, setNeighbors] = useState([]);
@@ -78,6 +82,10 @@ export default function ScatterWithContour({ fetchedNames }) {
 		sourceItems = sourceItems.concat(unselected);
 		setActiveData(destItems);
 		setDataLibrary(sourceItems);
+		setDensityDataLibrary(sourceItems);
+		setScatterDataLibrary(sourceItems);
+		setDensityActiveData(destItems);
+		setScatterActiveData(destItems);
 	};
 
 	async function fetchDataFromAWS(info, index) {
@@ -118,6 +126,8 @@ export default function ScatterWithContour({ fetchedNames }) {
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
+						setDensityActiveData((prev) => [...prev, ...processedData]);
+						setScatterActiveData((prev) => [...prev, ...processedData]);
 						setDataLoadingStates((prev) =>
 							prev.map((obj) =>
 								obj.name === info.name
@@ -188,6 +198,8 @@ export default function ScatterWithContour({ fetchedNames }) {
 						</div>
 						<ScatterWithContourWrapper
 							data={activeData}
+							densityData={density_activeData}
+							scatterData={scatter_activeData}
 							completeData={completeData}
 							maxDataPointsPerDataset={maxDataPointsPerDataset}
 							setDataPoint={setDataPoint}
@@ -238,6 +250,14 @@ export default function ScatterWithContour({ fetchedNames }) {
 							dataLibrary={dataLibrary}
 							setActiveData={setActiveData}
 							setDataLibrary={setDataLibrary}
+							density_activeData={density_activeData}
+							setDensityActiveData={setDensityActiveData}
+							density_dataLibrary={density_dataLibrary}
+							setDensityDataLibrary={setDensityDataLibrary}
+							scatter_activeData={scatter_activeData}
+							setScatterActiveData={setScatterActiveData}
+							scatter_dataLibrary={scatter_dataLibrary}
+							setScatterDataLibrary={setScatterDataLibrary}
 							setCompleteData={setCompleteData}
 							open={open}
 						/>
