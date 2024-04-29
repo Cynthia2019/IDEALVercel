@@ -527,7 +527,7 @@ const DataSelector = ({
                                 <TableCell>Name</TableCell>
                                 <TableCell>Scatter</TableCell>
                                 <TableCell>Density</TableCell>
-                                <TableCell>Select</TableCell>
+                                <TableCell>Dataset</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

@@ -124,7 +124,8 @@ class ScatterWithContour {
 		clickedNeighbor,
 		setOpenNeighbor,
 	    legendElement,
-	    showDensity
+	    showDensity,
+		showScatter
 
 		   }) {
 		this.data = data;
@@ -401,8 +402,12 @@ class ScatterWithContour {
 					.remove()
 			}
 		}
-
-        drawCircles(xScale, yScale, this.svg, scatter_finalData)
+		d3.selectAll(".dataCircle").remove();
+		if (showScatter) {
+        	drawCircles(xScale, yScale, this.svg, scatter_finalData)
+		} else {
+			d3.selectAll(".dataCircle").remove();
+		}
         // ==========================================
 
         // =========== Select Circle Logic ===========
@@ -529,13 +534,38 @@ class ScatterWithContour {
 							.sort((a, b) => a.index > b.index) // ensure always select the topmost indices
 					})
 				);
+
+				console.log('complete final', completeData);
+
+				console.log('scatter final', scatter_finalData);
+				let new_scatter_final = [].concat(
+					...scatterData.filter(
+								(d) =>
+									d[query1] > X0 &&
+									d[query1] < X1 &&
+									d[query2] > Y0 &&
+									d[query2] < Y1
+							)
+							.sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+				);
+
+				let new_density_final = [].concat(
+					...densityData.filter(
+								(d) =>
+									d[query1] > X0 &&
+									d[query1] < X1 &&
+									d[query2] > Y0 &&
+									d[query2] < Y1
+							)
+							.sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+				);
 				let new_datasets = [];
 				let new_colors = {}
 
 				for (let i = 0; i <= max_num_datasets; i++) {
 					new_datasets.push([])
 				}
-				let organizedData = organizeByName(newFinalData);
+				let organizedData = organizeByName(new_density_final);
 				organizedData.map((d, i) => {
 					new_colors[d.name] = d.color;
 					new_datasets[i] = (d.data) ? (d.data) : [];
@@ -548,7 +578,11 @@ class ScatterWithContour {
                 }
 
 				d3.selectAll(".dataCircle").remove();
-                drawCircles(newXScale, newYScale, this.svg, newFinalData)
+				if (showScatter) {
+					drawCircles(newXScale, newYScale, this.svg, new_scatter_final)
+				} else {
+					d3.selectAll(".dataCircle").remove();
+				}
 			});
 
 		let brush = d3.brush().on("brush end", (event) => {
@@ -557,7 +591,7 @@ class ScatterWithContour {
 				let _xScale = this.xScaleForBrush;
 				let _yScale = this.yScaleForBrush;
 				d3.selectAll(".dataCircle")
-					.data(scatter_finalData)
+					.data(new_scatter_finalData)
 					.classed("selected", function (d) {
 						return (
 							d3.select(this).classed("selected") ||

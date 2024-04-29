@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/shared/header";
-import styles from "@/styles/Home.module.css";
+import styles from "@/styles/scatterWithContour.Home.module.css";
 import ScatterWithContourWrapper from "../components/scatter/scatterWithContourWrapper";
 import StructureWrapper from "../components/structureWrapper";
 import { csvParse } from "d3";
