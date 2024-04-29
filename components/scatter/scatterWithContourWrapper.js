@@ -181,7 +181,7 @@ const ScatterWithContourWrapper = ({
 					</span>
                     </Button>
                 </Row>
-                <Row justify={"space-between"} style={{width: "100%", marginTop: 20}}>
+                <Row justify={"space-around"} style={{width: "100%", marginTop: 20}}>
                     <Button
                         variant="outlined"
                         aria-label="find nearest neighbors"
