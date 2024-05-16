@@ -4,6 +4,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Checkbox from "@mui/material/Checkbox";
+import { grey, lightGreen } from '@mui/material/colors';
 import Select from "@mui/material/Select";
 import {styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
@@ -311,7 +312,9 @@ const DataSelector = ({
                         {/*	<CircularProgress />*/}
                         {/*) : (*/}
                         <Checkbox
-                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}}}
+                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
+                                '&.Mui-checked': {
+                                    color: lightGreen[600]}}}
                             onChange={(e) => onIconChange_scatter_density(e, index,
                                 scatter_activeData, scatter_dataLibrary, setScatterActiveData, setScatterDataLibrary, showScatter, setShowScatter)}
                             checked={showScatter[index]}
@@ -324,7 +327,9 @@ const DataSelector = ({
                         {/*	<CircularProgress />*/}
                         {/*) : (*/}
                         <Checkbox
-                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}}}
+                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
+                                '&.Mui-checked': {
+                                    color: lightGreen[600]}}}
                             onChange={(e) => onIconChange_scatter_density(e, index,
                                 density_activeData, density_dataLibrary, setDensityActiveData, setDensityDataLibrary, showDensity, setShowDensity)}
                             checked={showDensity[index]}
@@ -337,7 +342,9 @@ const DataSelector = ({
                         {/*	<CircularProgress />*/}
                         {/*) : (*/}
                         <Checkbox
-                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}}}
+                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
+                                '&.Mui-checked': {
+                                    color: lightGreen[600]}}}
                             onChange={(e) => onIconChange(e, index)}
                             checked={showData[index]}
                         />
@@ -441,18 +448,6 @@ const DataSelector = ({
                                     color: colorAssignment[prevState.length],
                                 },
                             ]);
-
-
-                            // console.log('activeData', activeData)
-                            // setActiveData((prevState) => [
-                            // 	...prevState,
-                            // 	{
-                            // 		bucket_name: "ideal-dataset-1",
-                            // 		name: file.name,
-                            // 		color: colorAssignment[prevState.length],
-                            // 	},
-                            // ]);
-                            // console.log('activeData', activeData)
 
                         },
                     });
