@@ -125,7 +125,8 @@ class ScatterWithContour {
                setOpenNeighbor,
                legendElement,
                showDensity,
-               showScatter
+               showScatter,
+               setCaptured
 
            }) {
         this.data = data;
@@ -135,6 +136,8 @@ class ScatterWithContour {
         let finalData = [].concat(...data);
         let density_finalData = [].concat(...densityData);
         let scatter_finalData = [].concat(...scatterData);
+        let master_datasets = [];
+        let min_density = [];
 
         //remove elements to avoid repeated append
 
@@ -220,6 +223,8 @@ class ScatterWithContour {
             dataset_dic[i] = d.name;
         });
 
+        master_datasets = datasets;
+
         // =============== Mouse Logic ================
         let mouseover = function (e, d) {
             d3.select(this)
@@ -272,7 +277,6 @@ class ScatterWithContour {
         };
 
         let mouseleave_contour = function (e, d) {
-            // tooltip_hist.style("visibility", "hidden").transition().duration(200);
             d3.select(this)
                 .style("stroke", "grey")
                 .style("stroke-width", 0)
@@ -280,6 +284,9 @@ class ScatterWithContour {
         };
 
         let mouseover_contour = function (e, d) {
+            let i = +d3.select(this).attr("class").replace('group', '');
+            console.log('density', i, min_density, d.value)
+            setCaptured(Math.floor(master_datasets[i].length * min_density[i] / d.value));
             d3.select(this.parentNode)
                 .raise();
             d3.selectAll(".dataCircle").raise();
@@ -356,7 +363,6 @@ class ScatterWithContour {
 
             hsl.opacity = 0.5;
 
-            // console.log('hsl', hsl)
             return hsl.toString();
         }
 
@@ -376,13 +382,11 @@ class ScatterWithContour {
             } else if ((density / maxDensity) > 0.05 * density_offset) {
                 hsl.l = 0.80
             } else {
-                // console.log('density', (density / maxDensity))
                 hsl.l = 0.90
             }
 
             hsl.opacity = 0.5;
 
-            // console.log('hsl', hsl)
             return hsl.toString();
         }
 
@@ -393,8 +397,9 @@ class ScatterWithContour {
         // =========== Draw Initial Plots ==========
         if (showDensity) {
             createLegend(Object.values(colors), false, datasets);
-            for (let i = max_num_datasets; i >= 0; i--) {
-                drawContour(i, xScale, yScale, this.svg, false)
+            min_density = [];
+            for (let i = 0; i <= max_num_datasets; i++) {
+                drawContour(i, xScale, yScale, this.svg, false, datasets)
             }
         } else {
             this.legendSvg.selectAll("*").remove();
@@ -574,11 +579,19 @@ class ScatterWithContour {
                     new_colors[d.name] = d.color;
                     new_datasets[i] = (d.data) ? (d.data) : [];
                 });
-                createLegend(Object.values(new_colors), true, new_datasets);
 
-                for (let i = max_num_datasets; i >= 0; i--) {
-                    d3.selectAll(".group" + i).remove()
-                    drawContour(i, newXScale, newYScale, this.svg, true)
+                master_datasets = new_datasets;
+                if (showDensity) {
+                    createLegend(Object.values(new_colors), true, new_datasets);
+                    min_density = [];
+                    for (let i = 0; i <= max_num_datasets; i++) {
+                        d3.selectAll(".group" + i).remove()
+                        drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
+                    }
+                } else {
+                    for (let i = 0; i <= max_num_datasets; i++) {
+                        d3.selectAll(".group" + i).remove()
+                    }
                 }
 
                 d3.selectAll(".dataCircle").remove();
@@ -616,7 +629,7 @@ class ScatterWithContour {
         this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
         this.svg.call(zoom).on("mousedown.zoom", null);
 
-        function drawContour(i, xScale, yScale, svg, zoomed) {
+        function drawContour(i, xScale, yScale, svg, zoomed, datasets) {
             d3.selectAll(".group" + i).remove()
             let contours = []
             if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
@@ -637,11 +650,13 @@ class ScatterWithContour {
                     .thresholds(50)(datasets[i]);
             }
 
-            let maxDensity = d3.max(contours, d => d.value); // Maximum density for the current dataset
+            min_density.push(d3.min(contours, d => d.value)); // Minimum density for the current dataset
+            let maxDensity = d3.max(contours, d => d.value); // Maximum density for current datasets
 
             if (datasets[i].length == 1) {
                 d3.selectAll(".group" + i)
                     .remove()
+                min_density = []
             } else {
                 if (datasets[i][1]) {
                     let contour = svg
@@ -686,7 +701,7 @@ class ScatterWithContour {
                 .attr("clip-path", "url(#clip)")
                 .attr("class", "clipPath")
                 .selectAll(".dataCircle")
-                .data(scatter_finalData);
+                .data(data);
 
             circles.exit().transition().attr("r", 0).remove();
             circles

@@ -66,6 +66,7 @@ const ScatterWithContourWrapper = ({
     const [activateKNN, setActivateKNN] = useState("#556cd6");
     const [activeDensity, setActiveDensity] = useState("#556cd6");
     const [activeScatter, setActiveScatter] = useState("#556cd6");
+    const [captured, setCaptured] = useState(0);
 
 
     const toggleFindNeighbors = () => {
@@ -134,7 +135,8 @@ const ScatterWithContourWrapper = ({
                 clickedNeighbor,
                 setOpenNeighbor,
                 showDensity: activeDensity === "#556cd6",
-                showScatter: activeScatter === "#556cd6"
+                showScatter: activeScatter === "#556cd6",
+                setCaptured
             });
         }
     }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity, activeScatter]);
@@ -157,9 +159,13 @@ const ScatterWithContourWrapper = ({
                 <div id="legend" ref={legendArea}></div>
             </Col>
             <div id="main-plot" ref={chartArea}></div>
-            <Col justify={"space-around"} style={{width: "100%", marginTop: "30px"}}>
+            <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
+                <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
+                    Points in highlighted contour: {captured}
+                </p>
+            </Row>
+            <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>
                 <Row justify={"space-evenly"} style={{width: "100%"}}>
-
                     <Button
                         variant="outlined"
                         aria-label="Show / Hide Density Plots"
