@@ -295,6 +295,21 @@ const DataSelector = ({
                         </IconButton>
                     </TableCell>
 
+                    {/*dataset select box*/}
+                    <TableCell>
+                        {/*{props.dataLoadingState.loading ? (*/}
+                        {/*	<CircularProgress />*/}
+                        {/*) : (*/}
+                        <Checkbox
+                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
+                                '&.Mui-checked': {
+                                    color: lightGreen[600]}}}
+                            onChange={(e) => onIconChange(e, index)}
+                            checked={showData[index]}
+                        />
+                        {/*)}*/}
+                    </TableCell>
+
                     <TableCell component="th" scope="row">
                         <Chip
                             key={dataset.name}
@@ -336,20 +351,7 @@ const DataSelector = ({
                         />
                         {/*)}*/}
                     </TableCell>
-                    {/*dataset select box*/}
-                    <TableCell>
-                        {/*{props.dataLoadingState.loading ? (*/}
-                        {/*	<CircularProgress />*/}
-                        {/*) : (*/}
-                        <Checkbox
-                            sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
-                                '&.Mui-checked': {
-                                    color: lightGreen[600]}}}
-                            onChange={(e) => onIconChange(e, index)}
-                            checked={showData[index]}
-                        />
-                        {/*)}*/}
-                    </TableCell>
+
                 </TableRow>
                 <TableRow
                     key={dataset.name + " details"}
@@ -519,10 +521,10 @@ const DataSelector = ({
                         <TableHead>
                             <TableRow>
                                 <TableCell></TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Scatter</TableCell>
-                                <TableCell>Density</TableCell>
-                                <TableCell>Dataset</TableCell>
+                                <TableCell>Dataset Selection</TableCell>
+                                <TableCell>Dataset Name</TableCell>
+                                <TableCell>Scatter Plot</TableCell>
+                                <TableCell>Density Plot</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
