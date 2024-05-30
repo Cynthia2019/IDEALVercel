@@ -133,9 +133,11 @@ class ScatterWithContour {
         this.query1 = query1;
         this.query2 = query2;
 
-        let finalData = [].concat(...data);
-        let density_finalData = [].concat(...densityData);
-        let scatter_finalData = [].concat(...scatterData);
+        let finalData = [].concat(...data).slice(0, maxDataPointsPerDataset);
+        let density_finalData = [].concat(...densityData).slice(0, maxDataPointsPerDataset);
+        let scatter_finalData = [].concat(...scatterData).slice(0, maxDataPointsPerDataset);
+        console.log('density', density_finalData);
+        console.log('scatter', scatter_finalData);
         let master_datasets = [];
         let min_density = [];
 
@@ -286,7 +288,6 @@ class ScatterWithContour {
 
         let mouseover_contour = function (e, d) {
             let i = +d3.select(this).attr("class").replace('group', '');
-            console.log('density', i, min_density, d.value)
             setCaptured(Math.floor(master_datasets[i].length * min_density[i] / d.value));
             d3.select(this.parentNode)
                 .raise();

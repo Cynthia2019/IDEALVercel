@@ -39,7 +39,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 
 	//record the whole dataset
 	const [completeData, setCompleteData] = useState([]);
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(20);
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(300);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
@@ -119,10 +119,10 @@ export default function ScatterWithContour({ fetchedNames }) {
 								data: processedData,
 							},
 						]);
-						processedData = processedData.slice(
-							0,
-							maxDataPointsPerDataset
-						);
+						// processedData = processedData.slice(
+						// 	0,
+						// 	maxDataPointsPerDataset
+						// );
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
@@ -154,10 +154,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 					(fetchedNames.length === 0 ? 1 : fetchedNames.length)
 			)
 		);
-		console.log('max pts', Math.floor(
-			MAX_DATA_POINTS_NUM /
-			(fetchedNames.length === 0 ? 1 : fetchedNames.length)
-		))
+
 	};
 
 	useEffect(() => {

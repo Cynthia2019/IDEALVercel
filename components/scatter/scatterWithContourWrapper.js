@@ -177,7 +177,7 @@ const ScatterWithContourWrapper = ({
             }}
         >
             <TextField
-                label="Max Data Points Per Dataset"
+                label="Total Number of Data Points"
                 type="number"
                 variant="outlined"
                 value={inputValue}
@@ -186,7 +186,7 @@ const ScatterWithContourWrapper = ({
                 onKeyPress={handleKeyPress}
                 helperText="Enter a positive number"
                 error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
-                style={{ marginBottom: 20 }}
+                style={{ marginTop: 20 }}
             />
             {/*<Col>*/}
             {/*    {activeDensity === "#556cd6" && (*/}
