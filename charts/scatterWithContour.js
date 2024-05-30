@@ -281,6 +281,7 @@ class ScatterWithContour {
                 .style("stroke", "grey")
                 .style("stroke-width", 0)
                 .attr("opacity", 0.5);
+            setCaptured('NA');
         };
 
         let mouseover_contour = function (e, d) {

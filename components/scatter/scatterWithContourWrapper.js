@@ -68,7 +68,7 @@ const ScatterWithContourWrapper = ({
     const [activateKNN, setActivateKNN] = useState("#556cd6");
     const [activeDensity, setActiveDensity] = useState("#556cd6");
     const [activeScatter, setActiveScatter] = useState("#556cd6");
-    const [captured, setCaptured] = useState(0);
+    const [captured, setCaptured] = useState('NA');
     const [inputValue, setInputValue] = useState(maxDataPointsPerDataset);
 
 
@@ -188,23 +188,18 @@ const ScatterWithContourWrapper = ({
                 error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
                 style={{ marginBottom: 20 }}
             />
-            <Col>
-                {activeDensity === "#556cd6" && (
-                    <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 50, marginTop: 10}}>
-                        Legend
-                    </p>
-                )}
-                <div id="legend" ref={legendArea}></div>
-            </Col>
+            {/*<Col>*/}
+            {/*    {activeDensity === "#556cd6" && (*/}
+            {/*        <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 50, marginTop: 10}}>*/}
+            {/*            Legend*/}
+            {/*        </p>*/}
+            {/*    )}*/}
+            {/*    <div id="legend" ref={legendArea}></div>*/}
+            {/*</Col>*/}
             <div id="main-plot" ref={chartArea}></div>
             <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
                 <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
-                    Points in highlighted contour: {captured}
-                </p>
-            </Row>
-            <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
-                <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
-                    Total Number of points to display: {captured}
+                    KDE density in highlighted contour: {captured}
                 </p>
             </Row>
             <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>
