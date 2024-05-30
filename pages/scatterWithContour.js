@@ -39,7 +39,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 
 	//record the whole dataset
 	const [completeData, setCompleteData] = useState([]);
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(20);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
@@ -149,11 +149,15 @@ export default function ScatterWithContour({ fetchedNames }) {
 			}))
 		);
 		setMaxDataPointsPerDataset(
-			Math.ceil(
+			Math.floor(
 				MAX_DATA_POINTS_NUM /
 					(fetchedNames.length === 0 ? 1 : fetchedNames.length)
 			)
 		);
+		console.log('max pts', Math.floor(
+			MAX_DATA_POINTS_NUM /
+			(fetchedNames.length === 0 ? 1 : fetchedNames.length)
+		))
 	};
 
 	useEffect(() => {
@@ -202,6 +206,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 							scatterData={scatter_activeData}
 							completeData={completeData}
 							maxDataPointsPerDataset={maxDataPointsPerDataset}
+							setMaxDataPointsPerDataset={setMaxDataPointsPerDataset}
 							setDataPoint={setDataPoint}
 							query1={query1}
 							query2={query2}

@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import {Typography} from "@mui/material";
+import {TextField, Typography} from "@mui/material";
 import {FcMindMap} from "react-icons/fc";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -14,6 +14,7 @@ import {Col, Row} from "antd";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
 import CloseIcon from '@mui/icons-material/Close';
+
 
 const PaperComponent = (props) => {
     return (
@@ -44,6 +45,7 @@ const ScatterWithContourWrapper = ({
                                        scatterData,
                                        completeData,
                                        maxDataPointsPerDataset,
+                                       setMaxDataPointsPerDataset,
                                        setDataPoint,
                                        query1,
                                        query2,
@@ -67,6 +69,7 @@ const ScatterWithContourWrapper = ({
     const [activeDensity, setActiveDensity] = useState("#556cd6");
     const [activeScatter, setActiveScatter] = useState("#556cd6");
     const [captured, setCaptured] = useState(0);
+    const [inputValue, setInputValue] = useState(maxDataPointsPerDataset);
 
 
     const toggleFindNeighbors = () => {
@@ -96,6 +99,29 @@ const ScatterWithContourWrapper = ({
     };
     const handleResetClick = () => {
         setReset(true);
+    };
+
+
+    const validateAndSetMaxDataPoints = (value) => {
+        const numericValue = parseInt(value, 10);
+        if (numericValue > 0) {
+            setMaxDataPointsPerDataset(numericValue); // Set the valid number to state
+            setInputValue(numericValue.toString()); // Also update the input value to reflect this
+        }
+    };
+
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value); // Update input value directly from event
+    };
+
+    const handleBlur = () => {
+        validateAndSetMaxDataPoints(inputValue); // Validate and set on blur
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            validateAndSetMaxDataPoints(inputValue); // Validate and set on pressing Enter
+        }
     };
 
     useEffect(() => {
@@ -139,7 +165,7 @@ const ScatterWithContourWrapper = ({
                 setCaptured
             });
         }
-    }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity, activeScatter]);
+    }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity, activeScatter, maxDataPointsPerDataset]);
 
     return (
         <div
@@ -150,6 +176,18 @@ const ScatterWithContourWrapper = ({
                 marginLeft: "30px",
             }}
         >
+            <TextField
+                label="Max Data Points Per Dataset"
+                type="number"
+                variant="outlined"
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                onKeyPress={handleKeyPress}
+                helperText="Enter a positive number"
+                error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
+                style={{ marginBottom: 20 }}
+            />
             <Col>
                 {activeDensity === "#556cd6" && (
                     <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 50, marginTop: 10}}>
@@ -162,6 +200,11 @@ const ScatterWithContourWrapper = ({
             <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
                 <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
                     Points in highlighted contour: {captured}
+                </p>
+            </Row>
+            <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
+                <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
+                    Total Number of points to display: {captured}
                 </p>
             </Row>
             <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>

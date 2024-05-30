@@ -31,4 +31,4 @@ export const nnColorAssignment = [
   "#EA1A7F", "#FEC603", "#A8F387", "#16D6FA", '#6020a4'
 ]
 
-export const MAX_DATA_POINTS_NUM = 700; 
+export const MAX_DATA_POINTS_NUM = 50;

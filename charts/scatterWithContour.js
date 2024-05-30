@@ -500,6 +500,7 @@ class ScatterWithContour {
             [WIDTH, HEIGHT],
         ];
 
+
         // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
         let zoom = d3
             .zoom()
@@ -696,6 +697,10 @@ class ScatterWithContour {
 
         // ============= Draw Plot Logic ================
         function drawCircles(xScale, yScale, svg, data) {
+            d3.selectAll(".dataCircle").remove();
+            d3.selectAll("defs").remove();
+            d3.selectAll(".clipPath").remove();
+
             let circles = svg
                 .append("g")
                 .attr("clip-path", "url(#clip)")
