@@ -39,7 +39,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 
 	//record the whole dataset
 	const [completeData, setCompleteData] = useState([]);
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(300);
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(25);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
