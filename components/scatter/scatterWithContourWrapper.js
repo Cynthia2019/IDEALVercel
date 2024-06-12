@@ -177,7 +177,7 @@ const ScatterWithContourWrapper = ({
             }}
         >
             <TextField
-                label="Total Number of Data Points"
+                label="Total Points in Scatter Plot"
                 type="number"
                 variant="outlined"
                 value={inputValue}

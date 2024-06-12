@@ -133,9 +133,9 @@ class ScatterWithContour {
         this.query1 = query1;
         this.query2 = query2;
 
-        let finalData = [].concat(...data).slice(0, maxDataPointsPerDataset);
-        let density_finalData = [].concat(...densityData).slice(0, maxDataPointsPerDataset);
-        let scatter_finalData = [].concat(...scatterData).slice(0, maxDataPointsPerDataset);
+        let finalData = [].concat(...data).slice(0, Math.min(maxDataPointsPerDataset, data.length));
+        let density_finalData = [].concat(...densityData);
+        let scatter_finalData = [].concat(...scatterData).slice(0, Math.min(maxDataPointsPerDataset, scatterData.length));
         console.log('density', density_finalData);
         console.log('scatter', scatter_finalData);
         let master_datasets = [];
@@ -569,7 +569,6 @@ class ScatterWithContour {
                             d[query2] < Y1
                     )
                         .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-                        .slice(0, maxDataPointsPerDataset)
                 );
                 let new_datasets = [];
                 let new_colors = {}
