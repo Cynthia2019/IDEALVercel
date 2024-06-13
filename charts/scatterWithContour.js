@@ -134,7 +134,7 @@ class ScatterWithContour {
         this.query2 = query2;
 
         let finalData = [].concat(...data).slice(0, Math.min(maxDataPointsPerDataset, data.length));
-        let density_finalData = [].concat(...densityData);
+        let density_finalData = [].concat(...densityData)
         let scatter_finalData = [].concat(...scatterData).slice(0, Math.min(maxDataPointsPerDataset, scatterData.length));
         console.log('density', density_finalData);
         console.log('scatter', scatter_finalData);

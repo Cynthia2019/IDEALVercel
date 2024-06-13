@@ -41,8 +41,8 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                     Math.max(...data.map((d) => d[name])).toExponential(),
                                 ]}
                                 value={[
-                                    Math.min(...filtered.map((d) => d[name])).toExponential(),
-                                    Math.max(...filtered.map((d) => d[name])).toExponential(),
+                                    Math.min(...data.map((d) => d[name])).toExponential(),
+                                    Math.max(...data.map((d) => d[name])).toExponential(),
                                 ]}
                                 min={Math.min(...data.map((d) => d[name]))}
                                 max={Math.max(...data.map((d) => d[name]))}

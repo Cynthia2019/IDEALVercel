@@ -119,15 +119,15 @@ export default function ScatterWithContour({ fetchedNames }) {
 								data: processedData,
 							},
 						]);
-						// processedData = processedData.slice(
-						// 	0,
-						// 	maxDataPointsPerDataset
-						// );
-						setDatasets((prev) => [...prev, ...processedData]);
-						setDataPoint(processedData[0]);
-						setActiveData((prev) => [...prev, ...processedData]);
-						setDensityActiveData((prev) => [...prev, ...processedData]);
-						setScatterActiveData((prev) => [...prev, ...processedData]);
+						let processedData2 = processedData.slice(
+							0,
+							500
+						);
+						setDatasets((prev) => [...prev, ...processedData2]);
+						setDataPoint(processedData2[0]);
+						setActiveData((prev) => [...prev, ...processedData2]);
+						setDensityActiveData((prev) => [...prev, ...processedData2]);
+						setScatterActiveData((prev) => [...prev, ...processedData2]);
 						setDataLoadingStates((prev) =>
 							prev.map((obj) =>
 								obj.name === info.name
