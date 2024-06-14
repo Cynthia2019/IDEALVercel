@@ -70,6 +70,7 @@ const ScatterWithContourWrapper = ({
     const [activeScatter, setActiveScatter] = useState("#556cd6");
     const [captured, setCaptured] = useState('NA');
     const [inputValue, setInputValue] = useState(maxDataPointsPerDataset);
+    const legendContainer = useRef(null);
 
 
     const toggleFindNeighbors = () => {
@@ -130,6 +131,7 @@ const ScatterWithContourWrapper = ({
                 new ScatterWithContour(
                     chartArea.current,
                     legendArea.current,
+                    legendContainer.current,
                     data,
                     densityData,
                     scatterData,
@@ -147,6 +149,7 @@ const ScatterWithContourWrapper = ({
                 maxDataPointsPerDataset,
                 element: chartArea.current,
                 legendElement: legendArea.current,
+                legendContainer: legendContainer.current,
                 setDataPoint,
                 query1,
                 query2,
@@ -197,11 +200,18 @@ const ScatterWithContourWrapper = ({
             {/*    <div id="legend" ref={legendArea}></div>*/}
             {/*</Col>*/}
             <div id="main-plot" ref={chartArea}></div>
+
             <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
                 <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 10, marginTop: 10}}>
                     KDE density in highlighted contour: {captured}
                 </p>
+
             </Row>
+            <Row
+                id="main-plot-legend"
+                // style={{display: "flex", flexDirection: "column"}}
+                ref={legendContainer}
+            ></Row>
             <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>
                 <Row justify={"space-evenly"} style={{width: "100%"}}>
                     <Button

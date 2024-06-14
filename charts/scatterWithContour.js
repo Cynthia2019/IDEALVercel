@@ -33,7 +33,7 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 class ScatterWithContour {
-    constructor(element, legendElement, data, densityData, scatterData) {
+    constructor(element, legendElement, legendContainer, data, densityData, scatterData) {
         this.isDarkMode =
             window?.matchMedia &&
             window?.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -62,6 +62,12 @@ class ScatterWithContour {
                 LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
             .attr("style", "max-width: 100%; overflow: visible");
+        this.legend = d3
+            .select(legendContainer)
+            .append("svg")
+            .attr("width", 120)
+            .append("g")
+            .attr("class", "pairwise-plot-legend");
         //brush
         this.svg.append("g").attr("class", "brush");
 
@@ -120,10 +126,12 @@ class ScatterWithContour {
                setNeighbors,
                reset,
                setReset,
+               orig_datasets,
                max_num_datasets,
                clickedNeighbor,
                setOpenNeighbor,
                legendElement,
+                legendContainer,
                showDensity,
                showScatter,
                setCaptured
@@ -132,6 +140,11 @@ class ScatterWithContour {
         this.data = data;
         this.query1 = query1;
         this.query2 = query2;
+
+        const legendCircleSize = 5.0;
+        const legendSpacing = 4;
+
+        d3.select(legendContainer).selectAll(".legend").remove();
 
         let finalData = [].concat(...data).slice(0, Math.min(maxDataPointsPerDataset, data.length));
         let density_finalData = [].concat(...densityData)
@@ -303,6 +316,32 @@ class ScatterWithContour {
 
         //=============== Contours Helper =========================
 
+        let createDatasetNames = (data) => {
+            let legend = this.legend.selectAll(".legend").data(data);
+
+            legend.exit().remove();
+
+            legend
+                .enter()
+                .append("circle")
+                .attr("class", "legend")
+                .attr("r", legendCircleSize)
+                .attr("cx", 10)
+                .attr("cy", (d, i) => (legendCircleSize * 2 + legendSpacing * 2) * i + 30)
+                .style("fill", (d) => d.color);
+            //Create legend labels
+            legend
+                .enter()
+                .append("text")
+                .attr("class", "legend")
+                .attr("x", 20)
+                .attr("y", (d, i) => (legendCircleSize * 2 + legendSpacing * 2) * i + 30)
+                .text((d) => d.name)
+                .attr("text-anchor", "left")
+                .style("alignment-baseline", "middle");
+
+            legend.exit().remove();
+        }
         let createLegend = (baseColors, zoomed, curr_data) => {
             const numSamples = 5; // Number of samples in the gradient
             const legendWidth = LEGEND_WIDTH;
@@ -398,13 +437,15 @@ class ScatterWithContour {
 
         // =========== Draw Initial Plots ==========
         if (showDensity) {
-            createLegend(Object.values(colors), false, datasets);
+            // createLegend(Object.values(colors), false, datasets);
+            // createDatasetNames(orig_datasets);
             min_density = [];
             for (let i = 0; i <= max_num_datasets; i++) {
                 drawContour(i, xScale, yScale, this.svg, false, datasets)
             }
         } else {
             this.legendSvg.selectAll("*").remove();
+            d3.select(legendContainer).selectAll(".legend").remove();
             for (let i = 0; i <= max_num_datasets; i++) {
                 d3.selectAll(".group" + i)
                     .remove()
@@ -584,13 +625,16 @@ class ScatterWithContour {
 
                 master_datasets = new_datasets;
                 if (showDensity) {
-                    createLegend(Object.values(new_colors), true, new_datasets);
+                    // createLegend(Object.values(new_colors), true, new_datasets);
+                    // createDatasetNames(orig_datasets);
                     min_density = [];
                     for (let i = 0; i <= max_num_datasets; i++) {
                         d3.selectAll(".group" + i).remove()
                         drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
                     }
                 } else {
+                    this.legendSvg.selectAll("*").remove();
+                    d3.select(legendContainer).selectAll(".legend").remove();
                     for (let i = 0; i <= max_num_datasets; i++) {
                         d3.selectAll(".group" + i).remove()
                     }
