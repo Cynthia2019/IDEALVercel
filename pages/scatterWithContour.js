@@ -39,7 +39,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 
 	//record the whole dataset
 	const [completeData, setCompleteData] = useState([]);
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(25);
+	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(500);
 
 	const router = useRouter();
 	const { pairwise_query1, pairwise_query2 } = router.query;
@@ -92,10 +92,10 @@ export default function ScatterWithContour({ fetchedNames }) {
 		const command = new GetObjectCommand({
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
-			cacheControl: "no-cache",
 		});
 
 		await s3Client.send(command).then((res) => {
+			console.log('fetched data');
 			let body = res.Body.transformToByteArray();
 			body.then((stream) => {
 				new Response(stream, {
@@ -104,10 +104,11 @@ export default function ScatterWithContour({ fetchedNames }) {
 					.text()
 					.then((data) => {
 						let parsed = csvParse(data);
-
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
+						console.log('data', processedData)
+
 						processedData.map((p) => (p.name = info.name));
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
@@ -121,7 +122,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 						]);
 						let processedData2 = processedData.slice(
 							0,
-							500
+							maxDataPointsPerDataset
 						);
 						setDatasets((prev) => [...prev, ...processedData2]);
 						setDataPoint(processedData2[0]);
@@ -141,6 +142,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 	}
 	const fetchDataNames = async () => {
 		const fetchedNames = (await fetchNames()).fetchedNames;
+		console.log('fetched names', fetchedNames);
 		setAvailableDatasetNames(fetchedNames);
 		setDataLoadingStates(
 			fetchedNames.map((info) => ({
@@ -163,7 +165,7 @@ export default function ScatterWithContour({ fetchedNames }) {
 
 	useEffect(() => {
 		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
-	}, [maxDataPointsPerDataset]);
+	}, [maxDataPointsPerDataset, availableDatasetNames]);
 
 	useEffect(() => {
 		if (availableDatasetNames.length > 0) {

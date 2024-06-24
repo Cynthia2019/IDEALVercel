@@ -17,7 +17,6 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
         const handleSliderChange = (name, value) => {
             handleChange(name, value);
         };
-        console.log('data', data);
         return (
             <div className={styles["property-range"]}>
                 <Typography color="textPrimary" className={styles["range-title"]}>Property Range</Typography>

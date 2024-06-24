@@ -207,11 +207,11 @@ const ScatterWithContourWrapper = ({
                 </p>
 
             </Row>
-            <Row
-                id="main-plot-legend"
-                // style={{display: "flex", flexDirection: "column"}}
-                ref={legendContainer}
-            ></Row>
+            {/*<Row*/}
+            {/*    id="main-plot-legend"*/}
+            {/*    style={{display: "flex", flexDirection: "column"}}*/}
+            {/*    ref={legendContainer}*/}
+            {/*></Row>*/}
             <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>
                 <Row justify={"space-evenly"} style={{width: "100%"}}>
                     <Button

@@ -6,7 +6,7 @@ export async function fetchNames() {
     let fetchedNames = []
     const listObjectCommand = new ListObjectsCommand({
         Bucket: 'ideal-dataset-1',
-        cacheControl: "no-cache",
+        // cacheControl: "no-cache",
     })
     await s3Client.send(listObjectCommand).then((res) => {
         const names = res.Contents.map(content => content.Key)

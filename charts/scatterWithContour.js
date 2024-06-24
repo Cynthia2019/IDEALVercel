@@ -146,11 +146,11 @@ class ScatterWithContour {
 
         d3.select(legendContainer).selectAll(".legend").remove();
 
+
         let finalData = [].concat(...data).slice(0, Math.min(maxDataPointsPerDataset, data.length));
         let density_finalData = [].concat(...densityData)
         let scatter_finalData = [].concat(...scatterData).slice(0, Math.min(maxDataPointsPerDataset, scatterData.length));
-        console.log('density', density_finalData);
-        console.log('scatter', scatter_finalData);
+
         let master_datasets = [];
         let min_density = [];
 
