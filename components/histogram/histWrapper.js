@@ -16,6 +16,7 @@ const HistWrapper = ({data, element, setDataPoint, setSelectedData, query1, max_
         if (!chart) {
             setChart(new Hist(data, histContainer, legendContainer.current));
         } else {
+            console.log("updating hist", data)
             chart.update(data, {
                     columns: [
                         "C11",

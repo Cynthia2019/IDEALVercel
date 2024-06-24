@@ -7,37 +7,31 @@ import dynamic from "next/dynamic";
 import DataSelector from "@/components/shared/dataSelector";
 import RangeSelector from "@/components/shared/rangeSelector";
 import MaterialInformation from "../components/shared/materialInfo";
-import { Row, Col } from "antd";
+import { Row } from "antd";
 import PairwiseWrapper from "../components/pairwise/pairwiseWrapper";
 import { GetObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import s3Client from "./api/aws";
-import {
-	MAX_DATA_POINTS_NUM,
-	colorAssignment,
-	s3BucketList,
-} from "@/util/constants";
+import { colorAssignment, s3BucketList } from "@/util/constants";
 import processData from "../util/processData";
 import Button from "@mui/material/Button";
 import * as React from "react";
 import Head from "next/head";
 import { fetchNames } from "@/components/fetchNames";
+import ContourWrapper from "@/components/contour/contourWrapper";
 
-export default function Pairwise() {
-	const [completeData, setCompleteData] = useState([]);
+const regex = /[-+]?[0-9]*\.?[0-9]+([eE]?[-+]?[0-9]+)/g;
 
+export default function Contour() {
 	// record all fetched data from the data library
 	// all data stored in one array
 	const [datasets, setDatasets] = useState([]);
 	// record all available data names in the data library
 	const [availableDatasetNames, setAvailableDatasetNames] = useState([]);
 	// record all currently selected data
-	const [activeData, setActiveData] = useState([]);
+	const [activeData, setActiveData] = useState([datasets]);
 	// record all non active data
 	const [dataLibrary, setDataLibrary] = useState([]);
-	// record the loading state of data
-	const [dataLoadingStates, setDataLoadingStates] = useState([]);
 	const [dataPoint, setDataPoint] = useState({});
-	const [maxDataPointsPerDataset, setMaxDataPointsPerDataset] = useState(200);
 
 	const Youngs = dynamic(() => import("../components/youngs"), {
 		ssr: false,
@@ -49,7 +43,9 @@ export default function Pairwise() {
 
 	const handleRangeChange = (name, value) => {
 		let filtered_datasets = datasets.filter((d, i) => {
-			let filtered = d[name] >= value[0] && d[name] <= value[1];
+			let filtered =
+				d[name] >= value[0] &&
+				d[name] <= value[1]
 			return filtered;
 		});
 		// remove filtered out data from active data and add to data library
@@ -65,6 +61,7 @@ export default function Pairwise() {
 
 	async function fetchDataFromAWS(info, index) {
 		const command = new GetObjectCommand({
+			// Bucket: info.bucket_name,
 			Bucket: "ideal-dataset-1",
 			Key: info.name,
 			cacheControl: "no-cache",
@@ -83,67 +80,30 @@ export default function Pairwise() {
 						let processedData = parsed.map((dataset, i) => {
 							return processData(dataset, i);
 						});
-						setCompleteData((prev) => [
-							...prev,
-							{
-								name: info.name,
-								data: processedData,
-							},
-						]);
-						processedData = processedData.slice(
-							0,
-							maxDataPointsPerDataset
+						processedData.map(
+							(p) => (p.name = info.name)
 						);
-						processedData.map((p) => (p.name = info.name));
 						processedData.map(
 							(p) => (p.color = colorAssignment[index])
 						);
 						setDatasets((prev) => [...prev, ...processedData]);
 						setDataPoint(processedData[0]);
 						setActiveData((prev) => [...prev, ...processedData]);
-						setDataLoadingStates((prev) =>
-							prev.map((obj) =>
-								obj.name === info.name
-									? { ...obj, loading: false }
-									: obj
-							)
-						);
 					});
 			});
 		});
 	}
-	const fetchDataNames = async () => {
-		const fetchedNames = (await fetchNames()).fetchedNames;
-		setAvailableDatasetNames(fetchedNames);
-		setDataLoadingStates(
-			fetchedNames.map((info) => ({
-				...info,
-				loading: true,
-			}))
-		);
-		setMaxDataPointsPerDataset(
-			Math.ceil(
-				MAX_DATA_POINTS_NUM /
-					(fetchedNames.length === 0 ? 1 : fetchedNames.length)
-			)
-		);
-	};
+	const fetchData = async () => {
+		const fetchedNames = await fetchNames();
+		console.log(fetchedNames)
+		setAvailableDatasetNames(fetchedNames.fetchedNames);
+		fetchedNames.fetchedNames.map((info, i) => fetchDataFromAWS(info, i));
+
+	}
 
 	useEffect(() => {
-		fetchDataNames();
+		fetchData()
 	}, []);
-
-	useEffect(() => {
-		dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
-	}, [maxDataPointsPerDataset]);
-
-	useEffect(() => {
-		if (availableDatasetNames.length > 0) {
-			const lastIndex = availableDatasetNames.length - 1;
-			const lastInfo = availableDatasetNames[lastIndex];
-			fetchDataFromAWS(lastInfo, lastIndex);
-		}
-	}, [availableDatasetNames]);
 
 	const [open, setOpen] = useState(true);
 
@@ -156,65 +116,54 @@ export default function Pairwise() {
 			<div className={styles.body}>
 				<Row>
 					<div className={styles.mainPlot}>
-						<div style={{ margin: "8px", marginLeft: "20px" }}>
-							<Button
-								size="medium"
-								href="/umap"
-								variant="contained"
-							>
-								Visualize in Reduced Dimension
-							</Button>
-						</div>
-
-						<PairwiseWrapper
+						<ContourWrapper
 							data={activeData}
 							setDataPoint={setDataPoint}
 							max_num_datasets={availableDatasetNames.length}
+							query1={"C11"}
+							query2={"C12"}
 						/>
 					</div>
-					<div className={styles.subPlots}>
+					{/* <div className={styles.subPlots}>
 						<StructureWrapper data={dataPoint} />
 						<Youngs dataPoint={dataPoint} />
 						<Poisson dataPoint={dataPoint} />
-					</div>
-					<div
-						className={`${
-							open ? styles.selectors : styles.selectorsClosed
-						}`}
-					>
-						<img
-							src="/control.png"
-							className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple
-                m-4 border-2 rounded-full  ${open && "rotate-180"}`}
-							onClick={() => setOpen(!open)}
-							alt="control"
-						/>
+					</div>  */}
+				{/*	<div*/}
+				{/*		className={`${*/}
+				{/*			open ? styles.selectors : styles.selectorsClosed*/}
+				{/*		}`}*/}
+				{/*	>*/}
+				{/*		<img*/}
+				{/*			src="/control.png"*/}
+				{/*			className={`cursor-pointer -right-3 top-9 w-7 border-dark-purple*/}
+                {/*m-4 border-2 rounded-full  ${open && "rotate-180"}`}*/}
+				{/*			onClick={() => setOpen(!open)}*/}
+				{/*			alt="control"*/}
+				{/*		/>*/}
 
-						<DataSelector
-							page={"scatter"}
-							datasets={datasets}
-							setDatasets={setDatasets}
-							availableDatasetNames={availableDatasetNames}
-							setAvailableDatasetNames={setAvailableDatasetNames}
-							dataLoadingStates={dataLoadingStates}
-							activeData={activeData}
-							dataLibrary={dataLibrary}
-							setActiveData={setActiveData}
-							setDataLibrary={setDataLibrary}
-							setCompleteData={setCompleteData}
-							open={open}
-						/>
-						<RangeSelector
-							datasets={datasets}
-							activeData={activeData}
-							handleChange={handleRangeChange}
-							open={open}
-						/>
-						<MaterialInformation
-							dataPoint={dataPoint}
-							open={open}
-						/>
-					</div>
+				{/*		<DataSelector*/}
+				{/*			page={"pairwise"}*/}
+				{/*			setDatasets={setDatasets}*/}
+				{/*			availableDatasetNames={availableDatasetNames}*/}
+				{/*			setAvailableDatasetNames={setAvailableDatasetNames}*/}
+				{/*			activeData={activeData}*/}
+				{/*			dataLibrary={dataLibrary}*/}
+				{/*			setActiveData={setActiveData}*/}
+				{/*			setDataLibrary={setDataLibrary}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*		<RangeSelector*/}
+				{/*			datasets={datasets}*/}
+				{/*			activeData={activeData}*/}
+				{/*			handleChange={handleRangeChange}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*		<MaterialInformation*/}
+				{/*			dataPoint={dataPoint}*/}
+				{/*			open={open}*/}
+				{/*		/>*/}
+				{/*	</div> */}
 				</Row>
 			</div>
 		</div>

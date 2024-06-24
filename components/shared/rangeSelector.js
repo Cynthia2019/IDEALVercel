@@ -2,17 +2,21 @@ import { Slider, Row, Col } from "antd";
 import styles from "@/styles/rangeSelector.module.css";
 import sigFigs from "@/util/convertTo4SigFig";
 import { Typography } from "@mui/material";
+import {useEffect} from "react";
 
 
 const rangeList = ["C11", "C12", "C22", "C16", "C26", "C66"];
 
 const RangeSelector = ({datasets, activeData, handleChange, open}) => {
+        useEffect(() => {
+
+        }, [datasets]);
+
         const data = datasets;
         const filtered = activeData;
         const handleSliderChange = (name, value) => {
             handleChange(name, value);
         };
-
         return (
             <div className={styles["property-range"]}>
                 <Typography color="textPrimary" className={styles["range-title"]}>Property Range</Typography>
@@ -32,12 +36,12 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                     draggableTrack: true
                                 }}
                                 defaultValue={[
-                                    Math.min(...data.map((d) => d[name])),
-                                    Math.max(...data.map((d) => d[name])),
+                                    Math.min(...data.map((d) => d[name])).toExponential(),
+                                    Math.max(...data.map((d) => d[name])).toExponential(),
                                 ]}
                                 value={[
-                                    Math.min(...filtered.map((d) => d[name])),
-                                    Math.max(...filtered.map((d) => d[name])),
+                                    Math.min(...data.map((d) => d[name])).toExponential(),
+                                    Math.max(...data.map((d) => d[name])).toExponential(),
                                 ]}
                                 min={Math.min(...data.map((d) => d[name]))}
                                 max={Math.max(...data.map((d) => d[name]))}
@@ -47,8 +51,8 @@ const RangeSelector = ({datasets, activeData, handleChange, open}) => {
                                 style={{margin: "0"}}
                             />
                             <Row justify={'space-between'}>
-                                <Col style={{color:'gray'}}>{sigFigs(Math.min(...data.map((d) => d[name])), 4)}</Col>
-                                <Col style={{color:'gray'}}>{Math.max(...data.map((d) => d[name]))}</Col>
+                                <Col style={{color:'gray'}}>{sigFigs(Math.min(...data.map((d) => d[name])), 3).toExponential()}</Col>
+                                <Col style={{color:'gray'}}>{sigFigs(Math.max(...data.map((d) => d[name])), 3).toExponential()}</Col>
                             </Row>
                         </Col>
                     </Row>

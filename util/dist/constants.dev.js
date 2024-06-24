@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.nnColorAssignment = exports.requiredColumns = exports.colorAssignment = exports.s3BucketList = void 0;
+exports.MAX_DATA_POINTS_NUM = exports.nnColorAssignment = exports.requiredColumns = exports.colorAssignment = exports.s3BucketList = void 0;
 var s3BucketList = [// {
 //   name: "free form 2D", 
 //   bucket_name: "ideal-dataset-1",
@@ -29,3 +29,5 @@ var requiredColumns = ["symmetry", "unit_cell_x", "unit_cell_y", "geometry_full"
 exports.requiredColumns = requiredColumns;
 var nnColorAssignment = ["#EA1A7F", "#FEC603", "#A8F387", "#16D6FA", '#6020a4'];
 exports.nnColorAssignment = nnColorAssignment;
+var MAX_DATA_POINTS_NUM = 700;
+exports.MAX_DATA_POINTS_NUM = MAX_DATA_POINTS_NUM;

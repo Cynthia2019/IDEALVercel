@@ -1,20 +1,18 @@
 import React, {useRef, useState, useEffect} from "react";
-import Pairwise from "@/charts/pairwise";
+import Contour from "@/charts/contour-pairwise";
 import {useRouter} from "next/router";
 
-
-const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_datasets}) => {
-    const pairwiseContainer = useRef(null);
+const ContourPairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_datasets}) => {
+    const contourContainer = useRef(null);
     const legendContainer = useRef(null);
     const [chart, setChart] = useState(null);
     const router = useRouter();
 
-    console.log('pairwise wrapper', data)
 
     useEffect(() => {
         if (!chart) {
-            setChart(new Pairwise(data,
-                pairwiseContainer,
+            setChart(new Contour(data,
+                contourContainer,
                 legendContainer.current));
         } else {
             chart.update(data, {
@@ -26,7 +24,7 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_
                         "C26",
                         "C66"
                     ]
-                }, pairwiseContainer,
+                }, contourContainer,
                 legendContainer.current,
                 setDataPoint,
                 router,
@@ -36,19 +34,12 @@ const PairwiseWrapper = ({data, element, setDataPoint, setSelectedData, max_num_
 
     return (
         <div style={{display: "flex", flexDirection: "column"}}>
-            <div id="main-plot" ref={pairwiseContainer}
+            <div id="main-plot" ref={contourContainer}
                  style={{display: "flex", flexDirection: "column"}}
             ></div>
-            {/*<div*/}
-            {/*    id="main-plot-legend"*/}
-            {/*    style={{display: "flex", flexDirection: "column"}}*/}
-            {/*    ref={legendContainer}*/}
-            {/*>*/}
-
-            {/*</div>*/}
 
         </div>
 
     );
 };
-export default PairwiseWrapper;
+export default ContourPairwiseWrapper;
