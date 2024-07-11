@@ -547,7 +547,7 @@ class ScatterWithContour {
         // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
         let zoom = d3
             .zoom()
-            .scaleExtent([1, 1.5]) // This control how much you can unzoom (x1) and zoom (x20)
+            .scaleExtent([1, 10]) // This control how much you can unzoom (x1) and zoom (x20)
             .translateExtent(chartExtent)
             .extent(chartExtent)
             .on("zoom", (event) => {
