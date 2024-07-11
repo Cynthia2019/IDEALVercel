@@ -140,7 +140,9 @@ const ScatterWithContourWrapper = ({
                     setSelectedData
                 )
             );
+            console.log('scatter init', scatterData)
         } else {
+            console.log('scatter update', scatterData)
             chart.update({
                 data,
                 densityData,

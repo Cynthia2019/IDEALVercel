@@ -147,9 +147,11 @@ class ScatterWithContour {
         d3.select(legendContainer).selectAll(".legend").remove();
 
 
-        let finalData = [].concat(...data).slice(0, Math.min(maxDataPointsPerDataset, data.length));
+        let finalData = [].concat(...data)
+            // .slice(0, Math.min(maxDataPointsPerDataset, data.length));
         let density_finalData = [].concat(...densityData)
-        let scatter_finalData = [].concat(...scatterData).slice(0, Math.min(maxDataPointsPerDataset, scatterData.length));
+        let scatter_finalData = [].concat(...scatterData)
+            // .slice(0, Math.min(maxDataPointsPerDataset, scatterData.length));
 
         let master_datasets = [];
         let min_density = [];
@@ -582,7 +584,7 @@ class ScatterWithContour {
                                     d[query2] < Y1
                             )
                             .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-                            .slice(0, maxDataPointsPerDataset);
+                            // .slice(0, maxDataPointsPerDataset);
 
                     })
                 );
@@ -596,7 +598,7 @@ class ScatterWithContour {
                             d[query2] < Y1
                     )
                         .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-                        .slice(0, maxDataPointsPerDataset)
+                        // .slice(0, maxDataPointsPerDataset)
 
             )
                 ;
