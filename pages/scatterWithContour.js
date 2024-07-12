@@ -164,6 +164,12 @@ export default function ScatterWithContour({fetchedNames}) {
     }, []);
 
     useEffect(() => {
+        setCompleteData([]);
+        setDatasets([]);
+        setDataPoint({});
+        setActiveData([]);
+        setDensityActiveData([]);
+        setScatterActiveData([]);
         dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
     }, [maxDataPointsPerDataset, availableDatasetNames]);
 

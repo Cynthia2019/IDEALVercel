@@ -191,7 +191,12 @@ const ScatterWithContourWrapper = ({
                 onKeyPress={handleKeyPress}
                 helperText="Enter a positive number"
                 error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
-                style={{ marginTop: 20 }}
+                style={{marginTop: 20}}
+                InputLabelProps={{
+                    sx: { color: "black", "&.Mui-focused": { color: "black" } },
+                }}
+                // sx: {color: "red", }
+
             />
             {/*<Col>*/}
             {/*    {activeDensity === "#556cd6" && (*/}
