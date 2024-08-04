@@ -231,7 +231,6 @@ const DataSelector = ({
         if (!event.target.checked) {
             let sourceItems = dataLibrary;
             let destItems = activeData;
-            // let destItemsForDatasets = datasets;
             const unchecked = destItems.filter(
                 (item) => item.name == availableDatasetNames[index].name
             );
@@ -239,17 +238,12 @@ const DataSelector = ({
             destItems = destItems.filter(
                 (item) => item.name != availableDatasetNames[index].name
             );
-            // destItemsForDatasets = datasets.filter(
-            //     (item) => item.name != availableDatasetNames[index].name
-            // );
+
             sourceItems = sourceItems.concat(unchecked);
             setActiveData(destItems);
-            // setDatasets(destItemsForDatasets)
-            // setCompleteData((prev) => (prev.filter(item => item.name != availableDatasetNames[index].name)))
             setDataLibrary(sourceItems);
         } else {
             let sourceItems = activeData;
-            // let sourceItemsForDatasets = datasets;
             let destItems = dataLibrary;
             const checked = destItems.filter(
                 (item) => item.name == availableDatasetNames[index].name
@@ -258,13 +252,7 @@ const DataSelector = ({
                 (item) => item.name != availableDatasetNames[index].name
             );
             sourceItems = sourceItems.concat(checked);
-            // sourceItemsForDatasets = sourceItemsForDatasets.concat(checked)
             setActiveData(sourceItems);
-            // setDatasets(sourceItemsForDatasets)
-            // setCompleteData((prev) => [...prev, {
-            //     name: availableDatasetNames[index].name,
-            //     data: sourceItems.filter(item => item.name === availableDatasetNames[index].name)
-            // }])
             setDataLibrary(destItems);
         }
         let temp = [...showData];
@@ -323,9 +311,6 @@ const DataSelector = ({
 
                     {/*scatter select box*/}
                     <TableCell>
-                        {/*{props.dataLoadingState.loading ? (*/}
-                        {/*	<CircularProgress />*/}
-                        {/*) : (*/}
                         <Checkbox
                             sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
                                 '&.Mui-checked': {
@@ -334,13 +319,9 @@ const DataSelector = ({
                                 scatter_activeData, scatter_dataLibrary, setScatterActiveData, setScatterDataLibrary, showScatter, setShowScatter)}
                             checked={showScatter[index]}
                         />
-                        {/*)}*/}
                     </TableCell>
                     {/*density select box*/}
                     <TableCell>
-                        {/*{props.dataLoadingState.loading ? (*/}
-                        {/*	<CircularProgress />*/}
-                        {/*) : (*/}
                         <Checkbox
                             sx={{"& .MuiSvgIcon-root": {fontSize: 28}, color: grey[500], // Default color (when unchecked)
                                 '&.Mui-checked': {
@@ -349,9 +330,7 @@ const DataSelector = ({
                                 density_activeData, density_dataLibrary, setDensityActiveData, setDensityDataLibrary, showDensity, setShowDensity)}
                             checked={showDensity[index]}
                         />
-                        {/*)}*/}
                     </TableCell>
-
                 </TableRow>
                 <TableRow
                     key={dataset.name + " details"}

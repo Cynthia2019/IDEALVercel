@@ -27,6 +27,7 @@ export default function ScatterWithContour({fetchedNames}) {
     const [dataLibrary, setDataLibrary] = useState([]);
     const [density_activeData, setDensityActiveData] = useState(datasets);
     const [density_dataLibrary, setDensityDataLibrary] = useState([]);
+    const [scatter_by_dataset, setScatterByDataset] = useState({});
     const [scatter_activeData, setScatterActiveData] = useState(datasets);
     const [scatter_dataLibrary, setScatterDataLibrary] = useState([]);
     const [dataPoint, setDataPoint] = useState({});
@@ -118,16 +119,18 @@ export default function ScatterWithContour({fetchedNames}) {
                                 data: processedData,
                             },
                         ]);
-                        let processedData2 = processedData.slice(
-                            0,
-                            maxDataPointsPerDataset
-                        );
+                        // let processedData2 = processedData.slice(
+                        //     0,
+                        //     maxDataPointsPerDataset
+                        // );
 
-                        setDatasets((prev) => [...prev, ...processedData2]);
-                        setDataPoint(processedData2[0]);
-                        setActiveData((prev) => [...prev, ...processedData2]);
-                        setDensityActiveData((prev) => [...prev, ...processedData2]);
-                        setScatterActiveData((prev) => [...prev, ...processedData2]);
+                        scatter_by_dataset[info.name] = processedData;
+                        console.log('scatter_by_dataset', scatter_by_dataset);
+                        setDatasets((prev) => [...prev, ...processedData]);
+                        setDataPoint(processedData[0]);
+                        setActiveData((prev) => [...prev, ...processedData]);
+                        setDensityActiveData((prev) => [...prev, ...processedData]);
+                        setScatterActiveData((prev) => [...prev, ...processedData]);
                         setDataLoadingStates((prev) =>
                             prev.map((obj) =>
                                 obj.name === info.name
@@ -163,21 +166,24 @@ export default function ScatterWithContour({fetchedNames}) {
         fetchDataNames();
     }, []);
 
-    useEffect(() => {
-        setCompleteData([]);
-        setDatasets([]);
-        setDataPoint({});
-        setActiveData([]);
-        setDensityActiveData([]);
-        setScatterActiveData([]);
-        dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
-    }, [maxDataPointsPerDataset, availableDatasetNames]);
+    // useEffect(() => {
+    //     // setCompleteData([]);
+    //     // setDatasets([]);
+    //     // setDataPoint({});
+    //     // setActiveData([]);
+    //     // setDensityActiveData([]);
+    //     // setScatterActiveData([]);
+    //     dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
+    // }, [da]);
+
 
     useEffect(() => {
         if (availableDatasetNames.length > 2) {
             const lastIndex = availableDatasetNames.length - 1;
             const lastInfo = availableDatasetNames[lastIndex];
             fetchDataFromAWS(lastInfo, lastIndex);
+        } else {
+            dataLoadingStates.map((info, i) => fetchDataFromAWS(info, i));
         }
     }, [availableDatasetNames]);
 
@@ -202,7 +208,7 @@ export default function ScatterWithContour({fetchedNames}) {
                                 information. Scroll to zoom, click and drag to
                                 select. You can find out how the density plots are generated&nbsp;
                                  <a href="https://d3js.org/d3-contour/density"
-                                   style={{ textDecoration: 'underline'}}>here</a>.
+                                   style={{ textDecoration: 'underline', color: 'blue'}}>here</a>.
                                 The legend denotes the absolute number of points contained in each color.
                             </p>
                         </div>
@@ -225,6 +231,7 @@ export default function ScatterWithContour({fetchedNames}) {
                             datasets={datasets}
                             neighbors={neighbors}
                             max_num_datasets={availableDatasetNames.length}
+                            scatter_by_dataset={scatter_by_dataset}
                         />
                     </div>
                     <div className={styles.subPlots}>

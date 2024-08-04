@@ -58,6 +58,7 @@ const ScatterWithContourWrapper = ({
                                        max_num_datasets,
                                        datasets,
                                        neighbors,
+                                       scatter_by_dataset,
                                    }) => {
     const chartArea = useRef(null);
     const legendArea = useRef(null);
@@ -167,7 +168,8 @@ const ScatterWithContourWrapper = ({
                 setOpenNeighbor,
                 showDensity: activeDensity === "#556cd6",
                 showScatter: activeScatter === "#556cd6",
-                setCaptured
+                setCaptured,
+                scatter_by_dataset
             });
         }
     }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity, activeScatter, maxDataPointsPerDataset]);
@@ -193,7 +195,7 @@ const ScatterWithContourWrapper = ({
                 error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
                 style={{marginTop: 20}}
                 InputLabelProps={{
-                    sx: { color: "black", "&.Mui-focused": { color: "black" } },
+                    sx: {color: "black", "&.Mui-focused": {color: "black"}},
                 }}
                 // sx: {color: "red", }
 
