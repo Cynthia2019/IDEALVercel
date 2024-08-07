@@ -643,45 +643,45 @@ class ScatterWithContour {
 
                 let zoomed_scatter_final_by_dataset = updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1);
 
-                let zoomed_density_final = [].concat(
-                    ...densityData.filter(
-                        (d) =>
-                            d[query1] >= X0 &&
-                            d[query1] <= X1 &&
-                            d[query2] >= Y0 &&
-                            d[query2] <= Y1
-                    )
-                        .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-
-                );
-                let new_datasets = [];
-                let new_colors = {}
-
-                for (let i = 0; i <= max_num_datasets; i++) {
-                    new_datasets.push([])
-                }
-                let organizedData = organizeByName(zoomed_density_final);
-                organizedData.map((d, i) => {
-                    new_colors[d.name] = d.color;
-                    new_datasets[i] = (d.data) ? (d.data) : [];
-                });
-
-                master_datasets = new_datasets;
-                if (showDensity) {
-                    // createLegend(Object.values(new_colors), true, new_datasets);
-                    // createDatasetNames(orig_datasets);
-                    min_density = [];
-                    for (let i = 0; i <= max_num_datasets; i++) {
-                        d3.selectAll(".group" + i).remove()
-                        drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
-                    }
-                } else {
-                    this.legendSvg.selectAll("*").remove();
-                    d3.select(legendContainer).selectAll(".legend").remove();
-                    for (let i = 0; i <= max_num_datasets; i++) {
-                        d3.selectAll(".group" + i).remove()
-                    }
-                }
+                // let zoomed_density_final = [].concat(
+                //     ...densityData.filter(
+                //         (d) =>
+                //             d[query1] >= X0 &&
+                //             d[query1] <= X1 &&
+                //             d[query2] >= Y0 &&
+                //             d[query2] <= Y1
+                //     )
+                //         .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+                //
+                // );
+                // let new_datasets = [];
+                // let new_colors = {}
+                //
+                // for (let i = 0; i <= max_num_datasets; i++) {
+                //     new_datasets.push([])
+                // }
+                // let organizedData = organizeByName(zoomed_density_final);
+                // organizedData.map((d, i) => {
+                //     new_colors[d.name] = d.color;
+                //     new_datasets[i] = (d.data) ? (d.data) : [];
+                // });
+                //
+                // master_datasets = new_datasets;
+                // if (showDensity) {
+                //     // createLegend(Object.values(new_colors), true, new_datasets);
+                //     // createDatasetNames(orig_datasets);
+                //     min_density = [];
+                //     for (let i = 0; i <= max_num_datasets; i++) {
+                //         d3.selectAll(".group" + i).remove()
+                //         drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
+                //     }
+                // } else {
+                //     this.legendSvg.selectAll("*").remove();
+                //     d3.select(legendContainer).selectAll(".legend").remove();
+                //     for (let i = 0; i <= max_num_datasets; i++) {
+                //         d3.selectAll(".group" + i).remove()
+                //     }
+                // }
 
                 d3.selectAll(".dataCircle").remove();
                 if (showScatter) {
