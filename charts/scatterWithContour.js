@@ -15,7 +15,7 @@ const MARGIN = {
 const SIDE_BAR_SIZE = 100;
 
 const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT - SIDE_BAR_SIZE;
-const HEIGHT = 650 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
+const HEIGHT = 700 - MARGIN.TOP - MARGIN.BOTTOM - SIDE_BAR_SIZE;
 const LEGEND_WIDTH = 400;
 const LEGEND_HEIGHT = 20;
 
@@ -48,7 +48,7 @@ class ScatterWithContour {
                 WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
                 HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
-            .attr("style", "max-width: 100%; overflow: visible");
+            .attr("style", "max-width: 100%");
 
         this.legendSvg = d3
             .select(legendElement)
@@ -61,7 +61,7 @@ class ScatterWithContour {
                 LEGEND_WIDTH + MARGIN.LEFT + MARGIN.RIGHT,
                 LEGEND_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM,
             ])
-            .attr("style", "max-width: 100%; overflow: visible");
+            .attr("style", "max-width: 100%");
         this.legend = d3
             .select(legendContainer)
             .append("svg")
@@ -69,7 +69,8 @@ class ScatterWithContour {
             .append("g")
             .attr("class", "pairwise-plot-legend");
         //brush
-        this.svg.append("g").attr("class", "brush");
+        this.svg.append("g")
+            .attr("class", "brush");
 
         // Labels
         this.xLabel = this.svg
@@ -171,7 +172,7 @@ class ScatterWithContour {
         }
 
         function updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1) {
-            let res = {};
+            let res = [];
 
             // Iterate through each dataset in the dictionary
             Object.entries(scatter_by_dataset).forEach(([datasetName, data]) => {
@@ -186,7 +187,7 @@ class ScatterWithContour {
                 filteredData.sort((a, b) => a.index - b.index);
 
                 // Slice to limit the maximum points per dataset
-                res[datasetName] = filteredData.slice(0, Math.min(maxDataPointsPerDataset, filteredData.length));
+                res = res.concat(filteredData.slice(0, Math.min(maxDataPointsPerDataset, filteredData.length)));
             });
 
             return res;
@@ -212,12 +213,17 @@ class ScatterWithContour {
         let min_density = [];
 
         //remove elements to avoid repeated append
-
         d3.selectAll(".legend").remove();
         d3.select(".tooltip").remove();
         d3.selectAll(".dataCircle").remove();
-        d3.selectAll("defs").remove();
+        d3.selectAll(".rectZoom").remove();
         d3.selectAll(".clipPath").remove();
+        d3.selectAll(".mean-line").remove();
+        d3.selectAll(".group").remove();
+        d3.selectAll(".contour").remove();
+        d3.selectAll(".xAxisGroup").remove();
+        d3.selectAll(".yAxisGroup").remove();
+        d3.selectAll(".x-label").remove();
 
         let xScale = d3
             .scaleLinear()
@@ -239,7 +245,6 @@ class ScatterWithContour {
         this.yScaleForBrush = yScale;
         // Add a clipPath: everything out of this area won't be drawn.
         this.svg
-            .append("defs")
             .append("SVG:clipPath")
             .attr("id", "clip")
             .append("SVG:rect")
@@ -298,7 +303,7 @@ class ScatterWithContour {
         master_datasets = datasets;
 
         // =============== Mouse Logic ================
-        let mouseover = function (e, d) {
+        let mouseover_scatter = function (e, d) {
             d3.select(this)
                 .attr("r", circleFocusSize)
                 .style("stroke", "black")
@@ -308,7 +313,7 @@ class ScatterWithContour {
             tooltip.style("visibility", "visible").transition().duration(200);
         };
 
-        let mousemove = function (e, d) {
+        let mousemove_scatter = function (e, d) {
             tooltip
                 .html(
                     "Dataset: " +
@@ -333,7 +338,7 @@ class ScatterWithContour {
             this.isDarkMode ?? tooltip.style("color", "black");
         };
 
-        let mouseleave = function (e, d) {
+        let mouseleave_scatter = function (e, d) {
             tooltip.style("visibility", "hidden").transition().duration(200);
             const circle = d3.select(this);
             d3.select(this)
@@ -362,11 +367,14 @@ class ScatterWithContour {
             d3.select(this.parentNode)
                 .raise();
             d3.selectAll(".dataCircle").raise();
-            d3.selectAll(".clipPath").raise();
+            // d3.selectAll(".clipPath").raise();
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", 5)
                 .attr("opacity", 1);
+
+            // d3.selectAll(".xAxisGroup").raise();
+
         };
         // =================================================
 
@@ -510,7 +518,7 @@ class ScatterWithContour {
         }
         d3.selectAll(".dataCircle").remove();
         if (showScatter) {
-            drawCircles(xScale, yScale, this.svg, scatter_finalData)
+            drawCircles(xScale, yScale, this.svg, scatter_finalData_concat)
         } else {
             d3.selectAll(".dataCircle").remove();
         }
@@ -539,7 +547,7 @@ class ScatterWithContour {
             return response;
         }
 
-        let mousedown = function (e, d) {
+        let mousedown_scatter = function (e, d) {
             let columns = ["C11", "C12", "C22", "C16", "C26", "C66"];
             let inputDataPoint = columns.map((c) => d[c]);
             let target = d3.select(this);
@@ -553,6 +561,7 @@ class ScatterWithContour {
                 //get knn data
                 target.classed("selected", true);
                 getKnnData(inputDataPoint).then((data) => {
+                    console.log('knndata', data);
                     let indices = data.indices;
                     let distances = data.distances;
                     // index should be the index of the data in the current active dataset
@@ -641,51 +650,51 @@ class ScatterWithContour {
                     )
                 ;
 
-                let zoomed_scatter_final_by_dataset = updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1);
+                let zoomed_scatter_final_concat = updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1);
 
-                // let zoomed_density_final = [].concat(
-                //     ...densityData.filter(
-                //         (d) =>
-                //             d[query1] >= X0 &&
-                //             d[query1] <= X1 &&
-                //             d[query2] >= Y0 &&
-                //             d[query2] <= Y1
-                //     )
-                //         .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
-                //
-                // );
-                // let new_datasets = [];
-                // let new_colors = {}
-                //
-                // for (let i = 0; i <= max_num_datasets; i++) {
-                //     new_datasets.push([])
-                // }
-                // let organizedData = organizeByName(zoomed_density_final);
-                // organizedData.map((d, i) => {
-                //     new_colors[d.name] = d.color;
-                //     new_datasets[i] = (d.data) ? (d.data) : [];
-                // });
-                //
-                // master_datasets = new_datasets;
-                // if (showDensity) {
-                //     // createLegend(Object.values(new_colors), true, new_datasets);
-                //     // createDatasetNames(orig_datasets);
-                //     min_density = [];
-                //     for (let i = 0; i <= max_num_datasets; i++) {
-                //         d3.selectAll(".group" + i).remove()
-                //         drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
-                //     }
-                // } else {
-                //     this.legendSvg.selectAll("*").remove();
-                //     d3.select(legendContainer).selectAll(".legend").remove();
-                //     for (let i = 0; i <= max_num_datasets; i++) {
-                //         d3.selectAll(".group" + i).remove()
-                //     }
-                // }
+                let zoomed_density_final = [].concat(
+                    ...densityData.filter(
+                        (d) =>
+                            d[query1] >= X0 &&
+                            d[query1] <= X1 &&
+                            d[query2] >= Y0 &&
+                            d[query2] <= Y1
+                    )
+                        .sort((a, b) => a.index > b.index) // ensure always select the topmost indices
+
+                );
+                let new_datasets = [];
+                let new_colors = {}
+
+                for (let i = 0; i <= max_num_datasets; i++) {
+                    new_datasets.push([])
+                }
+                let organizedData = organizeByName(zoomed_density_final);
+                organizedData.map((d, i) => {
+                    new_colors[d.name] = d.color;
+                    new_datasets[i] = (d.data) ? (d.data) : [];
+                });
+
+                master_datasets = new_datasets;
+                if (showDensity) {
+                    // createLegend(Object.values(new_colors), true, new_datasets);
+                    // createDatasetNames(orig_datasets);
+                    min_density = [];
+                    for (let i = 0; i <= max_num_datasets; i++) {
+                        d3.selectAll(".group" + i).remove()
+                        drawContour(i, newXScale, newYScale, this.svg, true, new_datasets)
+                    }
+                } else {
+                    this.legendSvg.selectAll("*").remove();
+                    d3.select(legendContainer).selectAll(".legend").remove();
+                    for (let i = 0; i <= max_num_datasets; i++) {
+                        d3.selectAll(".group" + i).remove()
+                    }
+                }
 
                 d3.selectAll(".dataCircle").remove();
                 if (showScatter) {
-                    drawCircles(newXScale, newYScale, this.svg, zoomed_scatter_final_by_dataset)
+                    drawCircles(newXScale, newYScale, this.svg, zoomed_scatter_final_concat)
                 } else {
                     d3.selectAll(".dataCircle").remove();
                 }
@@ -722,6 +731,10 @@ class ScatterWithContour {
 
         function drawContour(i, xScale, yScale, svg, zoomed, datasets) {
             d3.selectAll(".group" + i).remove()
+            let contourGroup = svg.append("g")
+                .attr("clip-path", "url(#clip)")
+                .attr("class", "clipPath");
+
             let contours = []
             if (datasets[i][1] && datasets[i][1].name == "freeform_2d.csv") {
                 contours = d3
@@ -750,8 +763,7 @@ class ScatterWithContour {
                 min_density = []
             } else {
                 if (datasets[i][1]) {
-                    let contour = svg
-                        .append("g")
+                    contourGroup
                         .selectAll("path")
                         .data(contours)
                         .enter()
@@ -768,7 +780,7 @@ class ScatterWithContour {
                         .attr("stroke", "grey")
                         .attr("stroke-width", 0)
                         .attr("opacity", 0.5);
-                    contour.exit().remove();
+                    // contour.exit().remove();
 
                 }
 
@@ -786,52 +798,40 @@ class ScatterWithContour {
 
 
         // ============= Draw Plot Logic ================
-        function drawCircles(xScale, yScale, svg, scatter_by_dataset_sliced) {
+        function drawCircles(xScale, yScale, svg, scatter_concat) {
             // Remove any existing circles and definitions to clean up before redrawing
             svg.selectAll(".dataCircle").remove();
-            svg.selectAll("defs").remove();
-            svg.selectAll(".clipPath").remove();
 
             // Create a group for the circles if not already existing
-            const clipGroup = svg.append("g")
+            let circles = svg
+                .append("g")
                 .attr("clip-path", "url(#clip)")
-                .attr("class", "clipPath");
+                .attr("class", "clipPath")
+                .selectAll(".dataCircle")
+                .data(scatter_concat);
 
-            // Iterate over each dataset in the scatter_by_dataset dictionary
-            Object.entries(scatter_by_dataset_sliced).forEach(([datasetName, data]) => {
-                let circles = clipGroup.selectAll(`.dataCircle.${datasetName}`)
-                    .data(data, d => d.id);  // Assuming each data point has a unique 'id' for object constancy
+            circles.exit().transition().attr("r", 0).remove();
+            circles
+                .enter()
+                .append("circle")
+                .join(circles)
+                .attr("r", circleOriginalSize)
+                .attr("class", "dataCircle")
+                .attr("fill", (d) => d.color)
+                .classed("selected", function (d) {
+                    return selectedData.includes(d);
+                })
+                .style("stroke", "none")
+                .style("stroke-width", 2)
+                .style("fill-opacity", 0.8)
+                .on("mousedown", mousedown_scatter)
+                .on("mouseover", mouseover_scatter)
+                .on("mousemove", mousemove_scatter)
+                .on("mouseleave", mouseleave_scatter)
+                .attr("cx", (d) => xScale(d[query1]))
+                .attr("cy", (d) => yScale(d[query2]));
+            circles.exit().transition().attr("r", 0).remove();
 
-                // Handle exiting elements
-                circles.exit().transition().attr("r", 0).remove();
-
-                // Handle entering and updating elements
-                circles.enter()
-                    .append("circle")
-                    .merge(circles)  // Merges the entered elements with the existing elements
-                    .attr("class", `dataCircle ${datasetName}`)
-                    .attr("r", circleOriginalSize)
-                    .attr("fill", (d) => d.color)
-                    .classed("selected", function (d) {
-                        return selectedData.includes(d);
-                    })
-                    .style("stroke", "none")
-                    .style("stroke-width", 2)
-                    .style("fill-opacity", 0.8)
-                    .on("mousedown", mousedown)
-                    .on("mouseover", mouseover)
-                    .on("mousemove", mousemove)
-                    .on("mouseleave", mouseleave)
-                    .attr("cx", (d) => xScale(d[query1]))
-                    .attr("cy", (d) => yScale(d[query2]));
-
-                // Handle updating existing elements (if any data updates)
-                circles.transition()
-                    .attr("r", circleOriginalSize)
-                    .attr("fill", (d) => d.color)
-                    .attr("cx", (d) => xScale(d[query1]))
-                    .attr("cy", (d) => yScale(d[query2]));
-            });
         }
     }
 }

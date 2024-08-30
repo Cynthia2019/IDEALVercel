@@ -254,7 +254,9 @@ class Scatter {
 			if (clickedNeighbor) {
 				//get knn data
 				target.classed("selected", true);
+				console.log('finalData', finalData)
 				getKnnData(inputDataPoint).then((data) => {
+					console.log('knndata', data);
 					let indices = data.indices;
 					let distances = data.distances;
 					// index should be the index of the data in the current active dataset

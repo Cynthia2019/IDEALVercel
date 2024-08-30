@@ -16,6 +16,7 @@ import processData from "../util/processData";
 import {useRouter} from "next/router";
 import Head from "next/head";
 import {fetchNames} from "@/components/fetchNames";
+import RangeSelector_scatterWithContour from "@/components/scatter/rangeSelector_scatterWithContour";
 
 export default function ScatterWithContour({fetchedNames}) {
     const [datasets, setDatasets] = useState([]);
@@ -68,24 +69,40 @@ export default function ScatterWithContour({fetchedNames}) {
         setQuery2(e.target.value);
     };
 
+    function concatScatter(scatter_by_dataset) {
+        let res = [];
+
+        if (scatter_by_dataset === undefined) { return res; }
+
+        // Iterate through each dataset in the dictionary
+        Object.entries(scatter_by_dataset).forEach(([datasetName, data]) => {
+            // Slice the data for each dataset to respect the maximum points limit
+
+            // Concatenate the sliced data into the scatter_finalData array
+            res = res.concat(data);
+        });
+
+        return res;
+    }
     const handleRangeChange = (name, value) => {
-        let filtered_datasets = datasets.filter((d, i) => {
+        const data = concatScatter(scatter_by_dataset);
+        let filtered_datasets = data.filter((d, i) => {
             let filtered = d[name] >= value[0] && d[name] <= value[1];
             return filtered;
         });
         // remove filtered out data from active data and add to data library
         let sourceItems = dataLibrary;
         let destItems = filtered_datasets;
-        const unselected = activeData.filter(
+        const unselected = scatter_activeData.filter(
             (d) => !filtered_datasets.includes(d)
         );
 
         sourceItems = sourceItems.concat(unselected);
         setActiveData(destItems);
         setDataLibrary(sourceItems);
-        setDensityDataLibrary(sourceItems);
+        // setDensityDataLibrary(sourceItems);
         setScatterDataLibrary(sourceItems);
-        setDensityActiveData(destItems);
+        // setDensityActiveData(destItems);
         setScatterActiveData(destItems);
     };
 
@@ -279,11 +296,12 @@ export default function ScatterWithContour({fetchedNames}) {
                             setCompleteData={setCompleteData}
                             open={open}
                         />
-                        <RangeSelector
-                            datasets={datasets}
-                            activeData={activeData}
+                        <RangeSelector_scatterWithContour
+                            datasets={scatter_by_dataset}
+                            activeData={scatter_activeData}
                             handleChange={handleRangeChange}
                             open={open}
+                            concatScatter={concatScatter}
                         />
                         <MaterialInformation
                             dataPoint={dataPoint}

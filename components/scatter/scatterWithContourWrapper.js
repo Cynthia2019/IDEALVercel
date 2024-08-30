@@ -72,7 +72,17 @@ const ScatterWithContourWrapper = ({
     const [captured, setCaptured] = useState('NA');
     const [inputValue, setInputValue] = useState(maxDataPointsPerDataset);
     const legendContainer = useRef(null);
+    const [interactionMode, setInteractionMode] = useState('panning'); // Default to panning
 
+    const toggleInteractionMode = () => {
+        setInteractionMode(currentMode => {
+            const newMode = currentMode === 'panning' ? 'brushing' : 'panning';
+            if (chart) {
+                chart.setInteractionMode(newMode);
+            }
+            return newMode;
+        });
+    };
 
     const toggleFindNeighbors = () => {
         setClickedNeighbor((current) => !current);
@@ -86,6 +96,8 @@ const ScatterWithContourWrapper = ({
     const toggleScatterPlots = () => {
         setActiveScatter((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
     };
+
+
 
 
     const handleNeighborClose = () => {
@@ -141,9 +153,7 @@ const ScatterWithContourWrapper = ({
                     setSelectedData
                 )
             );
-            console.log('scatter init', scatterData)
         } else {
-            console.log('scatter update', scatterData)
             chart.update({
                 data,
                 densityData,
@@ -233,6 +243,15 @@ const ScatterWithContourWrapper = ({
 						Show / Hide Density Plots
 					</span>
                     </Button>
+                    <Button
+                        variant="contained"
+                        color={interactionMode === 'panning' ? "primary" : "secondary"}
+                        onClick={toggleInteractionMode}
+                        style={{ margin: 8 }}
+                    >
+                        {interactionMode === 'panning' ? 'Switch to Brushing' : 'Switch to Panning'}
+                    </Button>
+
                     <Button
                         variant="outlined"
                         aria-label="Show / Hide Scatter Plots"
