@@ -223,7 +223,7 @@ export default function ScatterWithContour({fetchedNames}) {
                                 Select properties from the dropdown menus to
                                 graph. Hover over data points for additional
                                 information. Scroll to zoom, click and drag to
-                                select. You can find out how the density plots are generated&nbsp;
+                                select. You can find out the method we used to generate the density plots are generated&nbsp;
                                  <a href="https://d3js.org/d3-contour/density"
                                    style={{ textDecoration: 'underline', color: 'blue'}}>here</a>.
                                 The legend denotes the absolute number of points contained in each color.
