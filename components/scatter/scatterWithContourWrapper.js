@@ -196,7 +196,7 @@ const ScatterWithContourWrapper = ({
                 onKeyPress={handleKeyPress}
                 helperText="Enter a positive number"
                 error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
-                style={{marginTop: 20}}
+                style={{marginTop: 10}}
                 InputLabelProps={{
                     sx: {color: "black", "&.Mui-focused": {color: "black"}},
                 }}
@@ -238,7 +238,7 @@ const ScatterWithContourWrapper = ({
                     </span>
                     </Button>
                 </Row>
-                <Row justify={"space-evenly"} style={{width: "100%", marginTop: 20}}>
+                <Row justify={"space-evenly"} style={{width: "100%", marginTop: 10}}>
                     <Button
                         variant="outlined"
                         aria-label="Show / Hide Density Plots"
@@ -262,7 +262,7 @@ const ScatterWithContourWrapper = ({
 					</span>
                     </Button>
                 </Row>
-                <Row justify={"space-around"} style={{width: "100%", marginTop: 20}}>
+                <Row justify={"space-around"} style={{width: "100%", marginTop: 10}}>
                     <Button
                         variant="outlined"
                         aria-label="find nearest neighbors"
