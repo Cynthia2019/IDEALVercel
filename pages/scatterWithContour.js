@@ -84,8 +84,22 @@ export default function ScatterWithContour({fetchedNames}) {
 
         return res;
     }
+    function filterScatterByDataset(scatterData, scatter_by_dataset) {
+        // Get a list of unique dataset names from scatterData
+        const uniqueDatasetNames = [...new Set(scatterData.map(d => d.name))];
+
+        // Filter scatter_by_dataset to only include datasets present in uniqueDatasetNames
+        let filteredScatterByDataset = {};
+        uniqueDatasetNames.forEach(name => {
+            if (scatter_by_dataset[name]) {
+                filteredScatterByDataset[name] = scatter_by_dataset[name];
+            }
+        });
+
+        return filteredScatterByDataset;
+    }
     const handleRangeChange = (name, value) => {
-        const data = concatScatter(scatter_by_dataset);
+        const data = concatScatter(filterScatterByDataset(scatter_activeData, scatter_by_dataset));
         let filtered_datasets = data.filter((d, i) => {
             let filtered = d[name] >= value[0] && d[name] <= value[1];
             return filtered;
@@ -227,6 +241,8 @@ export default function ScatterWithContour({fetchedNames}) {
                                  <a href="https://d3js.org/d3-contour/density"
                                    style={{ textDecoration: 'underline', color: 'blue'}}>here</a>.
                                 The legend denotes the absolute number of points contained in each color.
+                                The freeform_2d_sample.csv dataset was downsampled from 60,000 points to 1,000 points using
+                                random samping to retain its original distribution.
                             </p>
                         </div>
                         <ScatterWithContourWrapper

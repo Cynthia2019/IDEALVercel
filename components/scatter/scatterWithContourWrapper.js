@@ -72,18 +72,11 @@ const ScatterWithContourWrapper = ({
     const [captured, setCaptured] = useState('NA');
     const [inputValue, setInputValue] = useState(maxDataPointsPerDataset);
     const legendContainer = useRef(null);
-    const [interactionMode, setInteractionMode] = useState('panning'); // Default to panning
+    const [interactionMode, setInteractionMode] = useState('brushing'); // Default to brushing
 
     const toggleInteractionMode = () => {
-        setInteractionMode(currentMode => {
-            const newMode = currentMode === 'panning' ? 'brushing' : 'panning';
-            if (chart) {
-                chart.setInteractionMode(newMode);
-            }
-            return newMode;
-        });
+        setInteractionMode((currentMode) => currentMode == 'panning' ? 'brushing' : 'panning');
     };
-
     const toggleFindNeighbors = () => {
         setClickedNeighbor((current) => !current);
         setActivateKNN((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
@@ -96,8 +89,6 @@ const ScatterWithContourWrapper = ({
     const toggleScatterPlots = () => {
         setActiveScatter((currentColor) => currentColor == "#556cd6" ? "grey" : "#556cd6");
     };
-
-
 
 
     const handleNeighborClose = () => {
@@ -179,10 +170,12 @@ const ScatterWithContourWrapper = ({
                 showDensity: activeDensity === "#556cd6",
                 showScatter: activeScatter === "#556cd6",
                 setCaptured,
-                scatter_by_dataset
+                scatter_by_dataset,
+                interactionMode
             });
         }
-    }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor, activeDensity, activeScatter, maxDataPointsPerDataset]);
+    }, [chart, query1, query2, data, densityData, scatterData, reset, clickedNeighbor,
+        activeDensity, activeScatter, maxDataPointsPerDataset, interactionMode]);
 
     return (
         <div
@@ -233,6 +226,19 @@ const ScatterWithContourWrapper = ({
             {/*></Row>*/}
             <Col justify={"space-around"} style={{width: "100%", marginTop: "10px"}}>
                 <Row justify={"space-evenly"} style={{width: "100%"}}>
+
+                    <Button
+                        variant="contained"
+                        onClick={toggleInteractionMode}
+                        style={{margin: 8, backgroundColor: '#556cd6'}}
+                    >
+                    <span style={{fontSize: "10px", color: "white"}}>
+                        {interactionMode === 'panning' ? 'Current mode: Panning (click to switch to brushing)'
+                            : 'Current mode: Brushing (click to switch to panning)'}
+                    </span>
+                    </Button>
+                </Row>
+                <Row justify={"space-evenly"} style={{width: "100%", marginTop: 20}}>
                     <Button
                         variant="outlined"
                         aria-label="Show / Hide Density Plots"
@@ -243,14 +249,7 @@ const ScatterWithContourWrapper = ({
 						Show / Hide Density Plots
 					</span>
                     </Button>
-                    <Button
-                        variant="contained"
-                        color={interactionMode === 'panning' ? "primary" : "secondary"}
-                        onClick={toggleInteractionMode}
-                        style={{ margin: 8 }}
-                    >
-                        {interactionMode === 'panning' ? 'Switch to Brushing' : 'Switch to Panning'}
-                    </Button>
+
 
                     <Button
                         variant="outlined"

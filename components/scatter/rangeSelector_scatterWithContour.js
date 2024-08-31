@@ -12,7 +12,6 @@ const RangeSelector_scatterWithContour = ({datasets, activeData, handleChange, o
 
         }, [datasets]);
 
-
         const data = concatScatter(datasets);
         const filteredDatasets = activeData;
         console.log('data', data);

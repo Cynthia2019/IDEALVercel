@@ -110,8 +110,6 @@ class ScatterWithContour {
         });
     }
 
-    //query1: x-axis
-    //query2: y-axis
     update({
                data,
                densityData,
@@ -137,7 +135,29 @@ class ScatterWithContour {
                showScatter,
                setCaptured,
                scatter_by_dataset,
+               interactionMode
            }) {
+        let isZoomed = false;  // State variable to track zoom mode
+        let zoomed_scatter_final_concat = [];
+        // Function to get unique dataset names and filter scatter_by_dataset
+        function filterScatterByDataset(scatterData, scatter_by_dataset) {
+            // Get a list of unique dataset names from scatterData
+            const uniqueDatasetNames = [...new Set(scatterData.map(d => d.name))];
+
+            // Filter scatter_by_dataset to only include datasets present in uniqueDatasetNames
+            let filteredScatterByDataset = {};
+            uniqueDatasetNames.forEach(name => {
+                if (scatter_by_dataset[name]) {
+                    filteredScatterByDataset[name] = scatter_by_dataset[name];
+                }
+            });
+
+            return filteredScatterByDataset;
+        }
+
+        // Apply the filter function at the start of update
+        scatter_by_dataset = filterScatterByDataset(scatterData, scatter_by_dataset);
+
 
         function updateFinalData(scatter_by_dataset, maxDataPointsPerDataset) {
             let res = [];
@@ -616,6 +636,8 @@ class ScatterWithContour {
             .translateExtent([[0, 0], [WIDTH, HEIGHT]])
             .extent(chartExtent)
             .on("zoom", (event) => {
+                isZoomed = true;  // Set zoom mode to true when zooming
+
                 // recover the new scale
                 let newXScale = event.transform.rescaleX(xScale);
                 let newYScale = event.transform.rescaleY(yScale);
@@ -650,7 +672,7 @@ class ScatterWithContour {
                     )
                 ;
 
-                let zoomed_scatter_final_concat = updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1);
+                zoomed_scatter_final_concat = updateFilteredScatterData(scatter_by_dataset, maxDataPointsPerDataset, X0, X1, Y0, Y1);
 
                 let zoomed_density_final = [].concat(
                     ...densityData.filter(
@@ -701,33 +723,64 @@ class ScatterWithContour {
             });
         //--------
         //end of zoom
+        if (interactionMode == "brushing") {
+            let brush = d3.brush().on("brush end", (event) => {
+                if (event.sourceEvent?.type === "zoom") return; // ignore brush-by-zoom
 
-        let brush = d3.brush().on("brush end", (event) => {
-            if (event.sourceEvent?.type === "zoom") return; // ignore brush-by-zoom
-            if (event.selection) {
-                let _xScale = this.xScaleForBrush;
-                let _yScale = this.yScaleForBrush;
-                d3.selectAll(".dataCircle")
-                    .data(scatter_finalData_concat)
-                    .classed("selected", function (d) {
-                        return (
-                            d3.select(this).classed("selected") ||
-                            isBrushed(
+                let currentData = isZoomed ? zoomed_scatter_final_concat : scatter_finalData_concat;
+
+                if (event.selection) {
+                    let _xScale = this.xScaleForBrush;
+                    let _yScale = this.yScaleForBrush;
+                    d3.selectAll(".dataCircle")
+                        .data(currentData)
+                        .each(function (d) {
+                            const isInBrush = isBrushed(
                                 event.selection,
                                 _xScale(d[query1]),
                                 _yScale(d[query2])
-                            )
-                        );
-                    });
-            }
-            let selected = [];
-            d3.selectAll(".selected").each((d, i) => selected.push(d));
-            setSelectedData(selected);
-        });
+                            );
 
-        //apply zoom and brush to svg
-        this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
-        this.svg.call(zoom).on("mousedown.zoom", null);
+                            // Update the selection state and visual properties accordingly
+                            d3.select(this)
+                                .classed("selected", isInBrush)
+                                .attr("r", circleOriginalSize)
+                                .style("stroke", isInBrush ? "black" : "none")
+                                .style("stroke-width", isInBrush ? 2 : 0)
+                                .style("fill-opacity", isInBrush ? 1 : 0.8);
+                        });
+
+                    // Update the selected data array
+                    let selected = [];
+                    d3.selectAll(".dataCircle.selected").each((d) => selected.push(d));
+                    setSelectedData(selected);
+                } else {
+                    // If there is no selection (brush has been cleared), un-highlight all points
+                    d3.selectAll(".dataCircle")
+                        .classed("selected", false)
+                        .attr("r", circleOriginalSize)
+                        .style("stroke", "none")
+                        .style("stroke-width", 0)
+                        .style("fill-opacity", 0.8);
+
+                    // Clear the selected data array
+                    setSelectedData([]);
+                }
+            });
+            this.svg.select("g.brush").call(brush).on("wheel.zoom", null);
+            this.svg.call(zoom).on("mousedown.zoom", null);
+
+        } else if (interactionMode == "panning") {
+            // Clear the brush selection and remove the brush box
+            this.svg.select("g.brush").call(d3.brush().clear);
+            this.svg.select("g.brush").on(".brush", null);
+
+            // Enable zoom functionality
+            this.svg.call(zoom);
+        }
+
+
+        // apply zoom and brush to svg
 
         function drawContour(i, xScale, yScale, svg, zoomed, datasets) {
             d3.selectAll(".group" + i).remove()
