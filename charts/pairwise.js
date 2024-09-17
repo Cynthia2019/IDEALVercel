@@ -341,7 +341,7 @@ class Pairwise {
         let mousedown_non_hist = function (e, d) {
             d3.select(container.current).remove()
             router.push({
-                pathname: "/scatter",
+                pathname: "/scatterWithContour",
                 query: {
                     pairwise_query1 : x[d[0]],
                     pairwise_query2 : x[d[1]]
