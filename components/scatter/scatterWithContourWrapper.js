@@ -194,15 +194,21 @@ const ScatterWithContourWrapper = ({
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 onKeyPress={handleKeyPress}
-                helperText="Enter a positive number"
-                error={parseInt(inputValue, 10) <= 0 && inputValue.trim() !== ''}
-                style={{marginTop: 10}}
+                helperText={
+                    parseInt(inputValue, 10) < 1 || parseInt(inputValue, 10) > 1000
+                        ? "Please enter a number between 1 and 1000"
+                        : "Enter a number from 1 to 1000"
+                }
+                error={
+                    (parseInt(inputValue, 10) < 1 || parseInt(inputValue, 10) > 1000) &&
+                    inputValue.trim() !== ""
+                }
+                style={{ marginTop: 10 }}
                 InputLabelProps={{
-                    sx: {color: "black", "&.Mui-focused": {color: "black"}},
+                    sx: { color: "black", "&.Mui-focused": { color: "black" } },
                 }}
-                // sx: {color: "red", }
-
             />
+
             {/*<Col>*/}
             {/*    {activeDensity === "#556cd6" && (*/}
             {/*        <p style={{fontWeight: 'bold', fontSize: '24px', marginLeft: 50, marginTop: 10}}>*/}
